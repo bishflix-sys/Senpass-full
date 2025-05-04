@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { QRCodeCanvas } from 'qrcode.react';
+import { useRouter } from "next/navigation"; // Import useRouter
 import {
   Tabs,
   TabsContent,
@@ -23,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code } from "lucide-react";
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, Video, VideoOff } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -43,6 +44,11 @@ import {
   DialogFooter,
   DialogClose
 } from "@/components/ui/dialog";
+import {
+  Alert,
+  AlertTitle,
+  AlertDescription,
+} from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -57,9 +63,147 @@ const phoneSchema = z.object({
 
 type PhoneFormValues = z.infer<typeof phoneSchema>;
 
+// Component for Facial Recognition Dialog Content
+const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [hasCameraPermission, setHasCameraPermission] = React.useState<boolean | null>(null);
+  const [isScanning, setIsScanning] = React.useState(false);
+  const { toast } = useToast();
+  const streamRef = React.useRef<MediaStream | null>(null);
+
+  React.useEffect(() => {
+    const getCameraPermission = async () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          console.error('Camera API not supported.');
+          setHasCameraPermission(false);
+          toast({
+              variant: 'destructive',
+              title: 'Erreur Caméra',
+              description: 'Votre navigateur ne supporte pas l\'accès à la caméra.',
+          });
+          return;
+      }
+      try {
+        streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
+        setHasCameraPermission(true);
+        if (videoRef.current) {
+          videoRef.current.srcObject = streamRef.current;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        // Toast is shown below in the UI
+      }
+    };
+
+    getCameraPermission();
+
+    // Cleanup function to stop the stream when the component unmounts or dialog closes
+    return () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+            if(videoRef.current) videoRef.current.srcObject = null; // Clear video source
+        }
+    };
+  }, [toast]); // Added toast dependency
+
+  const handleSimulateScan = () => {
+      setIsScanning(true);
+      // Simulate API call for facial recognition
+      setTimeout(() => {
+          const success = Math.random() > 0.3; // Simulate 70% success rate
+          setIsScanning(false);
+          if (success) {
+              toast({
+                  title: "Succès",
+                  description: "Reconnaissance faciale réussie ! Redirection...",
+              });
+              onAuthenticated(); // Call the callback to handle redirection
+          } else {
+              toast({
+                  title: "Échec",
+                  description: "Échec de la reconnaissance faciale. Essayez de vous rapprocher ou d'améliorer l'éclairage.",
+                  variant: "destructive",
+              });
+          }
+      }, 2000); // Simulate 2 seconds scan
+  };
+
+  return (
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+            <ScanFace className="h-5 w-5" /> Reconnaissance Faciale
+        </DialogTitle>
+        <DialogDescription>
+          Positionnez votre visage face à la caméra. (Simulation)
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-4">
+        <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted flex items-center justify-center">
+           <video ref={videoRef} className={cn("w-full h-full object-cover", { 'hidden': hasCameraPermission === false })} autoPlay muted playsInline />
+            {hasCameraPermission === null && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin mb-2" />
+                    <p>Demande d'accès caméra...</p>
+                </div>
+            )}
+             {hasCameraPermission === false && (
+                 <div className="absolute inset-0 flex flex-col items-center justify-center text-destructive p-4">
+                     <VideoOff className="h-10 w-10 mb-2" />
+                     <p className="text-center font-semibold">Caméra non accessible</p>
+                     <p className="text-center text-sm">Veuillez autoriser l'accès dans les paramètres de votre navigateur.</p>
+                 </div>
+             )}
+              {isScanning && (
+                 <div className="absolute inset-0 bg-background/70 flex flex-col items-center justify-center text-primary">
+                     <Loader2 className="h-10 w-10 animate-spin mb-2" />
+                     <p>Scan en cours...</p>
+                 </div>
+             )}
+        </div>
+
+        {hasCameraPermission === false && (
+          <Alert variant="destructive">
+            <VideoOff className="h-4 w-4" />
+            <AlertTitle>Accès Caméra Refusé</AlertTitle>
+            <AlertDescription>
+              Veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur pour utiliser cette fonctionnalité.
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+      <DialogFooter className="sm:justify-center">
+         <Button
+            type="button"
+            onClick={handleSimulateScan}
+            disabled={!hasCameraPermission || isScanning}
+            className="w-full sm:w-auto"
+          >
+            {isScanning ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <ScanFace className="mr-2 h-4 w-4" />
+            )}
+            Scanner mon visage (Simulation)
+          </Button>
+         <DialogClose asChild>
+           <Button type="button" variant="secondary">
+             Annuler
+           </Button>
+         </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  );
+};
+
+
 export default function LoginPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
+  const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
 
   const form = useForm<PhoneFormValues>({
     resolver: zodResolver(phoneSchema),
@@ -68,16 +212,33 @@ export default function LoginPage() {
     },
   });
 
+   const handleAuthenticationSuccess = () => {
+      // Stop camera stream if facial recognition dialog was open
+      // (Cleanup in FacialRecognitionDialogContent handles this now)
+      setShowFacialRecognitionDialog(false);
+
+      // Simulate successful login redirect after a short delay
+      setTimeout(() => {
+        router.push('/'); // Redirect to home page
+      }, 500); // Short delay to allow toast to show
+   };
+
   function onSubmit(data: PhoneFormValues) {
-    // Simulate login attempt
+    // Simulate login attempt with phone number
     toast({
-      title: "Tentative de connexion (Simulation)",
-      description: `Numéro de téléphone: ${data.phoneNumber}`,
+      title: "Vérification OTP (Simulation)",
+      description: `Un code a été envoyé au ${data.phoneNumber}. Entrez le code pour continuer.`, // Simulate OTP step
     });
     console.log("Phone login attempt:", data);
-    // In a real app, you'd redirect here after successful OTP or similar
-    // For simulation, maybe redirect after a short delay
-    // router.push('/'); // Requires importing useRouter from 'next/navigation'
+    // In a real app, you'd wait for OTP verification before calling handleAuthenticationSuccess
+    // For simulation, we'll assume OTP is correct after a delay
+    setTimeout(() => {
+      toast({
+        title: "Connexion réussie!",
+        description: "Redirection vers l'accueil...",
+      });
+       handleAuthenticationSuccess();
+    }, 2000); // Simulate OTP entry and verification time
   }
 
   const handleQrLogin = () => {
@@ -88,18 +249,19 @@ export default function LoginPage() {
       description: "Scannez le code pour une connexion simulée.",
     });
     console.log("QR Code login initiated, data:", qrData);
+     // Simulate successful scan after a while
+     setTimeout(() => {
+        // Check if QR code dialog is still relevant (user might have closed it)
+        if (qrCodeData === qrData) { // Check if the data is still the current one
+             toast({
+                title: "QR Code Scanné!",
+                description: "Connexion réussie via QR Code. Redirection...",
+             });
+             handleAuthenticationSuccess();
+        }
+     }, 10000); // Simulate 10 seconds for scanning
   };
 
-  const handleFaceLogin = () => {
-    toast({
-      title: "Reconnaissance Faciale (Simulation)",
-      description: "Scan facial initié. Cette fonctionnalité nécessite une implémentation plus complexe.",
-    });
-    console.log("Facial recognition login initiated");
-    // You would typically trigger camera access here.
-    // For now, it just shows a toast.
-    // Consider redirecting to a dedicated facial recognition page/component
-  };
 
   return (
     <div className="flex justify-center items-center py-12">
@@ -145,15 +307,12 @@ export default function LoginPage() {
                                {...field}
                                onChange={(e) => {
                                  const value = e.target.value;
-                                 if (value.startsWith('+221')) {
-                                    const numericPart = value.substring(4).replace(/\D/g, '');
-                                    field.onChange(`+221${numericPart}`);
-                                 } else if (value === '+22' || value === '+2' || value === '+') {
-                                    field.onChange('+221');
-                                 } else if (value === '') {
-                                    field.onChange('+221');
+                                 // Ensure it always starts with +221 and only allows digits after that
+                                 if (!value.startsWith('+221')) {
+                                      field.onChange('+221');
                                  } else {
-                                     field.onChange('+221');
+                                      const numericPart = value.substring(4).replace(/\D/g, '');
+                                      field.onChange(`+221${numericPart}`);
                                  }
                                }}
                                className="rounded-l-none flex-1"
@@ -168,8 +327,13 @@ export default function LoginPage() {
                       </FormItem>
                     )}
                   />
-                   <Button type="submit" className="w-full">
-                     <LogIn className="mr-2 h-4 w-4" /> Se connecter par téléphone
+                   <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                     {form.formState.isSubmitting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                     ) : (
+                        <LogIn className="mr-2 h-4 w-4" />
+                     )}
+                      Se connecter par téléphone
                    </Button>
                 </form>
               </Form>
@@ -204,20 +368,26 @@ export default function LoginPage() {
                         <div className="flex items-center justify-center p-4">
                         {qrCodeData ? (
                             <QRCodeCanvas
-                            value={qrCodeData}
-                            size={256}
-                            bgColor={"#ffffff"}
-                            fgColor={"#000000"}
-                            level={"L"}
-                            includeMargin={false}
-                            imageSettings={{
-                                src: "/sn-flag-icon.png", // Optional: Add a small logo in the center
-                                x: undefined,
-                                y: undefined,
-                                height: 32,
-                                width: 32,
-                                excavate: true,
-                            }}
+                                value={qrCodeData}
+                                size={256}
+                                // Senegal Flag Colors: Green (#00853F), Yellow (#FDEF42), Red (#E31B23)
+                                bgColor={"#FFFFFF"} // White background
+                                fgColor={"#00853F"} // Green for the main pattern
+                                level={"H"} // High error correction level for potential logo/color complexity
+                                includeMargin={true}
+                                // imageSettings - Consider removing if colors are primary focus
+                                // imageSettings={{
+                                //   src: "/sn-flag-icon.png", // Path to your Senegal flag icon
+                                //   height: 48,
+                                //   width: 48,
+                                //   excavate: true,
+                                // }}
+                                // --- Custom Pixel Rendering for Flag Colors (Advanced) ---
+                                // This requires a more complex setup, potentially drawing directly on a canvas
+                                // and then placing the QR code pattern over it, or customizing the QRCodeCanvas render.
+                                // The library might not directly support multi-color patterns easily.
+                                // A simpler approach is a colored logo or just one primary color.
+                                // Let's stick with the green primary color for simplicity.
                             />
                         ) : (
                             <p>Génération du QR code...</p>
@@ -233,9 +403,16 @@ export default function LoginPage() {
                     </DialogContent>
                 </Dialog>
 
-                <Button variant="outline" onClick={handleFaceLogin}>
-                  <ScanFace className="mr-2 h-4 w-4 text-accent" /> Reconnaissance Faciale
-                </Button>
+                 {/* Facial Recognition Dialog */}
+                 <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}>
+                     <DialogTrigger asChild>
+                         <Button variant="outline" onClick={() => setShowFacialRecognitionDialog(true)}>
+                             <ScanFace className="mr-2 h-4 w-4 text-accent" /> Reconnaissance Faciale
+                         </Button>
+                     </DialogTrigger>
+                     {/* Render content only when open to trigger useEffect on mount */}
+                     {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={handleAuthenticationSuccess} />}
+                 </Dialog>
               </div>
             </CardContent>
              <CardFooter>
