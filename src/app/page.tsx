@@ -2,15 +2,16 @@ import { getUserProfile, type UserProfile } from "@/services/identity";
 import ProfileCard from "@/components/profile-card";
 import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
-import LoginSimulation from "@/components/login-simulation";
-import NotificationSimulation from "@/components/notification-simulation";
+// Removed LoginSimulation and NotificationSimulation imports as they are no longer displayed here.
+// import LoginSimulation from "@/components/login-simulation";
+// import NotificationSimulation from "@/components/notification-simulation";
 import {
   Fingerprint,
   ScanFace,
   KeyRound,
   FileSignature,
   UserCheck,
-  Bell,
+  // Bell, // Removed as NotificationSimulation is removed
   UserSquare,
 } from "lucide-react";
 
@@ -21,10 +22,10 @@ export default async function Home() {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-primary">
-        Bienvenue sur SenPass Lite
+        Bienvenue sur SenPass Lite, {userProfile.name} !
       </h1>
       <p className="text-muted-foreground">
-        Votre identité numérique nationale simulée.
+        Votre tableau de bord d'identité numérique nationale simulée.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -33,10 +34,17 @@ export default async function Home() {
           <ProfileCard user={userProfile} />
         </div>
 
-        {/* Login & Notifications */}
+        {/* Removed Login & Notifications */}
         <div className="md:col-span-2 space-y-6">
-           <LoginSimulation />
-           <NotificationSimulation />
+           {/* Placeholder for potential future content like recent activity or important alerts */}
+            <div className="p-6 border rounded-lg bg-card text-card-foreground shadow-sm">
+              <h3 className="text-lg font-semibold mb-2">Activité récente</h3>
+              <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
+            </div>
+            <div className="p-6 border rounded-lg bg-card text-card-foreground shadow-sm">
+              <h3 className="text-lg font-semibold mb-2">Alertes importantes</h3>
+              <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
+            </div>
         </div>
       </div>
 
