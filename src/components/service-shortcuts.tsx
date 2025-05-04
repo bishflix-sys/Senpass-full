@@ -4,12 +4,12 @@ import { GraduationCap, HeartPulse, Briefcase, Home, Landmark, FileText } from "
 import Link from "next/link";
 
 const services = [
-  { title: "État Civil", icon: FileText, description: "Actes de naissance, mariage...", href: "#etat-civil" },
-  { title: "Scolarité", icon: GraduationCap, description: "Inscriptions, résultats...", href: "#scolarite" },
-  { title: "Santé", icon: HeartPulse, description: "Carnet de santé, RDV...", href: "#sante" },
-  { title: "Sécurité Sociale", icon: Briefcase, description: "Prestations, cotisations...", href: "#secu" },
-  { title: "Logement", icon: Home, description: "Demandes, aides...", href: "#logement" },
-  { title: "Services Bancaires", icon: Landmark, description: "Comptes, virements...", href: "#banque" },
+  { title: "État Civil", icon: FileText, description: "Actes de naissance, mariage...", href: "/services/etat-civil" },
+  { title: "Scolarité", icon: GraduationCap, description: "Inscriptions, résultats...", href: "/services/scolarite" },
+  { title: "Santé", icon: HeartPulse, description: "Carnet de santé, RDV...", href: "/services/sante" },
+  { title: "Sécurité Sociale", icon: Briefcase, description: "Prestations, cotisations...", href: "/services/secu" },
+  { title: "Logement", icon: Home, description: "Demandes, aides...", href: "/services/logement" },
+  { title: "Services Bancaires", icon: Landmark, description: "Comptes, virements...", href: "/services/banque" },
 ];
 
 export default function ServiceShortcuts() {
