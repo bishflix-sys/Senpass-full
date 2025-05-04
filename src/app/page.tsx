@@ -4,22 +4,23 @@ import ProfileCard from "@/components/profile-card";
 import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
 import LogoutButton from "@/components/logout-button"; // Import the LogoutButton
-// Removed LoginSimulation and NotificationSimulation imports as they are no longer displayed here.
-// import LoginSimulation from "@/components/login-simulation";
-// import NotificationSimulation from "@/components/notification-simulation";
+import QRCodeDisplay from "@/components/qr-code-display"; // Import the QRCodeDisplay component
 import {
   Fingerprint,
   ScanFace,
   KeyRound,
   FileSignature,
   UserCheck,
-  // Bell, // Removed as NotificationSimulation is removed
   UserSquare,
 } from "lucide-react";
 
 export default async function Home() {
   // Fetch user profile data on the server
   const userProfile: UserProfile = await getUserProfile("user123"); // Using a placeholder ID
+
+  // Data for the QR code (e.g., user's national ID or a link to their profile)
+  // Using nationalId as an example
+  const qrData = `senpass-profile:${userProfile.nationalId || 'unknown'}`;
 
   return (
     <div className="space-y-8">
@@ -42,8 +43,17 @@ export default async function Home() {
           <ProfileCard user={userProfile} />
         </div>
 
-        {/* Removed Login & Notifications */}
+        {/* QR Code and Activity/Alerts Section */}
         <div className="md:col-span-2 space-y-6">
+            {/* Integrate QR Code Display */}
+            <QRCodeDisplay
+              data={qrData}
+              title="Votre Identifiant QR SenPass"
+              description="Utilisez ce code pour partager votre identifiant (Simulation)."
+              size={160} // Adjust size as needed
+              className="shadow-md"
+            />
+
            {/* Placeholder for potential future content like recent activity or important alerts */}
             <div className="p-6 border rounded-lg bg-card text-card-foreground shadow-sm">
               <h3 className="text-lg font-semibold mb-2">Activité récente</h3>
@@ -102,4 +112,3 @@ export default async function Home() {
     </div>
   );
 }
-
