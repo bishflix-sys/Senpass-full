@@ -1,10 +1,11 @@
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Import CardContent
 import { Button } from "@/components/ui/button";
 import {
   GraduationCap,
   HeartPulse,
   Briefcase,
-  Home,
+  Home as HomeIcon, // Renamed to avoid conflict with page component
   Landmark,
   FileText,
   FileSpreadsheet, // Impôts
@@ -19,6 +20,7 @@ import {
   Users,          // ONGs
 } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils"; // Import cn
 
 const services = [
   // Existing Government/Social Services
@@ -26,43 +28,51 @@ const services = [
   { title: "Scolarité", icon: GraduationCap, description: "Inscriptions...", href: "/services/scolarite" },
   { title: "Santé", icon: HeartPulse, description: "Carnet, RDV...", href: "/services/sante" },
   { title: "Sécu Sociale", icon: Briefcase, description: "Prestations...", href: "/services/secu" },
-  { title: "Logement", icon: Home, description: "Demandes, aides...", href: "/services/logement" },
+  { title: "Logement", icon: HomeIcon, description: "Demandes, aides...", href: "/services/logement" },
   { title: "Impôts/Domaines", icon: FileSpreadsheet, description: "Déclarations...", href: "/services/impots" },
   { title: "Justice", icon: Scale, description: "Procédures...", href: "/services/justice" },
   { title: "Transport", icon: Truck, description: "Permis, titres...", href: "/services/transport" },
 
   // Private/Utilities
-  { title: "Énergie (Senelec)", icon: Zap, description: "Factures, suivi...", href: "/services/energie" },
-  { title: "Eau (Sen'Eau)", icon: Droplet, description: "Factures, suivi...", href: "/services/eau" },
-  { title: "Télécom (Orange...)", icon: Signal, description: "Abonnements...", href: "/services/telecom" },
+  { title: "Énergie", icon: Zap, description: "Senelec...", href: "/services/energie" }, // Shortened title
+  { title: "Eau", icon: Droplet, description: "Sen'Eau...", href: "/services/eau" }, // Shortened title
+  { title: "Télécom", icon: Signal, description: "Orange...", href: "/services/telecom" }, // Shortened title
 
   // Uniformed Services
-  { title: "Police Nationale", icon: Shield, description: "Déclarations...", href: "/services/police" },
+  { title: "Police", icon: Shield, description: "Nationale...", href: "/services/police" }, // Shortened title
   { title: "Gendarmerie", icon: ShieldAlert, description: "Signalements...", href: "/services/gendarmerie" },
   { title: "Douanes", icon: Anchor, description: "Formalités...", href: "/services/douanes" },
 
   // Other Sectors
-  { title: "Banques", icon: Landmark, description: "Comptes, virements...", href: "/services/banque" }, // Keep generic bank
-  { title: "ONGs", icon: Users, description: "Enregistrement...", href: "/services/ongs" },
+  { title: "Banques", icon: Landmark, description: "Comptes...", href: "/services/banque" }, // Shortened description
+  { title: "ONGs", icon: Users, description: "Associations...", href: "/services/ongs" }, // Shortened description
 ];
 
 export default function ServiceShortcuts() {
   return (
     <section>
-      <h2 className="text-2xl font-semibold mb-4">Accès aux Services (Simulation)</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+      <h2 className="text-2xl font-semibold mb-4">Accès Rapide aux Services (Simulation)</h2>
+      {/* Adjusted grid columns for better responsiveness */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {services.map((service) => (
-          <Card key={service.title} className="hover:shadow-lg transition-shadow duration-200 text-center flex flex-col justify-between">
+          <Card
+            key={service.title}
+            className={cn(
+              "hover:shadow-lg transition-all duration-200 text-center flex flex-col justify-between border", // Added border
+              "hover:-translate-y-1 hover:border-primary" // Hover effect
+            )}
+          >
             <CardHeader className="items-center p-4 pb-2 flex-grow">
-              <service.icon className="h-8 w-8 text-primary mb-2" />
+              <service.icon className="h-7 w-7 text-primary mb-2" /> {/* Slightly smaller icon */}
               <CardTitle className="text-sm font-medium leading-tight">{service.title}</CardTitle>
+              {/* Optional: uncomment description if needed, kept short */}
               {/* <CardDescription className="text-xs hidden sm:block mt-1">{service.description}</CardDescription> */}
             </CardHeader>
-             <div className="p-4 pt-2">
-              <Button variant="outline" size="sm" asChild className="w-full">
+             <CardContent className="p-4 pt-0"> {/* Use CardContent for button */}
+              <Button variant="ghost" size="sm" asChild className="w-full h-8 text-xs text-primary hover:bg-primary/10">
                  <Link href={service.href}>Accéder</Link>
                </Button>
-             </div>
+             </CardContent>
           </Card>
         ))}
       </div>

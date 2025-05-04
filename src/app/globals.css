@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,102 +10,103 @@
 
 @layer base {
   :root {
-    /* Deep Blue: #00308F -> HSL(216, 100%, 28%) */
-    /* Light Blue: #ADD8E6 -> HSL(195, 53%, 79%) */
-    /* Teal: #008080 -> HSL(180, 100%, 25%) */
+    /* Slightly softer blue palette */
+    /* Primary Blue: HSL(210, 70%, 55%) */
+    /* Secondary Light Blue: HSL(200, 60%, 85%) */
+    /* Accent Teal: HSL(175, 55%, 40%) */
 
-    --background: 210 40% 98%; /* Lighter blue/white for background */
-    --foreground: 216 100% 10%; /* Darker blue/black for text */
+    --background: 210 60% 98%; /* Very light blue-white */
+    --foreground: 215 40% 15%; /* Dark grayish blue */
 
-    --card: 210 40% 98%;
-    --card-foreground: 216 100% 10%;
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 215 40% 15%;
 
-    --popover: 210 40% 98%;
-    --popover-foreground: 216 100% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 40% 15%;
 
-    --primary: 216 100% 28%; /* Deep Blue */
+    --primary: 210 70% 55%; /* Main blue */
     --primary-foreground: 0 0% 98%; /* White text on primary */
 
-    --secondary: 195 53% 79%; /* Light Blue */
-    --secondary-foreground: 216 100% 10%; /* Dark text on secondary */
+    --secondary: 200 60% 90%; /* Lighter blue for secondary elements */
+    --secondary-foreground: 210 50% 30%; /* Darker blue text on secondary */
 
-    --muted: 210 40% 95%; /* Slightly darker light blue */
-    --muted-foreground: 210 40% 45%; /* Muted text */
+    --muted: 210 50% 94%; /* Slightly muted background tone */
+    --muted-foreground: 210 40% 50%; /* Muted text color */
 
-    --accent: 180 100% 25%; /* Teal */
+    --accent: 175 55% 40%; /* Teal accent */
     --accent-foreground: 0 0% 98%; /* White text on accent */
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 75% 55%; /* Adjusted destructive color */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 40% 90%; /* Border based on light blue */
-    --input: 210 40% 90%; /* Input background based on light blue */
-    --ring: 216 100% 28%; /* Ring color based on primary */
+    --border: 210 30% 88%; /* Softer border color */
+    --input: 210 30% 96%; /* Slightly off-white input background */
+    --ring: 210 70% 55%; /* Ring color matches primary */
 
-    --chart-1: 216 100% 50%;
-    --chart-2: 180 100% 35%;
-    --chart-3: 195 53% 60%;
-    --chart-4: 216 70% 70%;
-    --chart-5: 180 70% 70%;
+    --chart-1: 210 70% 60%;
+    --chart-2: 175 55% 50%;
+    --chart-3: 200 60% 75%;
+    --chart-4: 210 50% 70%;
+    --chart-5: 175 40% 60%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Increased radius for more rounded corners */
 
     /* Sidebar colors adjusted to fit the theme */
-    --sidebar-background: 210 40% 96%;
-    --sidebar-foreground: 216 100% 15%;
-    --sidebar-primary: 216 100% 28%;
+    --sidebar-background: 210 50% 96%;
+    --sidebar-foreground: 215 40% 20%;
+    --sidebar-primary: 210 70% 55%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 195 53% 85%;
-    --sidebar-accent-foreground: 216 100% 10%;
-    --sidebar-border: 210 40% 85%;
-    --sidebar-ring: 180 100% 25%;
+    --sidebar-accent: 200 60% 90%;
+    --sidebar-accent-foreground: 210 50% 30%;
+    --sidebar-border: 210 30% 85%;
+    --sidebar-ring: 175 55% 40%;
   }
 
   .dark {
-    /* Dark theme adjustments - keeping it simple for now */
-    --background: 216 50% 10%;
-    --foreground: 0 0% 98%;
+    /* Dark theme adjustments */
+    --background: 215 30% 12%;
+    --foreground: 210 40% 95%;
 
-    --card: 216 50% 10%;
-    --card-foreground: 0 0% 98%;
+    --card: 215 25% 16%;
+    --card-foreground: 210 40% 95%;
 
-    --popover: 216 50% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 215 25% 16%;
+    --popover-foreground: 210 40% 95%;
 
-    --primary: 216 100% 70%; /* Lighter Deep Blue */
-    --primary-foreground: 216 100% 10%;
+    --primary: 210 70% 65%; /* Lighter blue for dark mode */
+    --primary-foreground: 215 30% 15%;
 
-    --secondary: 195 53% 30%; /* Darker Light Blue */
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 210 30% 25%; /* Darker secondary */
+    --secondary-foreground: 210 40% 85%;
 
-    --muted: 210 40% 15%;
+    --muted: 210 30% 20%;
     --muted-foreground: 210 40% 60%;
 
-    --accent: 180 100% 40%; /* Lighter Teal */
-    --accent-foreground: 216 100% 10%;
+    --accent: 175 55% 50%; /* Lighter teal for dark mode */
+    --accent-foreground: 215 30% 15%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 65% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 40% 20%;
-    --input: 210 40% 20%;
-    --ring: 216 100% 70%;
+    --border: 210 30% 30%;
+    --input: 210 30% 22%;
+    --ring: 210 70% 65%;
 
-    --chart-1: 216 100% 60%;
-    --chart-2: 180 100% 45%;
-    --chart-3: 195 53% 50%;
-    --chart-4: 216 70% 60%;
-    --chart-5: 180 70% 60%;
+    --chart-1: 210 70% 70%;
+    --chart-2: 175 55% 60%;
+    --chart-3: 200 60% 65%;
+    --chart-4: 210 50% 60%;
+    --chart-5: 175 40% 50%;
 
     /* Dark Sidebar */
-    --sidebar-background: 216 50% 12%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 216 100% 70%;
-    --sidebar-primary-foreground: 216 100% 10%;
-    --sidebar-accent: 195 53% 25%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 210 40% 25%;
-    --sidebar-ring: 180 100% 40%;
+    --sidebar-background: 215 28% 14%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 210 70% 65%;
+    --sidebar-primary-foreground: 215 30% 15%;
+    --sidebar-accent: 210 30% 28%;
+    --sidebar-accent-foreground: 210 40% 90%;
+    --sidebar-border: 210 30% 25%;
+    --sidebar-ring: 175 55% 50%;
   }
 }
 
@@ -114,6 +116,18 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* font-feature-settings: "rlig" 1, "calt" 1; Remove this as well if not specifically needed */
+    /* Apply font smoothing for better text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+}
+
+/* Add subtle transition to color changes */
+:root, .dark {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ensure focus rings are visible and consistent */
+*:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
 }

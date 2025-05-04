@@ -17,9 +17,13 @@ import {
   User, // Use User icon
   Hash,
   Loader2, // Import Loader2 for loading state
+  Activity, // Import Activity icon
+  AlertTriangle // Import AlertTriangle icon
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Import Card components
+import { Separator } from "@/components/ui/separator"; // Import Separator
 
 // Helper function to generate a simple alphanumeric ID
 const generateAlphanumericId = (length = 12) => {
@@ -84,7 +88,7 @@ export default function Home() {
              <Skeleton className="h-8 w-3/4" />
              <Skeleton className="h-4 w-1/2" />
            </div>
-           <Skeleton className="h-9 w-32" />
+           <Skeleton className="h-9 w-32 rounded-md" />
          </div>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
            <Skeleton className="md:col-span-1 h-64 rounded-lg" />
@@ -94,20 +98,23 @@ export default function Home() {
                  <div className="space-y-2">
                      <Skeleton className="h-6 w-24" />
                      <Skeleton className="h-4 w-3/4" />
-                     <Skeleton className="h-8 w-40" />
+                     <Skeleton className="h-8 w-40 rounded-md" /> {/* Badge skeleton */}
                  </div>
               </div>
-             <Skeleton className="h-24 rounded-lg" />
-             <Skeleton className="h-24 rounded-lg" />
+             <Skeleton className="h-32 rounded-lg" /> {/* Activity Card Skeleton */}
+             <Skeleton className="h-32 rounded-lg" /> {/* Alerts Card Skeleton */}
            </div>
          </div>
-          <Skeleton className="h-10 w-40" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 rounded-lg" />
+          <Separator className="my-6" />
+          <Skeleton className="h-10 w-40 mb-4" /> {/* Service Shortcuts Title Skeleton */}
+          {/* Simplified skeleton for Service Shortcuts grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-36 rounded-lg" />
             ))}
           </div>
-          <Skeleton className="h-10 w-40" />
+          <Separator className="my-6" />
+          <Skeleton className="h-10 w-40 mb-4" /> {/* Features Title Skeleton */}
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
            {Array.from({ length: 6 }).map((_, i) => (
              <Skeleton key={i} className="h-28 rounded-lg" />
@@ -124,6 +131,7 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
+      {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
          <div className="flex-1">
             <h1 className="text-3xl font-bold text-primary">
@@ -137,73 +145,98 @@ export default function Home() {
       </div>
 
 
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Profile Section */}
+        {/* Profile Section (Left Column) */}
         <div className="md:col-span-1">
           <ProfileCard user={userProfile} />
         </div>
 
-        {/* QR Code, Unique ID, and Activity/Alerts Section */}
+        {/* QR, ID, Activity/Alerts Section (Right Column) */}
         <div className="md:col-span-2 space-y-6">
              {/* Container for QR Code and Unique ID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                {/* Integrate QR Code Display */}
+                {/* QR Code Display */}
                 <QRCodeDisplay
                   data={qrData || ''} // Pass current QR data, fallback to empty string
                   title="Votre Identifiant QR SenPass"
-                  description="Ce code se met à jour toutes les 10s (Simulation)."
+                  description="Code dynamique pour accès rapide (Simulation)."
                   size={160}
-                  className="shadow-md"
+                  className="shadow-md border" // Added border for slight emphasis
                   isLoading={!qrData} // Indicate loading if qrData is null
                 />
 
-                {/* Display Unique Alphanumeric ID */}
-                <div className="space-y-2">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                        <Hash className="h-5 w-5 text-primary" /> Votre ID Unique
-                    </h3>
-                    <p className="text-sm text-muted-foreground">Identifiant unique associé à votre profil SenPass.</p>
-                    <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2">
+                {/* Unique Alphanumeric ID */}
+                <Card className="shadow-md border">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        <Hash className="h-5 w-5 text-primary" /> ID Unique SenPass
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-2">Votre identifiant unique personnel.</p>
+                    <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
                         {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
                     </Badge>
-                </div>
+                 </CardContent>
+                </Card>
             </div>
 
+           {/* Recent Activity Card */}
+            <Card className="shadow-sm border">
+              <CardHeader>
+                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" /> Activité récente
+                 </CardTitle>
+              </CardHeader>
+              <CardContent>
+                 <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
+                 {/* Future: List recent logins, verifications etc. */}
+              </CardContent>
+            </Card>
 
-           {/* Placeholder for potential future content like recent activity or important alerts */}
-            <div className="p-6 border rounded-lg bg-card text-card-foreground shadow-sm">
-              <h3 className="text-lg font-semibold mb-2">Activité récente</h3>
-              <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
-            </div>
-            <div className="p-6 border rounded-lg bg-card text-card-foreground shadow-sm">
-              <h3 className="text-lg font-semibold mb-2">Alertes importantes</h3>
-              <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
-            </div>
+            {/* Important Alerts Card */}
+            <Card className="shadow-sm border">
+               <CardHeader>
+                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-destructive" /> Alertes importantes
+                 </CardTitle>
+              </CardHeader>
+               <CardContent>
+                 <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
+                 {/* Future: Display security alerts, pending actions etc. */}
+               </CardContent>
+            </Card>
         </div>
       </div>
 
+      {/* Separator */}
+      <Separator className="my-8" />
 
-      {/* Service Shortcuts */}
+      {/* Service Shortcuts Section */}
       <ServiceShortcuts />
+
+       {/* Separator */}
+      <Separator className="my-8" />
 
       {/* Features Section */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Fonctionnalités</h2>
+        <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard
             icon={User} // Use User icon
-            title="MonProfil"
+            title="MonProfil Connect"
             description="Remplissage automatique simulé des formulaires avec vos données officielles."
           />
           <FeatureCard
             icon={UserCheck}
-            title="Vérification d'identité"
+            title="Vérification Simplifiée"
             description="Simulation de vérification sécurisée de l'identité sans documents physiques."
           />
           <FeatureCard
             icon={FileSignature}
-            title="Signature numérique"
-            description="Simulation de signature électronique légale pour documents."
+            title="Signature Électronique"
+            description="Simulation de signature numérique à valeur légale pour documents."
           />
            <FeatureCard
             icon={Fingerprint}
@@ -219,8 +252,8 @@ export default function Home() {
           />
            <FeatureCard
             icon={KeyRound}
-            title="Code PIN"
-            description="Simulation d'authentification via code PIN sécurisé."
+            title="Accès par Code PIN"
+            description="Simulation d'authentification via code PIN sécurisé personnel."
             accentIcon
           />
         </div>

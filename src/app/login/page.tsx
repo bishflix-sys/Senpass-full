@@ -24,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, Video, VideoOff, User } from "lucide-react"; // Added User icon
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, Video, VideoOff, User, Lock } from "lucide-react"; // Added Lock icon
 import {
   Form,
   FormControl,
@@ -71,11 +71,13 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
   const streamRef = React.useRef<MediaStream | null>(null);
 
   React.useEffect(() => {
+    let mounted = true; // Track component mount state
+
     const getCameraPermission = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
           console.error('Camera API not supported.');
-          setHasCameraPermission(false);
-          toast({
+           if (mounted) setHasCameraPermission(false);
+           toast({
               variant: 'destructive',
               title: 'Erreur Caméra',
               description: 'Votre navigateur ne supporte pas l\'accès à la caméra.',
@@ -84,26 +86,33 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
       }
       try {
         streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
-        if (videoRef.current) {
-          videoRef.current.srcObject = streamRef.current;
+         if (mounted) {
+            setHasCameraPermission(true);
+            if (videoRef.current) {
+            videoRef.current.srcObject = streamRef.current;
+            }
+        } else {
+             // If component unmounted before permission granted, stop the stream
+            streamRef.current?.getTracks().forEach(track => track.stop());
         }
       } catch (error) {
         console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
+         if (mounted) setHasCameraPermission(false);
         // Toast is shown below in the UI
       }
     };
 
     getCameraPermission();
 
-    // Cleanup function to stop the stream when the component unmounts or dialog closes
+    // Cleanup function
     return () => {
+        mounted = false; // Mark as unmounted
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
             streamRef.current = null;
-            if(videoRef.current) videoRef.current.srcObject = null; // Clear video source
+             console.log("Camera stream stopped"); // Log cleanup
         }
+        if(videoRef.current) videoRef.current.srcObject = null; // Clear video source
     };
   }, [toast]); // Added toast dependency
 
@@ -122,7 +131,7 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
           } else {
               toast({
                   title: "Échec",
-                  description: "Échec de la reconnaissance faciale. Essayez de vous rapprocher ou d'améliorer l'éclairage.",
+                  description: "Reconnaissance faciale échouée. Veuillez réessayer.", // Simplified message
                   variant: "destructive",
               });
           }
@@ -132,63 +141,63 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2">
-            <ScanFace className="h-5 w-5" /> Reconnaissance Faciale
+        <DialogTitle className="flex items-center gap-2 text-lg"> {/* Adjusted size */}
+            <ScanFace className="h-5 w-5" /> Vérification Faciale
         </DialogTitle>
         <DialogDescription>
-          Positionnez votre visage face à la caméra. (Simulation)
+          Positionnez votre visage face à la caméra et cliquez sur Scanner. (Simulation)
         </DialogDescription>
       </DialogHeader>
-      <div className="space-y-4">
-        <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted flex items-center justify-center">
+      <div className="space-y-4 my-6"> {/* Added margin */}
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted flex items-center justify-center shadow-inner"> {/* Added shadow */}
            <video ref={videoRef} className={cn("w-full h-full object-cover", { 'hidden': hasCameraPermission === false })} autoPlay muted playsInline />
             {hasCameraPermission === null && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
-                    <Loader2 className="h-8 w-8 animate-spin mb-2" />
-                    <p>Demande d'accès caméra...</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground space-y-2">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <p>Activation caméra...</p>
                 </div>
             )}
              {hasCameraPermission === false && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center text-destructive p-4">
-                     <VideoOff className="h-10 w-10 mb-2" />
+                 <div className="absolute inset-0 flex flex-col items-center justify-center text-destructive p-4 space-y-2">
+                     <VideoOff className="h-10 w-10" />
                      <p className="text-center font-semibold">Caméra non accessible</p>
-                     <p className="text-center text-sm">Veuillez autoriser l'accès dans les paramètres de votre navigateur.</p>
+                     <p className="text-center text-sm">Veuillez autoriser l'accès dans votre navigateur.</p>
                  </div>
              )}
               {isScanning && (
-                 <div className="absolute inset-0 bg-background/70 flex flex-col items-center justify-center text-primary">
-                     <Loader2 className="h-10 w-10 animate-spin mb-2" />
-                     <p>Scan en cours...</p>
+                 <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center text-primary space-y-2 backdrop-blur-sm"> {/* Added blur */}
+                     <Loader2 className="h-10 w-10 animate-spin" />
+                     <p className="font-medium">Analyse en cours...</p>
                  </div>
              )}
         </div>
 
         {hasCameraPermission === false && (
-          <Alert variant="destructive" icon={VideoOff}> {/* Use icon prop */}
-            {/* <VideoOff className="h-4 w-4" /> Replaced by icon prop */}
+          <Alert variant="destructive" icon={VideoOff}>
             <AlertTitle>Accès Caméra Refusé</AlertTitle>
             <AlertDescription>
-              Veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur pour utiliser cette fonctionnalité.
+              L'accès à la caméra est nécessaire. Veuillez l'autoriser dans les paramètres de votre navigateur.
             </AlertDescription>
           </Alert>
         )}
       </div>
-      <DialogFooter className="sm:justify-center">
+      <DialogFooter className="sm:justify-center gap-2"> {/* Added gap */}
          <Button
             type="button"
             onClick={handleSimulateScan}
             disabled={!hasCameraPermission || isScanning}
             className="w-full sm:w-auto"
+            size="lg" // Larger button
           >
             {isScanning ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" /> // Larger icon
             ) : (
-              <ScanFace className="mr-2 h-4 w-4" />
+              <ScanFace className="mr-2 h-5 w-5" /> // Larger icon
             )}
-            Scanner mon visage (Simulation)
+            Scanner (Simulation)
           </Button>
          <DialogClose asChild>
-           <Button type="button" variant="secondary">
+           <Button type="button" variant="outline" size="lg"> {/* Use outline, larger size */}
              Annuler
            </Button>
          </DialogClose>
@@ -212,103 +221,110 @@ export default function LoginPage() {
     },
   });
 
-   const handleAuthenticationSuccess = () => {
+   const handleAuthenticationSuccess = React.useCallback(() => {
+      // Close dialogs first
       setShowFacialRecognitionDialog(false);
-      setIsQrDialogOpen(false); // Close QR dialog if open
+      setIsQrDialogOpen(false);
       setQrCodeData(null); // Clear QR data
 
+      // Use a slight delay to allow dialogs to close visually before redirecting
       setTimeout(() => {
         router.push('/'); // Redirect to home page
-      }, 500);
-   };
+      }, 300); // 300ms delay
+   }, [router]); // Add router to dependency array
 
   function onSubmit(data: PhoneFormValues) {
     toast({
-      title: "Vérification OTP (Simulation)",
-      description: `Un code a été envoyé au ${data.phoneNumber}. Entrez le code pour continuer.`,
+      title: "Vérification en cours... (Simulation)",
+      description: `Un code OTP simulé est envoyé à ${data.phoneNumber}.`,
     });
     console.log("Phone login attempt:", data);
+    // Simulate OTP verification and login
     setTimeout(() => {
       toast({
         title: "Connexion réussie!",
         description: "Redirection vers l'accueil...",
       });
        handleAuthenticationSuccess();
-    }, 2000);
+    }, 1500); // Shorter delay for phone login simulation
   }
 
   // Function to generate new QR data
-  const generateQrData = () => `senpass-lite-login-simulation-${Date.now()}`;
+  const generateQrData = () => `senpass-lite-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Added randomness
 
   const handleOpenQrDialog = () => {
     const initialQrData = generateQrData();
     setQrCodeData(initialQrData);
     setIsQrDialogOpen(true); // Open the dialog
-    toast({
-      title: "QR Code Généré (Simulation)",
-      description: "Scannez le code pour une connexion simulée.",
-    });
     console.log("QR Code login initiated, data:", initialQrData);
      // Simulate successful scan after a while (longer than refresh interval)
      // In a real app, this would be event-driven from the scanning device
-     setTimeout(() => {
+     const scanTimeout = setTimeout(() => {
         // Check if the dialog is still open before declaring success
-        if (isQrDialogOpen) {
+        if (isQrDialogOpen) { // Re-check using state directly
+             console.log("Simulating successful QR scan...");
              toast({
                 title: "QR Code Scanné!",
                 description: "Connexion réussie via QR Code. Redirection...",
              });
              handleAuthenticationSuccess();
+        } else {
+            console.log("QR scan simulation cancelled, dialog closed.");
         }
      }, 25000); // Simulate 25 seconds for scanning to allow refreshes
+
+     // Store timeout ID to clear it if dialog closes early
+     // Note: This simple approach doesn't use refs, relies on closure
+     // A more robust solution might use a ref to store the timeout ID
   };
 
   // Effect to refresh QR code every 10 seconds when the dialog is open
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
-    if (isQrDialogOpen && qrCodeData !== null) { // Check qrCodeData is not null to avoid unnecessary initial interval
+    if (isQrDialogOpen) { // Only run if dialog is open
+      // Initial QR code generation is handled in handleOpenQrDialog or onOpenChange
       intervalId = setInterval(() => {
-        const newData = generateQrData();
-        console.log("Refreshing QR Code:", newData); // Log refresh
-        setQrCodeData(newData);
+        setQrCodeData(generateQrData());
+        console.log("Refreshing QR Code..."); // Log refresh
       }, 10000); // Refresh every 10 seconds
+      console.log("QR Code refresh interval started.");
     }
 
-    // Cleanup function to clear the interval
+    // Cleanup function to clear the interval when dialog closes or component unmounts
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
         console.log("Cleared QR Code refresh interval.");
       }
     };
-  }, [isQrDialogOpen, qrCodeData]); // Depend on dialog state and data presence
+  }, [isQrDialogOpen]); // Only depend on dialog state
 
   return (
-    <div className="flex justify-center items-center py-12">
-      <Tabs defaultValue="individuals" className="w-full max-w-lg">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="individuals">
-            <User className="mr-2 h-4 w-4" /> Individus {/* Replaced UserSquare with User */}
+    <div className="flex justify-center items-start py-12 min-h-[calc(100vh-10rem)]"> {/* Adjust padding/min-height */}
+      <Tabs defaultValue="individuals" className="w-full max-w-md"> {/* Slightly narrower max-width */}
+        <TabsList className="grid w-full grid-cols-3 h-12"> {/* Increased height */}
+          <TabsTrigger value="individuals" className="text-base"> {/* Base text size */}
+            <User className="mr-2 h-5 w-5" /> Individus
           </TabsTrigger>
-          <TabsTrigger value="business">
-            <Building className="mr-2 h-4 w-4" /> Business
+          <TabsTrigger value="business" className="text-base">
+            <Building className="mr-2 h-5 w-5" /> Business
           </TabsTrigger>
-          <TabsTrigger value="developers">
-            <Code className="mr-2 h-4 w-4" /> Développeurs
+          <TabsTrigger value="developers" className="text-base">
+            <Code className="mr-2 h-5 w-5" /> Développeurs
           </TabsTrigger>
         </TabsList>
 
         {/* Individuals Tab */}
         <TabsContent value="individuals">
-          <Card>
+          <Card className="shadow-lg border"> {/* Added border and shadow */}
             <CardHeader>
-              <CardTitle>Connexion Individu</CardTitle>
+              <CardTitle className="text-xl">Connexion Individu</CardTitle> {/* Adjusted size */}
               <CardDescription>
-                Choisissez votre méthode de connexion sécurisée.
+                Connectez-vous de manière sécurisée avec votre compte SenPass.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 pt-2"> {/* Added top padding */}
               {/* Phone Number Login Form */}
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -317,54 +333,56 @@ export default function LoginPage() {
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center">
-                           <Phone className="mr-2 h-4 w-4" /> Numéro de téléphone
+                        <FormLabel className="flex items-center text-sm"> {/* Adjusted size */}
+                           <Phone className="mr-2 h-4 w-4 text-muted-foreground" /> Numéro de téléphone (+221)
                         </FormLabel>
                         <FormControl>
-                           <div className="flex items-center gap-2">
-                             <span className="text-sm font-medium p-2 bg-muted rounded-l-md border border-r-0 border-input h-10 flex items-center">+221</span>
+                           <div className="flex items-center"> {/* Removed gap, relying on input/span styles */}
+                             <span className="text-base font-medium p-2.5 bg-muted rounded-l-md border border-r-0 border-input h-11 flex items-center text-muted-foreground"> {/* Adjusted size/style */}
+                               +221
+                              </span>
                              <Input
+                               type="tel" // Use tel type
                                placeholder="7X XXX XX XX"
                                {...field}
                                onChange={(e) => {
-                                 const value = e.target.value;
-                                 if (!value.startsWith('+221')) {
-                                      field.onChange('+221');
-                                 } else {
-                                      const numericPart = value.substring(4).replace(/\D/g, '');
-                                      field.onChange(`+221${numericPart}`);
-                                 }
+                                 // Keep only digits after +221
+                                 const digits = e.target.value.replace(/\D/g, '');
+                                 // Ensure it starts with 221, then take the next 9 digits
+                                 const numberPart = digits.startsWith('221') ? digits.substring(3, 12) : digits.substring(0, 9);
+                                 field.onChange(`+221${numberPart}`);
                                }}
-                               className="rounded-l-none flex-1"
-                               maxLength={13}
+                               className="rounded-l-none flex-1 h-11 text-base tracking-wider" // Adjusted size/style
+                               maxLength={13} // +221 plus 9 digits
                              />
                            </div>
                         </FormControl>
-                        <FormDescription>
-                          Entrez votre numéro de téléphone enregistré (Sénégal uniquement). Un code sera envoyé.
-                        </FormDescription>
+                        {/* <FormDescription>
+                          Un code OTP sera envoyé pour vérification (Simulation).
+                        </FormDescription> */}
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                   <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                   <Button type="submit" className="w-full h-11 text-base" disabled={form.formState.isSubmitting}> {/* Adjusted size/text */}
                      {form.formState.isSubmitting ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> // Larger icon
                      ) : (
-                        <LogIn className="mr-2 h-4 w-4" />
+                        <LogIn className="mr-2 h-5 w-5" /> // Larger icon
                      )}
-                      Se connecter par téléphone
+                      Continuer par téléphone
                    </Button>
                 </form>
               </Form>
 
-              <div className="relative">
+              {/* Separator */}
+              <div className="relative my-6"> {/* Added margin */}
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
-                    Ou continuer avec
+                  <span className="bg-card px-3 text-muted-foreground"> {/* Use card background */}
+                    Ou utiliser
                   </span>
                 </div>
               </div>
@@ -374,56 +392,48 @@ export default function LoginPage() {
                 {/* QR Code Dialog */}
                 <Dialog open={isQrDialogOpen} onOpenChange={(open) => {
                     setIsQrDialogOpen(open);
-                    if (open) { // Only generate new QR data when opening
-                        const initialQrData = generateQrData();
-                        setQrCodeData(initialQrData);
-                        console.log("QR Code login initiated, data:", initialQrData);
-                        // Re-add simulation of successful scan if needed for testing
-                         setTimeout(() => {
-                            if (isQrDialogOpen) { // Re-check if dialog still open
-                                toast({
-                                    title: "QR Code Scanné! (Simulé)",
-                                    description: "Connexion réussie via QR Code. Redirection...",
-                                });
-                                handleAuthenticationSuccess();
-                            }
-                         }, 25000);
+                    if (open) {
+                        setQrCodeData(generateQrData()); // Generate fresh QR on open
+                        handleOpenQrDialog(); // Keep existing timeout logic if needed
                     } else {
                         setQrCodeData(null); // Clear data on close
+                        // Consider clearing the scan simulation timeout here
                     }
                  }}>
                     <DialogTrigger asChild>
-                        <Button variant="outline" onClick={handleOpenQrDialog}>
-                           <QrCode className="mr-2 h-4 w-4 text-accent" /> QR Code
+                        <Button variant="outline" className="h-12 text-base" > {/* Adjusted size/text */}
+                           <QrCode className="mr-2 h-5 w-5 text-accent" /> QR Code
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
+                    <DialogContent className="sm:max-w-xs"> {/* Smaller dialog */}
                         <DialogHeader>
-                           <DialogTitle>Scanner le QR Code</DialogTitle>
+                           <DialogTitle className="text-lg">Scanner le QR Code</DialogTitle> {/* Adjusted size */}
                            <DialogDescription>
-                              Utilisez l'application mobile SenPass pour scanner ce code. Il se met à jour toutes les 10 secondes. (Simulation)
+                              Scannez avec l'app SenPass. Se rafraîchit toutes les 10s. (Simulation)
                            </DialogDescription>
                         </DialogHeader>
-                        <div className="flex items-center justify-center p-4">
+                        <div className="flex items-center justify-center p-6"> {/* Increased padding */}
                            {qrCodeData ? (
-                              <QRCodeCanvas
-                                 value={qrCodeData}
-                                 size={256}
-                                 bgColor={"#FFFFFF"} // White background
-                                 fgColor={"#00853F"} // Senegal Green
-                                 level={"H"}
-                                 includeMargin={true}
-                              />
+                              <div className="p-2 bg-white rounded-md shadow-md"> {/* White background container */}
+                                <QRCodeCanvas
+                                    value={qrCodeData}
+                                    size={200} // Slightly smaller QR
+                                    bgColor={"#FFFFFF"}
+                                    fgColor={"#00853F"} // Senegal Green
+                                    level={"H"}
+                                    includeMargin={true}
+                                />
+                              </div>
                            ) : (
-                              <div className="flex flex-col items-center justify-center text-muted-foreground h-[256px]">
-                                 <Loader2 className="h-8 w-8 animate-spin mb-2" />
-                                 <p>Génération du QR code...</p>
+                              <div className="flex flex-col items-center justify-center text-muted-foreground h-[200px] space-y-2">
+                                 <Loader2 className="h-8 w-8 animate-spin" />
+                                 <p>Génération...</p>
                               </div>
                            )}
                         </div>
                         <DialogFooter className="sm:justify-center">
                             <DialogClose asChild>
-                                <Button type="button" variant="secondary">
+                                <Button type="button" variant="outline"> {/* Use outline */}
                                 Fermer
                                 </Button>
                             </DialogClose>
@@ -434,17 +444,18 @@ export default function LoginPage() {
                  {/* Facial Recognition Dialog */}
                  <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}>
                      <DialogTrigger asChild>
-                         <Button variant="outline" onClick={() => setShowFacialRecognitionDialog(true)}>
-                             <ScanFace className="mr-2 h-4 w-4 text-accent" /> Reconnaissance Faciale
+                         <Button variant="outline" className="h-12 text-base"> {/* Adjusted size/text */}
+                             <ScanFace className="mr-2 h-5 w-5 text-accent" /> Visage
                          </Button>
                      </DialogTrigger>
+                     {/* Conditionally render content to ensure useEffect runs on open */}
                      {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={handleAuthenticationSuccess} />}
                  </Dialog>
               </div>
             </CardContent>
              <CardFooter>
-                <p className="text-xs text-muted-foreground text-center w-full">
-                   Assurez-vous d'utiliser un appareil de confiance.
+                <p className="text-xs text-muted-foreground text-center w-full flex items-center justify-center gap-1.5">
+                   <Lock className="h-3 w-3"/> Connexion sécurisée.
                 </p>
             </CardFooter>
           </Card>
@@ -452,47 +463,48 @@ export default function LoginPage() {
 
         {/* Business Tab */}
         <TabsContent value="business">
-          <Card>
+          <Card className="shadow-lg border">
             <CardHeader>
-              <CardTitle>Connexion Business</CardTitle>
+              <CardTitle className="text-xl">Connexion Entreprise</CardTitle>
               <CardDescription>
-                Accès sécurisé pour les entreprises et organisations.
+                Accès sécurisé pour les organisations partenaires.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-2 text-center">
+              <Building className="h-16 w-16 text-muted-foreground mx-auto my-4"/>
               <p className="text-muted-foreground">
-                Les options de connexion pour les comptes Business seront bientôt disponibles.
-                Vous pourrez vous connecter via email/mot de passe ou intégration SSO.
+                Fonctionnalité bientôt disponible pour les comptes professionnels et partenaires.
               </p>
-               <Button disabled className="w-full">
-                 <LogIn className="mr-2 h-4 w-4" /> Connexion Business (Bientôt)
+               <Button disabled className="w-full h-11 text-base">
+                 <LogIn className="mr-2 h-5 w-5" /> Connexion Business (Bientôt)
                </Button>
             </CardContent>
              <CardFooter>
-                 <p className="text-xs text-muted-foreground">Besoin d'aide ? Contactez le support.</p>
+                 <p className="text-xs text-muted-foreground text-center w-full">Besoin d'un compte partenaire ? Contactez-nous.</p>
             </CardFooter>
           </Card>
         </TabsContent>
 
         {/* Developers Tab */}
         <TabsContent value="developers">
-          <Card>
+          <Card className="shadow-lg border">
             <CardHeader>
-              <CardTitle>Accès Développeur</CardTitle>
+              <CardTitle className="text-xl">Portail Développeur</CardTitle>
               <CardDescription>
-                Portail pour les développeurs et intégrateurs.
+                Accès aux APIs et outils d'intégration SenPass.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-2 text-center">
+               <Code className="h-16 w-16 text-muted-foreground mx-auto my-4"/>
               <p className="text-muted-foreground">
-                Connectez-vous avec votre compte développeur ou clé API. Documentation et outils disponibles après connexion.
+                Connectez-vous pour accéder à la documentation API, aux clés et aux environnements de test.
               </p>
-               <Button disabled className="w-full">
-                 <LogIn className="mr-2 h-4 w-4" /> Connexion Développeur (Bientôt)
+               <Button disabled className="w-full h-11 text-base">
+                 <LogIn className="mr-2 h-5 w-5" /> Connexion Développeur (Bientôt)
                </Button>
             </CardContent>
              <CardFooter>
-                 <p className="text-xs text-muted-foreground">Consultez la documentation API.</p>
+                 <p className="text-xs text-muted-foreground text-center w-full">Consultez la documentation publique.</p>
             </CardFooter>
           </Card>
         </TabsContent>

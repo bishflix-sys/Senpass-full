@@ -35,35 +35,43 @@ export default function QRCodeDisplay({
 }: QRCodeDisplayProps) {
 
   // Use Senegal Flag Colors: Green (#00853F), Yellow (#FDEF42), Red (#E31B23)
-  // For simplicity, we'll use green as the primary color.
+  // Using green as the primary QR color.
   const fgColor = "#00853F";
   const bgColor = "#FFFFFF"; // White background
 
+  // Calculate dynamic height for content area to prevent layout shifts
+  const contentHeight = size + 32; // Base size + padding
+
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-            <QrCode className="h-5 w-5" /> {title}
+    <Card className={cn("border", className)}> {/* Ensure border is present */}
+      <CardHeader className="pb-2"> {/* Reduce bottom padding */}
+        <CardTitle className="flex items-center gap-2 text-lg"> {/* Adjusted size */}
+            <QrCode className="h-5 w-5 text-primary" /> {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-center p-4" style={{ height: size + 32 }}> {/* Set fixed height based on size */}
+      <CardContent className="flex items-center justify-center p-4" style={{ height: contentHeight, minHeight: contentHeight }}> {/* Set fixed min-height */}
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center text-muted-foreground">
-             <Loader2 className="h-8 w-8 animate-spin mb-2" />
-             <p>Chargement...</p>
+          <div className="flex flex-col items-center justify-center text-muted-foreground space-y-2 w-full h-full">
+             <Loader2 className="h-8 w-8 animate-spin" />
+             <p className="text-sm">Chargement QR...</p>
            </div>
         ) : data ? (
-          <QRCodeCanvas
-            value={data}
-            size={size}
-            bgColor={bgColor}
-            fgColor={fgColor}
-            level={"H"} // High error correction level
-            includeMargin={true}
-          />
+           <div className="p-2 bg-white rounded-md shadow-inner"> {/* White background container */}
+              <QRCodeCanvas
+                value={data}
+                size={size}
+                bgColor={bgColor}
+                fgColor={fgColor}
+                level={"H"} // High error correction level
+                includeMargin={true}
+                className="rounded" // Optional: slight rounding on the canvas itself
+              />
+           </div>
         ) : (
-          <p className="text-muted-foreground">Aucune donnée à afficher.</p>
+           <div className="flex items-center justify-center text-muted-foreground h-full w-full">
+              <p>QR non disponible.</p>
+           </div>
         )}
       </CardContent>
     </Card>

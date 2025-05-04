@@ -1,11 +1,12 @@
 
 import type { Metadata } from "next";
-// Removed GeistSans import as it's causing an error and wasn't explicitly requested for styling.
-// import { GeistSans } from "geist/font/sans";
+// Font import removed previously due to error, relying on Tailwind's default sans-serif stack.
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/header";
+import { Separator } from "@/components/ui/separator"; // Import Separator
+import Footer from "@/components/footer"; // Import Footer
 
 export const metadata: Metadata = {
   title: "SenPass Lite",
@@ -21,16 +22,15 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-           // Font variable application removed
-          // GeistSans.variable
+          "min-h-screen bg-background font-sans antialiased flex flex-col",
+          // Apply Tailwind's default sans-serif font stack
         )}
       >
         <Header />
-        <main className="container mx-auto px-4 py-8">{children}</main>
+        <main className="flex-grow container mx-auto px-4 py-8">{children}</main>
+        <Footer /> {/* Add Footer component */}
         <Toaster />
       </body>
     </html>
   );
 }
-
