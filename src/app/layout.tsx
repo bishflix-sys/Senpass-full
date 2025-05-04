@@ -1,5 +1,7 @@
+
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
+// Removed GeistSans import as it's causing an error and wasn't explicitly requested for styling.
+// import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
@@ -20,8 +22,8 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-           // Apply the font variable here
-          GeistSans.variable
+           // Font variable application removed
+          // GeistSans.variable
         )}
       >
         <Header />
@@ -31,3 +33,4 @@ export default function RootLayout({
     </html>
   );
 }
+
