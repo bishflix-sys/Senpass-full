@@ -12,7 +12,19 @@ import {
   FileSignature,
   UserCheck,
   UserSquare,
+  Hash, // Import Hash icon for the ID
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge"; // Import Badge for styling the ID
+
+// Helper function to generate a simple alphanumeric ID (for simulation)
+const generateAlphanumericId = (length = 12) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+};
 
 export default async function Home() {
   // Fetch user profile data on the server
@@ -21,6 +33,9 @@ export default async function Home() {
   // Data for the QR code (e.g., user's national ID or a link to their profile)
   // Using nationalId as an example
   const qrData = `senpass-profile:${userProfile.nationalId || 'unknown'}`;
+
+  // Generate a unique alphanumeric ID for display
+  const uniqueId = generateAlphanumericId();
 
   return (
     <div className="space-y-8">
@@ -43,16 +58,31 @@ export default async function Home() {
           <ProfileCard user={userProfile} />
         </div>
 
-        {/* QR Code and Activity/Alerts Section */}
+        {/* QR Code, Unique ID, and Activity/Alerts Section */}
         <div className="md:col-span-2 space-y-6">
-            {/* Integrate QR Code Display */}
-            <QRCodeDisplay
-              data={qrData}
-              title="Votre Identifiant QR SenPass"
-              description="Utilisez ce code pour partager votre identifiant (Simulation)."
-              size={160} // Adjust size as needed
-              className="shadow-md"
-            />
+             {/* Container for QR Code and Unique ID */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                {/* Integrate QR Code Display */}
+                <QRCodeDisplay
+                  data={qrData}
+                  title="Votre Identifiant QR SenPass"
+                  description="Utilisez ce code pour partager votre identifiant (Simulation)."
+                  size={160} // Adjust size as needed
+                  className="shadow-md"
+                />
+
+                {/* Display Unique Alphanumeric ID */}
+                <div className="space-y-2">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Hash className="h-5 w-5 text-primary" /> Votre ID Unique
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Identifiant unique associé à votre profil SenPass.</p>
+                    <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2">
+                        {uniqueId}
+                    </Badge>
+                </div>
+            </div>
+
 
            {/* Placeholder for potential future content like recent activity or important alerts */}
             <div className="p-6 border rounded-lg bg-card text-card-foreground shadow-sm">
