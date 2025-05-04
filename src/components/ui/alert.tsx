@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import type { LucideProps } from "lucide-react"; // Import LucideProps
+import type { LucideProps } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
@@ -23,8 +23,8 @@ const alertVariants = cva(
 
 const Alert = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants> & { icon?: React.ElementType<LucideProps> } // Add optional icon prop
->(({ className, variant, icon: Icon, children, ...props }, ref) => ( // Destructure icon
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants> & { icon?: React.ElementType<LucideProps> }
+>(({ className, variant, icon: Icon, children, ...props }, ref) => (
   <div
     ref={ref}
     role="alert"
@@ -32,7 +32,9 @@ const Alert = React.forwardRef<
     {...props}
   >
       {Icon && <Icon className="h-4 w-4" />} {/* Render icon if provided */}
-    {children}
+      <div> {/* Wrap children in a div to ensure proper layout with icon */}
+          {children}
+      </div>
   </div>
 ))
 Alert.displayName = "Alert"
@@ -62,3 +64,4 @@ const AlertDescription = React.forwardRef<
 AlertDescription.displayName = "AlertDescription"
 
 export { Alert, AlertTitle, AlertDescription }
+```

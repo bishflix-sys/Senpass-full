@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { QRCodeCanvas } from 'qrcode.react';
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 import {
   Tabs,
   TabsContent,
@@ -24,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, Video, VideoOff } from "lucide-react";
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, Video, VideoOff, User } from "lucide-react"; // Added User icon
 import {
   Form,
   FormControl,
@@ -57,7 +57,6 @@ const phoneSchema = z.object({
   phoneNumber: z
     .string()
     .min(1, "Le numéro de téléphone est requis.")
-    // Basic validation: starts with +221 and has a reasonable length (e.g., +221 followed by 9 digits)
     .regex(/^\+221\d{9}$/, "Format invalide. Utilisez +221 suivi de 9 chiffres (ex: +221771234567)."),
 });
 
@@ -165,8 +164,8 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
         </div>
 
         {hasCameraPermission === false && (
-          <Alert variant="destructive">
-            <VideoOff className="h-4 w-4" />
+          <Alert variant="destructive" icon={VideoOff}> {/* Use icon prop */}
+            {/* <VideoOff className="h-4 w-4" /> Replaced by icon prop */}
             <AlertTitle>Accès Caméra Refusé</AlertTitle>
             <AlertDescription>
               Veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur pour utiliser cette fonctionnalité.
@@ -203,6 +202,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
+  const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
 
   const form = useForm<PhoneFormValues>({
@@ -213,62 +213,83 @@ export default function LoginPage() {
   });
 
    const handleAuthenticationSuccess = () => {
-      // Stop camera stream if facial recognition dialog was open
-      // (Cleanup in FacialRecognitionDialogContent handles this now)
       setShowFacialRecognitionDialog(false);
+      setIsQrDialogOpen(false); // Close QR dialog if open
+      setQrCodeData(null); // Clear QR data
 
-      // Simulate successful login redirect after a short delay
       setTimeout(() => {
         router.push('/'); // Redirect to home page
-      }, 500); // Short delay to allow toast to show
+      }, 500);
    };
 
   function onSubmit(data: PhoneFormValues) {
-    // Simulate login attempt with phone number
     toast({
       title: "Vérification OTP (Simulation)",
-      description: `Un code a été envoyé au ${data.phoneNumber}. Entrez le code pour continuer.`, // Simulate OTP step
+      description: `Un code a été envoyé au ${data.phoneNumber}. Entrez le code pour continuer.`,
     });
     console.log("Phone login attempt:", data);
-    // In a real app, you'd wait for OTP verification before calling handleAuthenticationSuccess
-    // For simulation, we'll assume OTP is correct after a delay
     setTimeout(() => {
       toast({
         title: "Connexion réussie!",
         description: "Redirection vers l'accueil...",
       });
        handleAuthenticationSuccess();
-    }, 2000); // Simulate OTP entry and verification time
+    }, 2000);
   }
 
-  const handleQrLogin = () => {
-    const qrData = `senpass-lite-login-simulation-${Date.now()}`;
-    setQrCodeData(qrData);
+  // Function to generate new QR data
+  const generateQrData = () => `senpass-lite-login-simulation-${Date.now()}`;
+
+  const handleOpenQrDialog = () => {
+    const initialQrData = generateQrData();
+    setQrCodeData(initialQrData);
+    setIsQrDialogOpen(true); // Open the dialog
     toast({
       title: "QR Code Généré (Simulation)",
       description: "Scannez le code pour une connexion simulée.",
     });
-    console.log("QR Code login initiated, data:", qrData);
-     // Simulate successful scan after a while
+    console.log("QR Code login initiated, data:", initialQrData);
+     // Simulate successful scan after a while (longer than refresh interval)
+     // In a real app, this would be event-driven from the scanning device
      setTimeout(() => {
-        // Check if QR code dialog is still relevant (user might have closed it)
-        if (qrCodeData === qrData) { // Check if the data is still the current one
+        // Check if the dialog is still open before declaring success
+        if (isQrDialogOpen) {
              toast({
                 title: "QR Code Scanné!",
                 description: "Connexion réussie via QR Code. Redirection...",
              });
              handleAuthenticationSuccess();
         }
-     }, 10000); // Simulate 10 seconds for scanning
+     }, 25000); // Simulate 25 seconds for scanning to allow refreshes
   };
 
+  // Effect to refresh QR code every 10 seconds when the dialog is open
+  React.useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    if (isQrDialogOpen && qrCodeData !== null) { // Check qrCodeData is not null to avoid unnecessary initial interval
+      intervalId = setInterval(() => {
+        const newData = generateQrData();
+        console.log("Refreshing QR Code:", newData); // Log refresh
+        setQrCodeData(newData);
+      }, 10000); // Refresh every 10 seconds
+    }
+
+    // Cleanup function to clear the interval
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        console.log("Cleared QR Code refresh interval.");
+      }
+    };
+  }, [isQrDialogOpen, qrCodeData]); // Depend on dialog state and data presence
 
   return (
     <div className="flex justify-center items-center py-12">
       <Tabs defaultValue="individuals" className="w-full max-w-lg">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="individuals">
-            <UserSquare className="mr-2 h-4 w-4" /> Individus
+            <User className="mr-2 h-4 w-4" /> Individus {/* Replaced UserSquare with User */}
           </TabsTrigger>
           <TabsTrigger value="business">
             <Building className="mr-2 h-4 w-4" /> Business
@@ -307,7 +328,6 @@ export default function LoginPage() {
                                {...field}
                                onChange={(e) => {
                                  const value = e.target.value;
-                                 // Ensure it always starts with +221 and only allows digits after that
                                  if (!value.startsWith('+221')) {
                                       field.onChange('+221');
                                  } else {
@@ -316,7 +336,7 @@ export default function LoginPage() {
                                  }
                                }}
                                className="rounded-l-none flex-1"
-                               maxLength={13} // +221 + 9 digits
+                               maxLength={13}
                              />
                            </div>
                         </FormControl>
@@ -352,46 +372,54 @@ export default function LoginPage() {
               {/* QR Code and Face Login Buttons */}
               <div className="grid grid-cols-2 gap-4">
                 {/* QR Code Dialog */}
-                <Dialog onOpenChange={(open) => !open && setQrCodeData(null)}>
+                <Dialog open={isQrDialogOpen} onOpenChange={(open) => {
+                    setIsQrDialogOpen(open);
+                    if (open) { // Only generate new QR data when opening
+                        const initialQrData = generateQrData();
+                        setQrCodeData(initialQrData);
+                        console.log("QR Code login initiated, data:", initialQrData);
+                        // Re-add simulation of successful scan if needed for testing
+                         setTimeout(() => {
+                            if (isQrDialogOpen) { // Re-check if dialog still open
+                                toast({
+                                    title: "QR Code Scanné! (Simulé)",
+                                    description: "Connexion réussie via QR Code. Redirection...",
+                                });
+                                handleAuthenticationSuccess();
+                            }
+                         }, 25000);
+                    } else {
+                        setQrCodeData(null); // Clear data on close
+                    }
+                 }}>
                     <DialogTrigger asChild>
-                        <Button variant="outline" onClick={handleQrLogin}>
-                        <QrCode className="mr-2 h-4 w-4 text-accent" /> QR Code
+                        <Button variant="outline" onClick={handleOpenQrDialog}>
+                           <QrCode className="mr-2 h-4 w-4 text-accent" /> QR Code
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                        <DialogTitle>Scanner le QR Code</DialogTitle>
-                        <DialogDescription>
-                            Utilisez l'application mobile SenPass pour scanner ce code et vous connecter. (Simulation)
-                        </DialogDescription>
+                           <DialogTitle>Scanner le QR Code</DialogTitle>
+                           <DialogDescription>
+                              Utilisez l'application mobile SenPass pour scanner ce code. Il se met à jour toutes les 10 secondes. (Simulation)
+                           </DialogDescription>
                         </DialogHeader>
                         <div className="flex items-center justify-center p-4">
-                        {qrCodeData ? (
-                            <QRCodeCanvas
-                                value={qrCodeData}
-                                size={256}
-                                // Senegal Flag Colors: Green (#00853F), Yellow (#FDEF42), Red (#E31B23)
-                                bgColor={"#FFFFFF"} // White background
-                                fgColor={"#00853F"} // Green for the main pattern
-                                level={"H"} // High error correction level for potential logo/color complexity
-                                includeMargin={true}
-                                // imageSettings - Consider removing if colors are primary focus
-                                // imageSettings={{
-                                //   src: "/sn-flag-icon.png", // Path to your Senegal flag icon
-                                //   height: 48,
-                                //   width: 48,
-                                //   excavate: true,
-                                // }}
-                                // --- Custom Pixel Rendering for Flag Colors (Advanced) ---
-                                // This requires a more complex setup, potentially drawing directly on a canvas
-                                // and then placing the QR code pattern over it, or customizing the QRCodeCanvas render.
-                                // The library might not directly support multi-color patterns easily.
-                                // A simpler approach is a colored logo or just one primary color.
-                                // Let's stick with the green primary color for simplicity.
-                            />
-                        ) : (
-                            <p>Génération du QR code...</p>
-                        )}
+                           {qrCodeData ? (
+                              <QRCodeCanvas
+                                 value={qrCodeData}
+                                 size={256}
+                                 bgColor={"#FFFFFF"} // White background
+                                 fgColor={"#00853F"} // Senegal Green
+                                 level={"H"}
+                                 includeMargin={true}
+                              />
+                           ) : (
+                              <div className="flex flex-col items-center justify-center text-muted-foreground h-[256px]">
+                                 <Loader2 className="h-8 w-8 animate-spin mb-2" />
+                                 <p>Génération du QR code...</p>
+                              </div>
+                           )}
                         </div>
                         <DialogFooter className="sm:justify-center">
                             <DialogClose asChild>
@@ -410,7 +438,6 @@ export default function LoginPage() {
                              <ScanFace className="mr-2 h-4 w-4 text-accent" /> Reconnaissance Faciale
                          </Button>
                      </DialogTrigger>
-                     {/* Render content only when open to trigger useEffect on mount */}
                      {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={handleAuthenticationSuccess} />}
                  </Dialog>
               </div>
@@ -473,21 +500,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-// Need UserSquare icon, let's define a simple one if not available
-const UserSquare = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("lucide lucide-user-square", className)}
-  >
-    <rect width="18" height="18" x="3" y="3" rx="2" />
-    <circle cx="12" cy="10" r="3" />
-    <path d="M7 21v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" />
-  </svg>
-);

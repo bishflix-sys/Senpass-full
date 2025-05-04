@@ -1,22 +1,27 @@
 
+"use client"; // Add 'use client' directive for useState and useEffect
+
+import * as React from "react"; // Import React for hooks
 import { getUserProfile, type UserProfile } from "@/services/identity";
 import ProfileCard from "@/components/profile-card";
 import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
-import LogoutButton from "@/components/logout-button"; // Import the LogoutButton
-import QRCodeDisplay from "@/components/qr-code-display"; // Import the QRCodeDisplay component
+import LogoutButton from "@/components/logout-button";
+import QRCodeDisplay from "@/components/qr-code-display";
 import {
   Fingerprint,
   ScanFace,
   KeyRound,
   FileSignature,
   UserCheck,
-  UserSquare,
-  Hash, // Import Hash icon for the ID
+  User, // Use User icon
+  Hash,
+  Loader2, // Import Loader2 for loading state
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge"; // Import Badge for styling the ID
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 
-// Helper function to generate a simple alphanumeric ID (for simulation)
+// Helper function to generate a simple alphanumeric ID
 const generateAlphanumericId = (length = 12) => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -26,16 +31,96 @@ const generateAlphanumericId = (length = 12) => {
   return result;
 };
 
-export default async function Home() {
-  // Fetch user profile data on the server
-  const userProfile: UserProfile = await getUserProfile("user123"); // Using a placeholder ID
+// Helper function to generate QR code data
+const generateQrData = (nationalId?: string) => `senpass-profile:${nationalId || 'unknown'}:${Date.now()}`;
 
-  // Data for the QR code (e.g., user's national ID or a link to their profile)
-  // Using nationalId as an example
-  const qrData = `senpass-profile:${userProfile.nationalId || 'unknown'}`;
 
-  // Generate a unique alphanumeric ID for display
-  const uniqueId = generateAlphanumericId();
+export default function Home() {
+  // State for user profile, QR data, and unique ID
+  const [userProfile, setUserProfile] = React.useState<UserProfile | null>(null);
+  const [qrData, setQrData] = React.useState<string | null>(null);
+  const [uniqueId, setUniqueId] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // Fetch user profile data on component mount
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setIsLoading(true);
+        const profile = await getUserProfile("user123"); // Using a placeholder ID
+        setUserProfile(profile);
+        setQrData(generateQrData(profile.nationalId)); // Initial QR data generation
+        setUniqueId(generateAlphanumericId()); // Generate unique ID once
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        // Handle error appropriately, e.g., show a toast message
+      } finally {
+         setIsLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+   // Effect to refresh QR code every 10 seconds
+   React.useEffect(() => {
+     const intervalId = setInterval(() => {
+       if (userProfile) {
+         const newData = generateQrData(userProfile.nationalId);
+         console.log("Refreshing home page QR Code:", newData);
+         setQrData(newData);
+       }
+     }, 10000); // Refresh every 10 seconds
+
+     // Cleanup function to clear the interval
+     return () => clearInterval(intervalId);
+   }, [userProfile]); // Re-run if userProfile changes (though unlikely here)
+
+  // Loading state UI
+  if (isLoading) {
+    return (
+      <div className="space-y-8 animate-pulse">
+         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+           <div className="flex-1 space-y-2">
+             <Skeleton className="h-8 w-3/4" />
+             <Skeleton className="h-4 w-1/2" />
+           </div>
+           <Skeleton className="h-9 w-32" />
+         </div>
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+           <Skeleton className="md:col-span-1 h-64 rounded-lg" />
+           <div className="md:col-span-2 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                 <Skeleton className="h-48 rounded-lg" />
+                 <div className="space-y-2">
+                     <Skeleton className="h-6 w-24" />
+                     <Skeleton className="h-4 w-3/4" />
+                     <Skeleton className="h-8 w-40" />
+                 </div>
+              </div>
+             <Skeleton className="h-24 rounded-lg" />
+             <Skeleton className="h-24 rounded-lg" />
+           </div>
+         </div>
+          <Skeleton className="h-10 w-40" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {Array.from({ length: 16 }).map((_, i) => (
+              <Skeleton key={i} className="h-32 rounded-lg" />
+            ))}
+          </div>
+          <Skeleton className="h-10 w-40" />
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+           {Array.from({ length: 6 }).map((_, i) => (
+             <Skeleton key={i} className="h-28 rounded-lg" />
+           ))}
+         </div>
+      </div>
+    );
+  }
+
+   // Ensure userProfile is loaded before rendering dependent components
+  if (!userProfile) {
+      return <div className="text-center text-muted-foreground py-10">Erreur lors du chargement du profil.</div>;
+  }
 
   return (
     <div className="space-y-8">
@@ -48,7 +133,7 @@ export default async function Home() {
               Votre tableau de bord d'identité numérique nationale simulée.
             </p>
          </div>
-         <LogoutButton /> {/* Add the logout button here */}
+         <LogoutButton />
       </div>
 
 
@@ -64,11 +149,12 @@ export default async function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
                 {/* Integrate QR Code Display */}
                 <QRCodeDisplay
-                  data={qrData}
+                  data={qrData || ''} // Pass current QR data, fallback to empty string
                   title="Votre Identifiant QR SenPass"
-                  description="Utilisez ce code pour partager votre identifiant (Simulation)."
-                  size={160} // Adjust size as needed
+                  description="Ce code se met à jour toutes les 10s (Simulation)."
+                  size={160}
                   className="shadow-md"
+                  isLoading={!qrData} // Indicate loading if qrData is null
                 />
 
                 {/* Display Unique Alphanumeric ID */}
@@ -78,7 +164,7 @@ export default async function Home() {
                     </h3>
                     <p className="text-sm text-muted-foreground">Identifiant unique associé à votre profil SenPass.</p>
                     <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2">
-                        {uniqueId}
+                        {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
                     </Badge>
                 </div>
             </div>
@@ -105,7 +191,7 @@ export default async function Home() {
         <h2 className="text-2xl font-semibold mb-4">Fonctionnalités</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard
-            icon={UserSquare}
+            icon={User} // Use User icon
             title="MonProfil"
             description="Remplissage automatique simulé des formulaires avec vos données officielles."
           />

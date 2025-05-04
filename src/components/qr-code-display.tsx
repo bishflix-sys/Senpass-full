@@ -4,7 +4,8 @@
 import React from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { QrCode } from 'lucide-react';
+import { QrCode, Loader2 } from 'lucide-react'; // Import Loader2
+import { cn } from '@/lib/utils'; // Import cn
 
 interface QRCodeDisplayProps {
   /** The data to encode in the QR code. */
@@ -17,6 +18,8 @@ interface QRCodeDisplayProps {
   size?: number;
   /** Optional className for the Card component */
   className?: string;
+  /** Indicates if the QR code data is currently loading */
+  isLoading?: boolean;
 }
 
 /**
@@ -27,7 +30,8 @@ export default function QRCodeDisplay({
   title,
   description,
   size = 128,
-  className
+  className,
+  isLoading = false // Default isLoading to false
 }: QRCodeDisplayProps) {
 
   // Use Senegal Flag Colors: Green (#00853F), Yellow (#FDEF42), Red (#E31B23)
@@ -43,8 +47,13 @@ export default function QRCodeDisplay({
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-center p-4">
-        {data ? (
+      <CardContent className="flex items-center justify-center p-4" style={{ height: size + 32 }}> {/* Set fixed height based on size */}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center text-muted-foreground">
+             <Loader2 className="h-8 w-8 animate-spin mb-2" />
+             <p>Chargement...</p>
+           </div>
+        ) : data ? (
           <QRCodeCanvas
             value={data}
             size={size}
