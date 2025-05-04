@@ -25,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus } from "lucide-react"; // Added UserPlus, Lock icons
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive } from "lucide-react"; // Added UserPlus, Lock, KeyRound, CaseSensitive icons
 import {
   Form,
   FormControl,
@@ -54,7 +54,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import RegistrationDialogContent from "@/components/registration-dialog-content"; // Import RegistrationDialogContent
 
-// Schema for phone number validation
+// Schema for phone number validation (Individuals)
 const phoneSchema = z.object({
   phoneNumber: z
     .string()
@@ -63,6 +63,14 @@ const phoneSchema = z.object({
 });
 
 type PhoneFormValues = z.infer<typeof phoneSchema>;
+
+// Schema for business login validation
+const businessSchema = z.object({
+  registrationNumber: z.string().min(5, "NINEA ou RCCM requis (min 5 caractères)."), // Basic validation
+  password: z.string().min(6, "Mot de passe requis (min 6 caractères)."),
+});
+
+type BusinessFormValues = z.infer<typeof businessSchema>;
 
 // Component for Facial Recognition Dialog Content
 const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
@@ -218,10 +226,20 @@ export default function LoginPage() {
   const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
   const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = React.useState(false); // State for registration dialog
 
-  const form = useForm<PhoneFormValues>({
+  // Form for Individuals (Phone Login)
+  const phoneForm = useForm<PhoneFormValues>({
     resolver: zodResolver(phoneSchema),
     defaultValues: {
       phoneNumber: "+221",
+    },
+  });
+
+  // Form for Business Login
+  const businessForm = useForm<BusinessFormValues>({
+    resolver: zodResolver(businessSchema),
+    defaultValues: {
+      registrationNumber: "",
+      password: "",
     },
   });
 
@@ -248,7 +266,8 @@ export default function LoginPage() {
       });
    }, [toast]);
 
-  function onSubmit(data: PhoneFormValues) {
+  // Submit handler for Phone Login (Individuals)
+  function onPhoneSubmit(data: PhoneFormValues) {
     toast({
       title: "Vérification en cours... (Simulation)",
       description: `Un code OTP simulé est envoyé à ${data.phoneNumber}.`,
@@ -263,6 +282,36 @@ export default function LoginPage() {
        handleAuthenticationSuccess();
     }, 1500); // Shorter delay for phone login simulation
   }
+
+  // Submit handler for Business Login
+  function onBusinessSubmit(data: BusinessFormValues) {
+    toast({
+      title: "Vérification Business en cours... (Simulation)",
+      description: `Tentative de connexion pour ${data.registrationNumber}.`,
+    });
+    console.log("Business login attempt:", data);
+    // Simulate business credential verification and login
+    setTimeout(() => {
+      // Simulate success/failure
+      const success = Math.random() > 0.2; // 80% success rate simulation
+      if (success) {
+        toast({
+          title: "Connexion Business réussie!",
+          description: "Redirection vers le portail entreprise...", // Or home page for now
+        });
+        handleAuthenticationSuccess(); // Redirect to home for simulation
+      } else {
+         toast({
+            title: "Échec de la Connexion Business",
+            description: "Identifiants incorrects. Veuillez réessayer.",
+            variant: "destructive",
+         });
+         // Reset password field on failure
+         businessForm.resetField("password");
+      }
+    }, 1500);
+  }
+
 
   // Function to generate new QR data
   const generateQrData = () => `senpass-lite-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Added randomness
@@ -346,10 +395,10 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent className="space-y-6 pt-2"> {/* Added top padding */}
               {/* Phone Number Login Form */}
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <Form {...phoneForm}>
+                <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
                   <FormField
-                    control={form.control}
+                    control={phoneForm.control}
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
@@ -384,8 +433,8 @@ export default function LoginPage() {
                       </FormItem>
                     )}
                   />
-                   <Button type="submit" className="w-full h-11 text-base" disabled={form.formState.isSubmitting}> {/* Adjusted size/text */}
-                     {form.formState.isSubmitting ? (
+                   <Button type="submit" className="w-full h-11 text-base" disabled={phoneForm.formState.isSubmitting}> {/* Adjusted size/text */}
+                     {phoneForm.formState.isSubmitting ? (
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" /> // Larger icon
                      ) : (
                         <LogIn className="mr-2 h-5 w-5" /> // Larger icon
@@ -501,20 +550,70 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Connexion Entreprise</CardTitle>
               <CardDescription>
-                Accès sécurisé pour les organisations partenaires.
+                Accès sécurisé pour les organisations partenaires via NINEA/RCCM.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 pt-2 text-center">
-              <Building className="h-16 w-16 text-muted-foreground mx-auto my-4"/>
-              <p className="text-muted-foreground">
-                Fonctionnalité bientôt disponible pour les comptes professionnels et partenaires.
-              </p>
-               <Button disabled className="w-full h-11 text-base">
-                 <LogIn className="mr-2 h-5 w-5" /> Connexion Business (Bientôt)
-               </Button>
+            <CardContent className="space-y-6 pt-2">
+              {/* Business Login Form */}
+              <Form {...businessForm}>
+                 <form onSubmit={businessForm.handleSubmit(onBusinessSubmit)} className="space-y-4">
+                   <FormField
+                     control={businessForm.control}
+                     name="registrationNumber"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormLabel className="flex items-center text-sm">
+                           <CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM
+                         </FormLabel>
+                         <FormControl>
+                           <Input
+                             placeholder="Ex: 001234567 ou SN.DKR.2023.A.12345"
+                             {...field}
+                             className="h-11 text-base"
+                           />
+                         </FormControl>
+                         <FormMessage />
+                       </FormItem>
+                     )}
+                   />
+                    <FormField
+                     control={businessForm.control}
+                     name="password"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormLabel className="flex items-center text-sm">
+                           <KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe
+                         </FormLabel>
+                         <FormControl>
+                           <Input
+                             type="password"
+                             placeholder="••••••••"
+                             {...field}
+                             className="h-11 text-base"
+                           />
+                         </FormControl>
+                         <FormMessage />
+                       </FormItem>
+                     )}
+                   />
+                    <Button type="submit" className="w-full h-11 text-base" disabled={businessForm.formState.isSubmitting}>
+                      {businessForm.formState.isSubmitting ? (
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      ) : (
+                        <LogIn className="mr-2 h-5 w-5" />
+                      )}
+                      Se Connecter (Business)
+                    </Button>
+                 </form>
+              </Form>
             </CardContent>
-             <CardFooter>
-                 <p className="text-xs text-muted-foreground text-center w-full">Besoin d'un compte partenaire ? Contactez-nous.</p>
+            <CardFooter>
+              <p className="text-xs text-muted-foreground text-center w-full">
+                Besoin d'un compte partenaire ?{" "}
+                 <Link href="#" className="text-primary underline hover:no-underline"> {/* Add link target later */}
+                  Contactez-nous
+                 </Link>.
+              </p>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -538,7 +637,11 @@ export default function LoginPage() {
                </Button>
             </CardContent>
              <CardFooter>
-                 <p className="text-xs text-muted-foreground text-center w-full">Consultez la documentation publique.</p>
+                 <p className="text-xs text-muted-foreground text-center w-full">
+                     <Link href="#" className="text-primary underline hover:no-underline"> {/* Add link target later */}
+                       Consultez la documentation publique
+                     </Link>.
+                 </p>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -546,5 +649,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
