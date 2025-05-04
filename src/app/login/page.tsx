@@ -5,6 +5,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { QRCodeCanvas } from 'qrcode.react';
 import {
   Tabs,
   TabsContent,
@@ -32,6 +33,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +59,7 @@ type PhoneFormValues = z.infer<typeof phoneSchema>;
 
 export default function LoginPage() {
   const { toast } = useToast();
+  const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
 
   const form = useForm<PhoneFormValues>({
     resolver: zodResolver(phoneSchema),
@@ -63,23 +75,30 @@ export default function LoginPage() {
       description: `Numéro de téléphone: ${data.phoneNumber}`,
     });
     console.log("Phone login attempt:", data);
-    // Reset or navigate after successful simulation if needed
+    // In a real app, you'd redirect here after successful OTP or similar
+    // For simulation, maybe redirect after a short delay
+    // router.push('/'); // Requires importing useRouter from 'next/navigation'
   }
 
   const handleQrLogin = () => {
+    const qrData = `senpass-lite-login-simulation-${Date.now()}`;
+    setQrCodeData(qrData);
     toast({
-      title: "Connexion par QR Code (Simulation)",
-      description: "Scan du QR Code initié.",
+      title: "QR Code Généré (Simulation)",
+      description: "Scannez le code pour une connexion simulée.",
     });
-    console.log("QR Code login initiated");
+    console.log("QR Code login initiated, data:", qrData);
   };
 
   const handleFaceLogin = () => {
     toast({
       title: "Reconnaissance Faciale (Simulation)",
-      description: "Scan facial initié.",
+      description: "Scan facial initié. Cette fonctionnalité nécessite une implémentation plus complexe.",
     });
     console.log("Facial recognition login initiated");
+    // You would typically trigger camera access here.
+    // For now, it just shows a toast.
+    // Consider redirecting to a dedicated facial recognition page/component
   };
 
   return (
@@ -120,22 +139,20 @@ export default function LoginPage() {
                         </FormLabel>
                         <FormControl>
                            <div className="flex items-center gap-2">
-                             <span className="text-sm font-medium p-2 bg-muted rounded-l-md border border-r-0 border-input">+221</span>
+                             <span className="text-sm font-medium p-2 bg-muted rounded-l-md border border-r-0 border-input h-10 flex items-center">+221</span>
                              <Input
                                placeholder="7X XXX XX XX"
                                {...field}
                                onChange={(e) => {
-                                 // Ensure +221 prefix is maintained and only allow digits after
                                  const value = e.target.value;
                                  if (value.startsWith('+221')) {
                                     const numericPart = value.substring(4).replace(/\D/g, '');
                                     field.onChange(`+221${numericPart}`);
                                  } else if (value === '+22' || value === '+2' || value === '+') {
-                                    field.onChange('+221'); // Handle partial prefix deletion
+                                    field.onChange('+221');
                                  } else if (value === '') {
-                                    field.onChange('+221'); // Reset if empty
+                                    field.onChange('+221');
                                  } else {
-                                     // If prefix is incorrect, reset or correct it. Here, reset.
                                      field.onChange('+221');
                                  }
                                }}
@@ -145,7 +162,7 @@ export default function LoginPage() {
                            </div>
                         </FormControl>
                         <FormDescription>
-                          Entrez votre numéro de téléphone enregistré (Sénégal uniquement).
+                          Entrez votre numéro de téléphone enregistré (Sénégal uniquement). Un code sera envoyé.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -170,9 +187,52 @@ export default function LoginPage() {
 
               {/* QR Code and Face Login Buttons */}
               <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" onClick={handleQrLogin}>
-                  <QrCode className="mr-2 h-4 w-4 text-accent" /> QR Code
-                </Button>
+                {/* QR Code Dialog */}
+                <Dialog onOpenChange={(open) => !open && setQrCodeData(null)}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" onClick={handleQrLogin}>
+                        <QrCode className="mr-2 h-4 w-4 text-accent" /> QR Code
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                        <DialogTitle>Scanner le QR Code</DialogTitle>
+                        <DialogDescription>
+                            Utilisez l'application mobile SenPass pour scanner ce code et vous connecter. (Simulation)
+                        </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex items-center justify-center p-4">
+                        {qrCodeData ? (
+                            <QRCodeCanvas
+                            value={qrCodeData}
+                            size={256}
+                            bgColor={"#ffffff"}
+                            fgColor={"#000000"}
+                            level={"L"}
+                            includeMargin={false}
+                            imageSettings={{
+                                src: "/sn-flag-icon.png", // Optional: Add a small logo in the center
+                                x: undefined,
+                                y: undefined,
+                                height: 32,
+                                width: 32,
+                                excavate: true,
+                            }}
+                            />
+                        ) : (
+                            <p>Génération du QR code...</p>
+                        )}
+                        </div>
+                        <DialogFooter className="sm:justify-center">
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">
+                                Fermer
+                                </Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
                 <Button variant="outline" onClick={handleFaceLogin}>
                   <ScanFace className="mr-2 h-4 w-4 text-accent" /> Reconnaissance Faciale
                 </Button>
@@ -200,7 +260,6 @@ export default function LoginPage() {
                 Les options de connexion pour les comptes Business seront bientôt disponibles.
                 Vous pourrez vous connecter via email/mot de passe ou intégration SSO.
               </p>
-              {/* Placeholder for Business login form */}
                <Button disabled className="w-full">
                  <LogIn className="mr-2 h-4 w-4" /> Connexion Business (Bientôt)
                </Button>
@@ -224,7 +283,6 @@ export default function LoginPage() {
               <p className="text-muted-foreground">
                 Connectez-vous avec votre compte développeur ou clé API. Documentation et outils disponibles après connexion.
               </p>
-              {/* Placeholder for Developer login form */}
                <Button disabled className="w-full">
                  <LogIn className="mr-2 h-4 w-4" /> Connexion Développeur (Bientôt)
                </Button>
@@ -256,4 +314,3 @@ const UserSquare = ({ className }: { className?: string }) => (
     <path d="M7 21v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" />
   </svg>
 );
-
