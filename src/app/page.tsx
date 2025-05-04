@@ -1,7 +1,9 @@
+
 import { getUserProfile, type UserProfile } from "@/services/identity";
 import ProfileCard from "@/components/profile-card";
 import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
+import LogoutButton from "@/components/logout-button"; // Import the LogoutButton
 // Removed LoginSimulation and NotificationSimulation imports as they are no longer displayed here.
 // import LoginSimulation from "@/components/login-simulation";
 // import NotificationSimulation from "@/components/notification-simulation";
@@ -21,12 +23,18 @@ export default async function Home() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-primary">
-        Bienvenue sur SenPass Lite, {userProfile.name} !
-      </h1>
-      <p className="text-muted-foreground">
-        Votre tableau de bord d'identité numérique nationale simulée.
-      </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+         <div className="flex-1">
+            <h1 className="text-3xl font-bold text-primary">
+              Bienvenue sur SenPass Lite, {userProfile.name} !
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Votre tableau de bord d'identité numérique nationale simulée.
+            </p>
+         </div>
+         <LogoutButton /> {/* Add the logout button here */}
+      </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Profile Section */}
@@ -94,3 +102,4 @@ export default async function Home() {
     </div>
   );
 }
+
