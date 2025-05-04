@@ -64,13 +64,13 @@ const phoneSchema = z.object({
 
 type PhoneFormValues = z.infer<typeof phoneSchema>;
 
-// Schema for business login validation
-const businessSchema = z.object({
+// Schema for business/developer login validation
+const orgLoginSchema = z.object({
   registrationNumber: z.string().min(5, "NINEA ou RCCM requis (min 5 caractères)."), // Basic validation
   password: z.string().min(6, "Mot de passe requis (min 6 caractères)."),
 });
 
-type BusinessFormValues = z.infer<typeof businessSchema>;
+type OrgLoginValues = z.infer<typeof orgLoginSchema>;
 
 // Component for Facial Recognition Dialog Content
 const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
@@ -235,8 +235,17 @@ export default function LoginPage() {
   });
 
   // Form for Business Login
-  const businessForm = useForm<BusinessFormValues>({
-    resolver: zodResolver(businessSchema),
+  const businessForm = useForm<OrgLoginValues>({
+    resolver: zodResolver(orgLoginSchema),
+    defaultValues: {
+      registrationNumber: "",
+      password: "",
+    },
+  });
+
+  // Form for Developer Login
+  const developerForm = useForm<OrgLoginValues>({
+    resolver: zodResolver(orgLoginSchema),
     defaultValues: {
       registrationNumber: "",
       password: "",
@@ -284,7 +293,7 @@ export default function LoginPage() {
   }
 
   // Submit handler for Business Login
-  function onBusinessSubmit(data: BusinessFormValues) {
+  function onBusinessSubmit(data: OrgLoginValues) {
     toast({
       title: "Vérification Business en cours... (Simulation)",
       description: `Tentative de connexion pour ${data.registrationNumber}.`,
@@ -308,6 +317,35 @@ export default function LoginPage() {
          });
          // Reset password field on failure
          businessForm.resetField("password");
+      }
+    }, 1500);
+  }
+
+  // Submit handler for Developer Login
+  function onDeveloperSubmit(data: OrgLoginValues) {
+    toast({
+      title: "Vérification Développeur en cours... (Simulation)",
+      description: `Tentative de connexion pour ${data.registrationNumber}.`,
+    });
+    console.log("Developer login attempt:", data);
+    // Simulate developer credential verification and login
+    setTimeout(() => {
+      // Simulate success/failure (e.g., 70% success rate)
+      const success = Math.random() > 0.3;
+      if (success) {
+        toast({
+          title: "Connexion Développeur réussie!",
+          description: "Redirection vers le portail développeur...", // Or home page for now
+        });
+        handleAuthenticationSuccess(); // Redirect to home for simulation
+      } else {
+         toast({
+            title: "Échec de la Connexion Développeur",
+            description: "Identifiants incorrects. Veuillez réessayer.",
+            variant: "destructive",
+         });
+         // Reset password field on failure
+         developerForm.resetField("password");
       }
     }, 1500);
   }
@@ -624,22 +662,67 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Portail Développeur</CardTitle>
               <CardDescription>
-                Accès aux APIs et outils d'intégration SenPass.
+                Accès aux APIs et outils d'intégration SenPass via NINEA/RCCM.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 pt-2 text-center">
-               <Code className="h-16 w-16 text-muted-foreground mx-auto my-4"/>
-              <p className="text-muted-foreground">
-                Connectez-vous pour accéder à la documentation API, aux clés et aux environnements de test.
-              </p>
-               <Button disabled className="w-full h-11 text-base">
-                 <LogIn className="mr-2 h-5 w-5" /> Connexion Développeur (Bientôt)
-               </Button>
+            <CardContent className="space-y-6 pt-2">
+              {/* Developer Login Form */}
+               <Form {...developerForm}>
+                 <form onSubmit={developerForm.handleSubmit(onDeveloperSubmit)} className="space-y-4">
+                   <FormField
+                     control={developerForm.control}
+                     name="registrationNumber"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormLabel className="flex items-center text-sm">
+                           <CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM (Développeur)
+                         </FormLabel>
+                         <FormControl>
+                           <Input
+                             placeholder="N° organisation développeur"
+                             {...field}
+                             className="h-11 text-base"
+                           />
+                         </FormControl>
+                         <FormMessage />
+                       </FormItem>
+                     )}
+                   />
+                    <FormField
+                     control={developerForm.control}
+                     name="password"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormLabel className="flex items-center text-sm">
+                           <KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe (API Key / Secret)
+                         </FormLabel>
+                         <FormControl>
+                           <Input
+                             type="password"
+                             placeholder="••••••••"
+                             {...field}
+                             className="h-11 text-base"
+                           />
+                         </FormControl>
+                         <FormMessage />
+                       </FormItem>
+                     )}
+                   />
+                    <Button type="submit" className="w-full h-11 text-base" disabled={developerForm.formState.isSubmitting}>
+                      {developerForm.formState.isSubmitting ? (
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      ) : (
+                        <LogIn className="mr-2 h-5 w-5" />
+                      )}
+                      Se Connecter (Développeur)
+                    </Button>
+                 </form>
+               </Form>
             </CardContent>
              <CardFooter>
                  <p className="text-xs text-muted-foreground text-center w-full">
                      <Link href="#" className="text-primary underline hover:no-underline"> {/* Add link target later */}
-                       Consultez la documentation publique
+                       Consultez la documentation API
                      </Link>.
                  </p>
             </CardFooter>
