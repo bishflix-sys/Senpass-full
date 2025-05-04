@@ -183,7 +183,7 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
         </div>
 
         {hasCameraPermission === false && (
-          <Alert variant="destructive" /* icon={VideoOff} - icon prop removed, use children instead */ >
+          <Alert variant="destructive">
              <VideoOff className="h-4 w-4" /> {/* Add icon directly */}
             <AlertTitle>Accès Caméra Refusé</AlertTitle>
             <AlertDescription>
@@ -252,7 +252,7 @@ export default function LoginPage() {
     },
   });
 
-   const handleAuthenticationSuccess = React.useCallback(() => {
+   const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/') => {
       // Close dialogs first
       setShowFacialRecognitionDialog(false);
       setIsQrDialogOpen(false);
@@ -261,7 +261,7 @@ export default function LoginPage() {
 
       // Use a slight delay to allow dialogs to close visually before redirecting
       setTimeout(() => {
-        router.push('/'); // Redirect to home page
+        router.push(targetPath); // Redirect to the specified path
       }, 300); // 300ms delay
    }, [router]); // Add router to dependency array
 
@@ -288,7 +288,7 @@ export default function LoginPage() {
         title: "Connexion réussie!",
         description: "Redirection vers l'accueil...",
       });
-       handleAuthenticationSuccess();
+       handleAuthenticationSuccess('/'); // Redirect to individual home
     }, 1500); // Shorter delay for phone login simulation
   }
 
@@ -306,9 +306,9 @@ export default function LoginPage() {
       if (success) {
         toast({
           title: "Connexion Business réussie!",
-          description: "Redirection vers le portail entreprise...", // Or home page for now
+          description: "Redirection vers le portail entreprise...",
         });
-        handleAuthenticationSuccess(); // Redirect to home for simulation
+        handleAuthenticationSuccess('/business-dashboard'); // Redirect to business dashboard
       } else {
          toast({
             title: "Échec de la Connexion Business",
@@ -337,7 +337,7 @@ export default function LoginPage() {
           title: "Connexion Développeur réussie!",
           description: "Redirection vers le portail développeur...", // Or home page for now
         });
-        handleAuthenticationSuccess(); // Redirect to home for simulation
+        handleAuthenticationSuccess('/'); // Redirect to home for simulation (or a future developer portal)
       } else {
          toast({
             title: "Échec de la Connexion Développeur",
@@ -369,7 +369,7 @@ export default function LoginPage() {
                 title: "QR Code Scanné!",
                 description: "Connexion réussie via QR Code. Redirection...",
              });
-             handleAuthenticationSuccess();
+             handleAuthenticationSuccess('/'); // Redirect to individual home
         } else {
             console.log("QR scan simulation cancelled, dialog closed.");
         }
@@ -556,7 +556,7 @@ export default function LoginPage() {
                          </Button>
                      </DialogTrigger>
                      {/* Conditionally render content to ensure useEffect runs on open */}
-                     {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={handleAuthenticationSuccess} />}
+                     {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess('/')} />}
                  </Dialog>
               </div>
 
