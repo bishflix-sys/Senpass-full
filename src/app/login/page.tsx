@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // Import Link
 import {
   Tabs,
   TabsContent,
@@ -24,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, Video, VideoOff, User, Lock } from "lucide-react"; // Added Lock icon
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus } from "lucide-react"; // Added UserPlus, Lock icons
 import {
   Form,
   FormControl,
@@ -51,6 +52,7 @@ import {
 } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import RegistrationDialogContent from "@/components/registration-dialog-content"; // Import RegistrationDialogContent
 
 // Schema for phone number validation
 const phoneSchema = z.object({
@@ -173,7 +175,8 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
         </div>
 
         {hasCameraPermission === false && (
-          <Alert variant="destructive" icon={VideoOff}>
+          <Alert variant="destructive" /* icon={VideoOff} - icon prop removed, use children instead */ >
+             <VideoOff className="h-4 w-4" /> {/* Add icon directly */}
             <AlertTitle>Accès Caméra Refusé</AlertTitle>
             <AlertDescription>
               L'accès à la caméra est nécessaire. Veuillez l'autoriser dans les paramètres de votre navigateur.
@@ -213,6 +216,7 @@ export default function LoginPage() {
   const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
+  const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = React.useState(false); // State for registration dialog
 
   const form = useForm<PhoneFormValues>({
     resolver: zodResolver(phoneSchema),
@@ -225,6 +229,7 @@ export default function LoginPage() {
       // Close dialogs first
       setShowFacialRecognitionDialog(false);
       setIsQrDialogOpen(false);
+      setIsRegistrationDialogOpen(false); // Close registration dialog as well
       setQrCodeData(null); // Clear QR data
 
       // Use a slight delay to allow dialogs to close visually before redirecting
@@ -232,6 +237,16 @@ export default function LoginPage() {
         router.push('/'); // Redirect to home page
       }, 300); // 300ms delay
    }, [router]); // Add router to dependency array
+
+   const handleRegistrationSuccess = React.useCallback(() => {
+      setIsRegistrationDialogOpen(false); // Close the registration dialog
+      // Optionally redirect or show another message
+      toast({
+          title: "Inscription Réussie!",
+          description: "Vous pouvez maintenant vous connecter.",
+          variant: "default" // Use default variant for success
+      });
+   }, [toast]);
 
   function onSubmit(data: PhoneFormValues) {
     toast({
@@ -261,7 +276,7 @@ export default function LoginPage() {
      // In a real app, this would be event-driven from the scanning device
      const scanTimeout = setTimeout(() => {
         // Check if the dialog is still open before declaring success
-        if (isQrDialogOpen) { // Re-check using state directly
+        if (isQrDialogOpenRef.current) { // Use ref to check current state
              console.log("Simulating successful QR scan...");
              toast({
                 title: "QR Code Scanné!",
@@ -278,12 +293,17 @@ export default function LoginPage() {
      // A more robust solution might use a ref to store the timeout ID
   };
 
+  // Ref to track if the QR dialog is open for the timeout callback
+  const isQrDialogOpenRef = React.useRef(isQrDialogOpen);
+  React.useEffect(() => {
+      isQrDialogOpenRef.current = isQrDialogOpen;
+  }, [isQrDialogOpen]);
+
   // Effect to refresh QR code every 10 seconds when the dialog is open
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
 
     if (isQrDialogOpen) { // Only run if dialog is open
-      // Initial QR code generation is handled in handleOpenQrDialog or onOpenChange
       intervalId = setInterval(() => {
         setQrCodeData(generateQrData());
         console.log("Refreshing QR Code..."); // Log refresh
@@ -394,10 +414,10 @@ export default function LoginPage() {
                     setIsQrDialogOpen(open);
                     if (open) {
                         setQrCodeData(generateQrData()); // Generate fresh QR on open
-                        handleOpenQrDialog(); // Keep existing timeout logic if needed
+                        handleOpenQrDialog(); // Start the login simulation timeout
                     } else {
                         setQrCodeData(null); // Clear data on close
-                        // Consider clearing the scan simulation timeout here
+                        // The timeout check logic remains the same (uses ref)
                     }
                  }}>
                     <DialogTrigger asChild>
@@ -452,6 +472,20 @@ export default function LoginPage() {
                      {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={handleAuthenticationSuccess} />}
                  </Dialog>
               </div>
+
+              {/* Registration Link/Dialog */}
+               <div className="text-center pt-4">
+                   <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
+                       <DialogTrigger asChild>
+                           <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
+                               <UserPlus className="h-4 w-4" /> S'inscrire à SenPass
+                           </Button>
+                       </DialogTrigger>
+                       {/* Registration Dialog Content */}
+                       {isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}
+                   </Dialog>
+               </div>
+
             </CardContent>
              <CardFooter>
                 <p className="text-xs text-muted-foreground text-center w-full flex items-center justify-center gap-1.5">
@@ -512,3 +546,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
