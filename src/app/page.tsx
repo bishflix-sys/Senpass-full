@@ -14,11 +14,15 @@ import {
   KeyRound,
   FileSignature,
   UserCheck,
-  User, // Use User icon
+  User,
   Hash,
-  Loader2, // Import Loader2 for loading state
-  Activity, // Import Activity icon
-  AlertTriangle // Import AlertTriangle icon
+  Loader2,
+  Activity,
+  AlertTriangle,
+  Wallet,         // Icon for E-Wallet
+  ShieldCheck,    // Icon for Data Protection
+  FolderArchive,  // Icon for Document Management
+  LockKeyhole     // Icon for Strong Authentication
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
@@ -116,7 +120,7 @@ export default function Home() {
           <Separator className="my-6" />
           <Skeleton className="h-10 w-40 mb-4" /> {/* Features Title Skeleton */}
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-           {Array.from({ length: 6 }).map((_, i) => (
+           {Array.from({ length: 7 }).map((_, i) => ( // Adjusted to 7 for the new feature card count
              <Skeleton key={i} className="h-28 rounded-lg" />
            ))}
          </div>
@@ -138,7 +142,7 @@ export default function Home() {
               Bienvenue sur SenPass Lite, {userProfile.name} !
             </h1>
             <p className="text-muted-foreground mt-1">
-              Votre tableau de bord d'identité numérique nationale simulée.
+              Votre tableau de bord centralisé pour votre identité numérique unique (Simulation).
             </p>
          </div>
          <LogoutButton />
@@ -174,7 +178,7 @@ export default function Home() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground mb-2">Votre identifiant unique personnel.</p>
+                    <p className="text-sm text-muted-foreground mb-2">Votre identifiant numérique unique personnel.</p>
                     <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
                         {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
                     </Badge>
@@ -221,41 +225,45 @@ export default function Home() {
 
       {/* Features Section */}
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales</h2>
+        <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales de SenPass</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <FeatureCard
-            icon={User} // Use User icon
-            title="MonProfil Connect"
-            description="Remplissage automatique simulé des formulaires avec vos données officielles."
-          />
-          <FeatureCard
-            icon={UserCheck}
-            title="Vérification Simplifiée"
-            description="Simulation de vérification sécurisée de l'identité sans documents physiques."
-          />
-          <FeatureCard
-            icon={FileSignature}
-            title="Signature Électronique"
-            description="Simulation de signature numérique à valeur légale pour documents."
-          />
+           {/* Reordered and added new features */}
            <FeatureCard
-            icon={Fingerprint}
-            title="Authentification Biométrique"
-            description="Simulation d'authentification via empreinte digitale."
-            accentIcon
-          />
+              icon={LockKeyhole} // New icon for strong auth
+              title="Authentification Sécurisée"
+              description="Accès aux services via biométrie, PIN, OTP (Simulation)."
+              accentIcon
+           />
            <FeatureCard
-            icon={ScanFace}
-            title="Reconnaissance Faciale"
-            description="Simulation d'authentification via reconnaissance faciale."
-            accentIcon
-          />
+              icon={UserCheck}
+              title="Vérification Simplifiée"
+              description="Validation d'identité sécurisée et rapide, sans documents physiques (Simulation)."
+           />
            <FeatureCard
-            icon={KeyRound}
-            title="Accès par Code PIN"
-            description="Simulation d'authentification via code PIN sécurisé personnel."
-            accentIcon
-          />
+              icon={FileSignature}
+              title="Signature Électronique"
+              description="Signature de documents administratifs avec valeur légale (Simulation)."
+           />
+           <FeatureCard
+              icon={Wallet} // New icon for e-wallet
+              title="Portefeuille Numérique"
+              description="Paiement intégré de taxes et factures via e-wallet (Simulation)."
+           />
+           <FeatureCard
+              icon={FolderArchive} // New icon for document management
+              title="Documents Dématérialisés"
+              description="Accès et stockage sécurisé de vos documents officiels (Simulation)."
+           />
+           <FeatureCard
+              icon={ShieldCheck} // New icon for data protection
+              title="Protection des Données"
+              description="Contrôle sur vos informations personnelles, respect de la confidentialité (Simulation)."
+           />
+           <FeatureCard
+              icon={User} // Keep MonProfil or similar
+              title="MonProfil Connect"
+              description="Remplissage automatique des formulaires avec vos données officielles (Simulation)."
+           />
         </div>
       </section>
     </div>

@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Import CardContent
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +35,7 @@ const services = [
   // Private/Utilities
   { title: "Énergie", icon: Zap, description: "Senelec...", href: "/services/energie" }, // Shortened title
   { title: "Eau", icon: Droplet, description: "Sen'Eau...", href: "/services/eau" }, // Shortened title
-  { title: "Télécom", icon: Signal, description: "Orange...", href: "/services/telecom" }, // Shortened title
+  { title: "Télécom", icon: Signal, description: "Opérateurs...", href: "/services/telecom" }, // Shortened title
 
   // Uniformed Services
   { title: "Police", icon: Shield, description: "Nationale...", href: "/services/police" }, // Shortened title
@@ -52,8 +51,8 @@ export default function ServiceShortcuts() {
   return (
     <section>
       <h2 className="text-2xl font-semibold mb-4">Accès Rapide aux Services (Simulation)</h2>
-      {/* Adjusted grid columns for better responsiveness */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      {/* Adjusted grid columns for better responsiveness with 16 items */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
         {services.map((service) => (
           <Card
             key={service.title}
