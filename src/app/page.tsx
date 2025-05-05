@@ -34,12 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"; // Import Card components
 import { Separator } from "@/components/ui/separator"; // Import Separator
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"; // Import Accordion
+// Accordion removed as chat is now fixed
 import { Button } from "@/components/ui/button"; // Import Button for toggle
 import { cn } from "@/lib/utils"; // Import cn for conditional styling
 
@@ -146,8 +141,7 @@ export default function Home() {
              <Skeleton key={i} className="h-28 rounded-lg" />
            ))}
          </div>
-         <Separator className="my-6" /> {/* Added separator for chat */}
-         <Skeleton className="h-12 w-full rounded-lg" /> {/* Chat Accordion Trigger Skeleton */}
+          {/* Chat skeleton removed from main flow */}
       </div>
     );
   }
@@ -158,202 +152,194 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-         <div className="flex-1">
-            <h1 className="text-3xl font-bold text-primary">
-              Bienvenue sur SenPass Lite, {userProfile.name} !
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Votre tableau de bord centralisé pour votre identité numérique unique (Simulation).
-            </p>
-         </div>
-         <LogoutButton />
-      </div>
-
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Profile Section (Left Column) */}
-        <div className="md:col-span-1">
-          <ProfileCard user={userProfile} />
+    // Added relative positioning context if needed, though fixed positioning usually doesn't require it.
+    <div className="relative">
+      <div className="space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+           <div className="flex-1">
+              <h1 className="text-3xl font-bold text-primary">
+                Bienvenue sur SenPass Lite, {userProfile.name} !
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Votre tableau de bord centralisé pour votre identité numérique unique (Simulation).
+              </p>
+           </div>
+           <LogoutButton />
         </div>
 
-        {/* QR, ID, Wallet, Activity/Alerts Section (Right Column) */}
-        <div className="md:col-span-2 space-y-6">
-             {/* Container for QR Code, Unique ID and Wallet */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                {/* QR Code Display */}
-                <QRCodeDisplay
-                  data={qrData || ''} // Pass current QR data, fallback to empty string
-                  title="Votre Identifiant QR SenPass"
-                  description="Code dynamique pour accès rapide (Simulation)."
-                  size={160}
-                  className="shadow-md border" // Added border for slight emphasis
-                  isLoading={!qrData} // Indicate loading if qrData is null
-                />
 
-                {/* Container for ID and Wallet */}
-                <div className="space-y-6">
-                    {/* Unique Alphanumeric ID Card */}
-                    <Card className="shadow-md border">
-                    <CardHeader className="pb-3"> {/* Reduced bottom padding */}
-                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                            <Hash className="h-5 w-5 text-primary" /> ID Unique SenPass
-                        </CardTitle>
-                         <CardDescription className="text-xs">Votre identifiant numérique personnel.</CardDescription>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Profile Section (Left Column) */}
+          <div className="md:col-span-1">
+            <ProfileCard user={userProfile} />
+          </div>
+
+          {/* QR, ID, Wallet, Activity/Alerts Section (Right Column) */}
+          <div className="md:col-span-2 space-y-6">
+               {/* Container for QR Code, Unique ID and Wallet */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                  {/* QR Code Display */}
+                  <QRCodeDisplay
+                    data={qrData || ''} // Pass current QR data, fallback to empty string
+                    title="Votre Identifiant QR SenPass"
+                    description="Code dynamique pour accès rapide (Simulation)."
+                    size={160}
+                    className="shadow-md border" // Added border for slight emphasis
+                    isLoading={!qrData} // Indicate loading if qrData is null
+                  />
+
+                  {/* Container for ID and Wallet */}
+                  <div className="space-y-6">
+                      {/* Unique Alphanumeric ID Card */}
+                      <Card className="shadow-md border">
+                      <CardHeader className="pb-3"> {/* Reduced bottom padding */}
+                          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                              <Hash className="h-5 w-5 text-primary" /> ID Unique SenPass
+                          </CardTitle>
+                           <CardDescription className="text-xs">Votre identifiant numérique personnel.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                          <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
+                              {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
+                          </Badge>
+                      </CardContent>
+                      </Card>
+
+                      {/* Wallet Balance Card */}
+                      <Card className="shadow-md border">
+                          <CardHeader className="pb-3">
+                              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                  <Wallet className="h-5 w-5 text-primary" /> Solde Portefeuille
+                              </CardTitle>
+                              <CardDescription className="text-xs">Votre balance e-wallet SenPass (Simulation).</CardDescription>
+                          </CardHeader>
+                          <CardContent className="flex items-center justify-between flex-wrap gap-4"> {/* Added flex-wrap */}
+                             <span className="text-2xl font-bold tracking-tight">
+                              {walletBalance === null ? (
+                                  <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
+                              ) : isBalanceVisible ? (
+                                  `${walletBalance.toLocaleString('fr-FR')} FCFA`
+                              ) : (
+                                  '**** FCFA'
+                              )}
+                             </span>
+                             <div className="flex items-center gap-2"> {/* Group toggle and pay buttons */}
+                                 <Button
+                                   variant="ghost"
+                                   size="icon"
+                                   onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+                                   aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
+                                   className="text-muted-foreground hover:text-primary"
+                                 >
+                                   {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                 </Button>
+                                 <Button asChild variant="outline" size="sm">
+                                     <Link href="/payment">
+                                         <CreditCard className="mr-2 h-4 w-4" /> Payer
+                                     </Link>
+                                 </Button>
+                             </div>
+                          </CardContent>
+                      </Card>
+                  </div>
+              </div>
+
+              {/* Grid for Recent Activity and Important Alerts */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                 {/* Recent Activity Card */}
+                  <Card className="shadow-sm border">
+                    <CardHeader>
+                       <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          <Activity className="h-5 w-5 text-primary" /> Activité récente
+                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
-                            {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
-                        </Badge>
+                       <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
+                       {/* Future: List recent logins, verifications etc. */}
                     </CardContent>
-                    </Card>
+                  </Card>
 
-                    {/* Wallet Balance Card */}
-                    <Card className="shadow-md border">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                                <Wallet className="h-5 w-5 text-primary" /> Solde Portefeuille
-                            </CardTitle>
-                            <CardDescription className="text-xs">Votre balance e-wallet SenPass (Simulation).</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex items-center justify-between flex-wrap gap-4"> {/* Added flex-wrap */}
-                           <span className="text-2xl font-bold tracking-tight">
-                            {walletBalance === null ? (
-                                <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
-                            ) : isBalanceVisible ? (
-                                `${walletBalance.toLocaleString('fr-FR')} FCFA`
-                            ) : (
-                                '**** FCFA'
-                            )}
-                           </span>
-                           <div className="flex items-center gap-2"> {/* Group toggle and pay buttons */}
-                               <Button
-                                 variant="ghost"
-                                 size="icon"
-                                 onClick={() => setIsBalanceVisible(!isBalanceVisible)}
-                                 aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
-                                 className="text-muted-foreground hover:text-primary"
-                               >
-                                 {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                               </Button>
-                               <Button asChild variant="outline" size="sm">
-                                   <Link href="/payment">
-                                       <CreditCard className="mr-2 h-4 w-4" /> Payer
-                                   </Link>
-                               </Button>
-                           </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-
-            {/* Grid for Recent Activity and Important Alerts */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-               {/* Recent Activity Card */}
-                <Card className="shadow-sm border">
-                  <CardHeader>
-                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                        <Activity className="h-5 w-5 text-primary" /> Activité récente
-                     </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                     <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
-                     {/* Future: List recent logins, verifications etc. */}
-                  </CardContent>
-                </Card>
-
-                {/* Important Alerts Card */}
-                <Card className="shadow-sm border">
-                   <CardHeader>
-                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-destructive" /> Alertes importantes
-                     </CardTitle>
-                  </CardHeader>
-                   <CardContent>
-                     <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
-                     {/* Future: Display security alerts, pending actions etc. */}
-                   </CardContent>
-                </Card>
-            </div>
+                  {/* Important Alerts Card */}
+                  <Card className="shadow-sm border">
+                     <CardHeader>
+                       <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          <AlertTriangle className="h-5 w-5 text-destructive" /> Alertes importantes
+                       </CardTitle>
+                    </CardHeader>
+                     <CardContent>
+                       <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
+                       {/* Future: Display security alerts, pending actions etc. */}
+                     </CardContent>
+                  </Card>
+              </div>
+          </div>
         </div>
+
+        {/* Separator */}
+        <Separator className="my-8" />
+
+        {/* Service Shortcuts Section */}
+        <ServiceShortcuts />
+
+         {/* Separator */}
+        <Separator className="my-8" />
+
+        {/* Features Section */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales de SenPass</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+             {/* Reordered and added new features */}
+             <FeatureCard
+                icon={LockKeyhole} // New icon for strong auth
+                title="Authentification Sécurisée"
+                description="Accès aux services via biométrie, PIN, OTP (Simulation)."
+                accentIcon
+             />
+             <FeatureCard
+                icon={UserCheck}
+                title="Vérification Simplifiée"
+                description="Validation d'identité sécurisée et rapide, sans documents physiques (Simulation)."
+             />
+             <FeatureCard
+                icon={FileSignature}
+                title="Signature Électronique"
+                description="Signature de documents administratifs avec valeur légale (Simulation)."
+             />
+             <FeatureCard
+                icon={Wallet} // New icon for e-wallet
+                title="Portefeuille Numérique"
+                description="Paiement intégré de taxes et factures via e-wallet (Simulation)."
+             />
+             <FeatureCard
+                icon={FolderArchive} // New icon for document management
+                title="Documents Dématérialisés"
+                description="Accès et stockage sécurisé de vos documents dans le cloud (Simulation)." // Updated description
+             />
+             <FeatureCard
+                icon={ShieldCheck} // New icon for data protection
+                title="Protection des Données"
+                description="Contrôle sur vos informations personnelles, respect de la confidentialité (Simulation)."
+             />
+             <FeatureCard
+                icon={User} // Keep MonProfil or similar
+                title="MonProfil Connect"
+                description="Remplissage automatique des formulaires avec vos données officielles (Simulation)."
+             />
+          </div>
+        </section>
+
+         {/* BISHOP Chatbot Section - Removed from Accordion */}
+         {/* The chatbot is now placed outside the main content flow */}
+
       </div>
 
-      {/* Separator */}
-      <Separator className="my-8" />
-
-      {/* Service Shortcuts Section */}
-      <ServiceShortcuts />
-
-       {/* Separator */}
-      <Separator className="my-8" />
-
-      {/* Features Section */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales de SenPass</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-           {/* Reordered and added new features */}
-           <FeatureCard
-              icon={LockKeyhole} // New icon for strong auth
-              title="Authentification Sécurisée"
-              description="Accès aux services via biométrie, PIN, OTP (Simulation)."
-              accentIcon
-           />
-           <FeatureCard
-              icon={UserCheck}
-              title="Vérification Simplifiée"
-              description="Validation d'identité sécurisée et rapide, sans documents physiques (Simulation)."
-           />
-           <FeatureCard
-              icon={FileSignature}
-              title="Signature Électronique"
-              description="Signature de documents administratifs avec valeur légale (Simulation)."
-           />
-           <FeatureCard
-              icon={Wallet} // New icon for e-wallet
-              title="Portefeuille Numérique"
-              description="Paiement intégré de taxes et factures via e-wallet (Simulation)."
-           />
-           <FeatureCard
-              icon={FolderArchive} // New icon for document management
-              title="Documents Dématérialisés"
-              description="Accès et stockage sécurisé de vos documents dans le cloud (Simulation)." // Updated description
-           />
-           <FeatureCard
-              icon={ShieldCheck} // New icon for data protection
-              title="Protection des Données"
-              description="Contrôle sur vos informations personnelles, respect de la confidentialité (Simulation)."
-           />
-           <FeatureCard
-              icon={User} // Keep MonProfil or similar
-              title="MonProfil Connect"
-              description="Remplissage automatique des formulaires avec vos données officielles (Simulation)."
-           />
-        </div>
-      </section>
-
-       {/* Separator */}
-       <Separator className="my-8" />
-
-       {/* BISHOP Chatbot Section */}
-       <section>
-         <Accordion type="single" collapsible className="w-full">
-           <AccordionItem value="item-1">
-             <AccordionTrigger className="text-xl font-semibold hover:no-underline">
-               <div className="flex items-center gap-3">
-                  <Bot className="h-6 w-6 text-primary"/>
-                  Besoin d'aide ? Parlez à BISHOP
-               </div>
-             </AccordionTrigger>
-             <AccordionContent>
-               <BishopChat />
-             </AccordionContent>
-           </AccordionItem>
-         </Accordion>
-       </section>
-
+      {/* Fixed Position Chatbot */}
+       {/* Adjust right, bottom, transform values for precise positioning */}
+       <div className="fixed right-6 bottom-1/2 translate-y-1/2 z-50">
+          <BishopChat />
+       </div>
     </div>
   );
 }

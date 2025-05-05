@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -73,7 +74,7 @@ export default function BishopChat() {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-xl border">
+    <Card className="w-full max-w-md mx-auto shadow-xl border"> {/* Changed max-w-2xl to max-w-md */}
       <CardHeader className="flex flex-row items-center gap-3 border-b pb-4">
          <Avatar className="h-10 w-10 border-2 border-primary">
             <AvatarFallback className="bg-primary text-primary-foreground"><Bot size={20} /></AvatarFallback>
