@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import { Lock } from "lucide-react"; // Import the Lock icon
 
 // SVG representation of the Senpass logo
 const SenpassLogo = () => (
@@ -71,15 +72,18 @@ const SenpassLogo = () => (
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm"> {/* Added shadow-sm */}
-      <div className="container flex h-16 items-center"> {/* Increased height slightly */}
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+      <div className="container flex h-16 items-center justify-between"> {/* Use justify-between */}
+        {/* Left side: Logo */}
+        <Link href="/" className="flex items-center space-x-2">
            <SenpassLogo />
-           {/* Original text removed, logo includes text */}
-          {/* <span className="font-bold sm:inline-block text-xl">
-            SenPass Lite
-          </span> */}
+           {/* Removed the text span */}
         </Link>
-        {/* Add navigation items here if needed */}
+
+        {/* Right side: Security Indicator */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Lock className="h-4 w-4" />
+          <span>Sécurisé</span>
+        </div>
       </div>
     </header>
   );
