@@ -25,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive } from "lucide-react"; // Added UserPlus, Lock, KeyRound, CaseSensitive icons
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2 } from "lucide-react"; // Added UserPlus, Lock, KeyRound, CaseSensitive, Building2 icons
 import {
   Form,
   FormControl,
@@ -53,6 +53,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import RegistrationDialogContent from "@/components/registration-dialog-content"; // Import RegistrationDialogContent
+import BusinessRegistrationDialogContent from "@/components/business-registration-dialog-content"; // Import BusinessRegistrationDialogContent
 
 // Schema for phone number validation (Individuals)
 const phoneSchema = z.object({
@@ -224,7 +225,8 @@ export default function LoginPage() {
   const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
-  const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = React.useState(false); // State for registration dialog
+  const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = React.useState(false); // State for individual registration dialog
+  const [isBusinessRegistrationDialogOpen, setIsBusinessRegistrationDialogOpen] = React.useState(false); // State for business registration dialog
 
   // Form for Individuals (Phone Login)
   const phoneForm = useForm<PhoneFormValues>({
@@ -256,7 +258,8 @@ export default function LoginPage() {
       // Close dialogs first
       setShowFacialRecognitionDialog(false);
       setIsQrDialogOpen(false);
-      setIsRegistrationDialogOpen(false); // Close registration dialog as well
+      setIsRegistrationDialogOpen(false); // Close individual registration dialog
+      setIsBusinessRegistrationDialogOpen(false); // Close business registration dialog
       setQrCodeData(null); // Clear QR data
 
       // Use a slight delay to allow dialogs to close visually before redirecting
@@ -266,7 +269,8 @@ export default function LoginPage() {
    }, [router]); // Add router to dependency array
 
    const handleRegistrationSuccess = React.useCallback(() => {
-      setIsRegistrationDialogOpen(false); // Close the registration dialog
+      setIsRegistrationDialogOpen(false); // Close the individual registration dialog
+      setIsBusinessRegistrationDialogOpen(false); // Close the business registration dialog
       // Optionally redirect or show another message
       toast({
           title: "Inscription Réussie!",
@@ -644,12 +648,26 @@ export default function LoginPage() {
                     </Button>
                  </form>
               </Form>
+
+               {/* Business Registration Link/Dialog */}
+               <div className="text-center pt-4">
+                 <Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}>
+                   <DialogTrigger asChild>
+                     <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
+                       <Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution
+                     </Button>
+                   </DialogTrigger>
+                   {/* Business Registration Dialog Content */}
+                   {isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}
+                 </Dialog>
+               </div>
+
             </CardContent>
             <CardFooter>
               <p className="text-xs text-muted-foreground text-center w-full">
-                Besoin d'un compte partenaire ?{" "}
+                Besoin d'aide ?{" "}
                  <Link href="#" className="text-primary underline hover:no-underline"> {/* Add link target later */}
-                  Contactez-nous
+                  Contactez le support
                  </Link>.
               </p>
             </CardFooter>
