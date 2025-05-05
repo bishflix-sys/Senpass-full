@@ -8,6 +8,7 @@ import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
 import LogoutButton from "@/components/logout-button";
 import QRCodeDisplay from "@/components/qr-code-display";
+import BishopChat from "@/components/bishop-chat"; // Import BishopChat
 import {
   Fingerprint,
   ScanFace,
@@ -22,12 +23,19 @@ import {
   Wallet,         // Icon for E-Wallet
   ShieldCheck,    // Icon for Data Protection
   FolderArchive,  // Icon for Document Management
-  LockKeyhole     // Icon for Strong Authentication
+  LockKeyhole,    // Icon for Strong Authentication
+  Bot // Icon for Chatbot
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Import Card components
 import { Separator } from "@/components/ui/separator"; // Import Separator
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"; // Import Accordion
 
 // Helper function to generate a simple alphanumeric ID
 const generateAlphanumericId = (length = 12) => {
@@ -124,6 +132,8 @@ export default function Home() {
              <Skeleton key={i} className="h-28 rounded-lg" />
            ))}
          </div>
+         <Separator className="my-6" /> {/* Added separator for chat */}
+         <Skeleton className="h-12 w-full rounded-lg" /> {/* Chat Accordion Trigger Skeleton */}
       </div>
     );
   }
@@ -266,6 +276,27 @@ export default function Home() {
            />
         </div>
       </section>
+
+       {/* Separator */}
+       <Separator className="my-8" />
+
+       {/* BISHOP Chatbot Section */}
+       <section>
+         <Accordion type="single" collapsible className="w-full">
+           <AccordionItem value="item-1">
+             <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+               <div className="flex items-center gap-3">
+                  <Bot className="h-6 w-6 text-primary"/>
+                  Besoin d'aide ? Parlez à BISHOP
+               </div>
+             </AccordionTrigger>
+             <AccordionContent>
+               <BishopChat />
+             </AccordionContent>
+           </AccordionItem>
+         </Accordion>
+       </section>
+
     </div>
   );
 }
