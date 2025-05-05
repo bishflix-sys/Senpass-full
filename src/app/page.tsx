@@ -319,7 +319,7 @@ export default function Home() {
            <FeatureCard
               icon={FolderArchive} // New icon for document management
               title="Documents Dématérialisés"
-              description="Accès et stockage sécurisé de vos documents officiels (Simulation)."
+              description="Accès et stockage sécurisé de vos documents dans le cloud (Simulation)." // Updated description
            />
            <FeatureCard
               icon={ShieldCheck} // New icon for data protection

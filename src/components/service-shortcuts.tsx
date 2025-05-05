@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Import CardContent
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,7 @@ import {
   ShieldAlert,    // Gendarmerie
   Anchor,         // Douanes (Ship not available)
   Users,          // ONGs
+  FolderArchive,  // Icon for Documents
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils"; // Import cn
@@ -31,6 +33,7 @@ const services = [
   { title: "Impôts/Domaines", icon: FileSpreadsheet, description: "Déclarations...", href: "/services/impots" },
   { title: "Justice", icon: Scale, description: "Procédures...", href: "/services/justice" },
   { title: "Transport", icon: Truck, description: "Permis, titres...", href: "/services/transport" },
+  { title: "Mes Documents", icon: FolderArchive, description: "Coffre-fort...", href: "/documents" }, // Added Documents shortcut
 
   // Private/Utilities
   { title: "Énergie", icon: Zap, description: "Senelec...", href: "/services/energie" }, // Shortened title
@@ -51,8 +54,8 @@ export default function ServiceShortcuts() {
   return (
     <section>
       <h2 className="text-2xl font-semibold mb-4">Accès Rapide aux Services (Simulation)</h2>
-      {/* Adjusted grid columns for better responsiveness with 16 items */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+      {/* Adjusted grid columns for better responsiveness with potentially more items */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-4"> {/* Increased xl cols */}
         {services.map((service) => (
           <Card
             key={service.title}
