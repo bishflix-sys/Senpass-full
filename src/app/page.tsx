@@ -104,15 +104,6 @@ export default function Home() {
      return () => clearInterval(intervalId);
    }, [userProfile]); // Re-run if userProfile changes (though unlikely here)
 
-   // Simulate deposit action
-   const handleDepositSimulation = () => {
-     toast({
-       title: "Simulation de Dépôt",
-       description: "Options de dépôt: Wave, Orange Money. (Simulation)",
-     });
-     // Add further simulation logic if needed, e.g., opening a modal or navigating
-   };
-
   // Loading state UI
   if (isLoading) {
     return (
@@ -252,8 +243,10 @@ export default function Home() {
                                  >
                                    {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                  </Button>
-                                 <Button variant="outline" size="sm" onClick={handleDepositSimulation}>
-                                   <ArrowDownToLine className="mr-2 h-4 w-4" /> Déposer
+                                 <Button asChild variant="outline" size="sm">
+                                     <Link href="/deposit">
+                                         <ArrowDownToLine className="mr-2 h-4 w-4" /> Déposer
+                                     </Link>
                                  </Button>
                                  <Button asChild variant="outline" size="sm">
                                      <Link href="/payment">
