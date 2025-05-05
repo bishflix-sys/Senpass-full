@@ -8,7 +8,7 @@ import ProfileCard from "@/components/profile-card";
 import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
 import LogoutButton from "@/components/logout-button";
-import QRCodeDisplay from "@/components/qr-code-display";
+import IdCardDisplay from "@/components/id-card-display"; // Import the new IdCardDisplay
 import BishopChat from "@/components/bishop-chat"; // Import BishopChat
 import {
   Fingerprint,
@@ -119,12 +119,13 @@ export default function Home() {
            <Skeleton className="md:col-span-1 h-64 rounded-lg" />
            <div className="md:col-span-2 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                 <Skeleton className="h-48 rounded-lg" />
-                 <div className="space-y-4"> {/* Added space-y */}
-                     {/* Skeleton for ID Card */}
-                     <Skeleton className="h-36 rounded-lg" /> {/* Adjusted height */}
+                 {/* Skeleton for ID Card */}
+                 <Skeleton className="h-60 rounded-lg" /> {/* Adjusted height for ID Card */}
+                 <div className="space-y-4">
+                     {/* Skeleton for Unique ID Card */}
+                     <Skeleton className="h-24 rounded-lg" /> {/* Adjusted height */}
                      {/* Skeleton for Wallet Card */}
-                     <Skeleton className="h-36 rounded-lg" /> {/* Adjusted height */}
+                     <Skeleton className="h-36 rounded-lg" />
                  </div>
               </div>
               {/* Skeleton for Activity and Alerts row */}
@@ -167,7 +168,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
            <div className="flex-1">
               <h1 className="text-3xl font-bold text-primary">
-                Bienvenue sur SenPass, {userProfile.name} ! {/* Changed from SenPass Lite */}
+                Bienvenue sur SenPass, {userProfile.name} !
               </h1>
               <p className="text-muted-foreground mt-1">
                 Votre tableau de bord centralisé pour votre identité numérique unique (Simulation).
@@ -184,21 +185,18 @@ export default function Home() {
             <ProfileCard user={userProfile} />
           </div>
 
-          {/* QR, ID, Wallet, Activity/Alerts Section (Right Column) */}
+          {/* ID Card, Wallet, Unique ID, Activity/Alerts Section (Right Column) */}
           <div className="md:col-span-2 space-y-6">
-               {/* Container for QR Code, Unique ID and Wallet */}
+               {/* Container for ID Card, Unique ID and Wallet */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                  {/* QR Code Display */}
-                  <QRCodeDisplay
-                    data={qrData || ''} // Pass current QR data, fallback to empty string
-                    title="Votre Identifiant QR SenPass"
-                    description="Code dynamique pour accès rapide (Simulation)."
-                    size={160}
-                    className="shadow-md border" // Added border for slight emphasis
-                    isLoading={!qrData} // Indicate loading if qrData is null
+                  {/* ID Card Display */}
+                  <IdCardDisplay
+                    user={userProfile}
+                    qrData={qrData}
+                    className="shadow-md border h-full" // Added h-full
                   />
 
-                  {/* Container for ID and Wallet */}
+                  {/* Container for Unique ID and Wallet */}
                   <div className="space-y-6">
                       {/* Unique Alphanumeric ID Card */}
                       <Card className="shadow-md border">
