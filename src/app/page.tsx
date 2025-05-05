@@ -2,6 +2,7 @@
 "use client"; // Add 'use client' directive for useState and useEffect
 
 import * as React from "react"; // Import React for hooks
+import Link from "next/link"; // Import Link for navigation
 import { getUserProfile, type UserProfile } from "@/services/identity";
 import ProfileCard from "@/components/profile-card";
 import ServiceShortcuts from "@/components/service-shortcuts";
@@ -26,7 +27,8 @@ import {
   LockKeyhole,    // Icon for Strong Authentication
   Bot, // Icon for Chatbot
   Eye, // Icon for visibility on
-  EyeOff // Icon for visibility off
+  EyeOff, // Icon for visibility off
+  CreditCard // Icon for Pay button
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
@@ -217,7 +219,7 @@ export default function Home() {
                             </CardTitle>
                             <CardDescription className="text-xs">Votre balance e-wallet SenPass (Simulation).</CardDescription>
                         </CardHeader>
-                        <CardContent className="flex items-center justify-between gap-4">
+                        <CardContent className="flex items-center justify-between flex-wrap gap-4"> {/* Added flex-wrap */}
                            <span className="text-2xl font-bold tracking-tight">
                             {walletBalance === null ? (
                                 <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
@@ -227,15 +229,22 @@ export default function Home() {
                                 '**** FCFA'
                             )}
                            </span>
-                           <Button
-                             variant="ghost"
-                             size="icon"
-                             onClick={() => setIsBalanceVisible(!isBalanceVisible)}
-                             aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
-                             className="text-muted-foreground hover:text-primary"
-                           >
-                             {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                           </Button>
+                           <div className="flex items-center gap-2"> {/* Group toggle and pay buttons */}
+                               <Button
+                                 variant="ghost"
+                                 size="icon"
+                                 onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+                                 aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
+                                 className="text-muted-foreground hover:text-primary"
+                               >
+                                 {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                               </Button>
+                               <Button asChild variant="outline" size="sm">
+                                   <Link href="/payment">
+                                       <CreditCard className="mr-2 h-4 w-4" /> Payer
+                                   </Link>
+                               </Button>
+                           </div>
                         </CardContent>
                     </Card>
                 </div>
