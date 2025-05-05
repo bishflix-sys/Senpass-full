@@ -69,6 +69,7 @@ export default function ServiceShortcuts() {
             </CardHeader>
              <CardContent className="p-4 pt-0"> {/* Use CardContent for button */}
               <Button variant="ghost" size="sm" asChild className="w-full h-8 text-xs text-primary hover:bg-primary/10">
+                 {/* Link component handles the navigation */}
                  <Link href={service.href}>Accéder</Link>
                </Button>
              </CardContent>
