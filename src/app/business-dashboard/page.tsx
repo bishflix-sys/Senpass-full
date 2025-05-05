@@ -9,41 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link"; // Import Link for logo
 
-// SVG representation of the Senpass logo (reuse from header if possible, or define locally)
-const SenpassLogo = () => (
-  <svg
-    width="160"
-    height="40"
-    viewBox="0 0 160 40"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-label="Senpass Logo"
-    className="h-8 w-auto" // Use Tailwind for responsive sizing
-  >
-    {/* Simplified Fingerprint Icon with Senegal Colors */}
-    <g transform="translate(5, 0)"> {/* Shift icon slightly right */}
-      <circle cx="20" cy="20" r="19" stroke="#D1D5DB" strokeWidth="0.5" />
-      <path d="M10 30 Q15 10 20 5" stroke="#00853F" strokeWidth="1.5" fill="none" />
-      <path d="M5 25 Q15 5 25 5" stroke="#00853F" strokeWidth="1.5" fill="none" />
-      <path d="M8 35 Q18 15 28 10" stroke="#00853F" strokeWidth="1.5" fill="none" />
-      <circle cx="6" cy="28" r="1" fill="#00853F" />
-      <circle cx="9" cy="33" r="1" fill="#00853F" />
-      <path d="M15 35 Q20 10 25 5" stroke="#FDEF42" strokeWidth="1.5" fill="none" />
-      <path d="M20 38 Q25 15 30 10" stroke="#FDEF42" strokeWidth="1.5" fill="none" />
-      <path d="M25 35 Q30 20 35 15" stroke="#FDEF42" strokeWidth="1.5" fill="none" />
-      <path d="M30 30 Q25 10 20 5" stroke="#E31B23" strokeWidth="1.5" fill="none" />
-      <path d="M35 25 Q25 5 15 5" stroke="#E31B23" strokeWidth="1.5" fill="none" />
-      <path d="M32 35 Q22 15 12 10" stroke="#E31B23" strokeWidth="1.5" fill="none" />
-       <circle cx="34" cy="28" r="1" fill="#E31B23" />
-       <circle cx="31" cy="33" r="1" fill="#E31B23" />
-    </g>
-    {/* Text: SENPASS */}
-    <text x="50" y="20" fontFamily="Arial, sans-serif" fontSize="16" fontWeight="bold" fill="hsl(var(--foreground))" dominantBaseline="middle">SENPASS</text>
-    {/* Text: LE SÉNÉGAL FUTUR */}
-    <text x="50" y="34" fontFamily="Arial, sans-serif" fontSize="8" fill="hsl(var(--muted-foreground))" dominantBaseline="middle">LE SÉNÉGAL FUTUR</text>
-  </svg>
-);
-
 
 export default function BusinessDashboardPage() {
     const router = useRouter();
@@ -73,11 +38,11 @@ export default function BusinessDashboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
-      {/* Header Section with Logo */}
+      {/* Header Section with Text Logo */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
-           <Link href="/" className="flex-shrink-0"> {/* Link logo to home */}
-             <SenpassLogo />
+           <Link href="/" className="flex-shrink-0"> {/* Link text logo to home */}
+             <span className="text-2xl font-bold text-foreground tracking-tight">SENPASS</span>
            </Link>
            <div className="flex-1">
              <h1 className="text-2xl sm:text-3xl font-bold text-primary flex items-center gap-3">
@@ -223,4 +188,3 @@ export default function BusinessDashboardPage() {
     </div>
   );
 }
-
