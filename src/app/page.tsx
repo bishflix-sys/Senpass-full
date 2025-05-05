@@ -24,11 +24,13 @@ import {
   ShieldCheck,    // Icon for Data Protection
   FolderArchive,  // Icon for Document Management
   LockKeyhole,    // Icon for Strong Authentication
-  Bot // Icon for Chatbot
+  Bot, // Icon for Chatbot
+  Eye, // Icon for visibility on
+  EyeOff // Icon for visibility off
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"; // Import Card components
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"; // Import Card components
 import { Separator } from "@/components/ui/separator"; // Import Separator
 import {
   Accordion,
@@ -36,6 +38,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"; // Import Accordion
+import { Button } from "@/components/ui/button"; // Import Button for toggle
+import { cn } from "@/lib/utils"; // Import cn for conditional styling
 
 // Helper function to generate a simple alphanumeric ID
 const generateAlphanumericId = (length = 12) => {
@@ -52,13 +56,15 @@ const generateQrData = (nationalId?: string) => `senpass-profile:${nationalId ||
 
 
 export default function Home() {
-  // State for user profile, QR data, and unique ID
+  // State for user profile, QR data, unique ID, balance, and visibility
   const [userProfile, setUserProfile] = React.useState<UserProfile | null>(null);
   const [qrData, setQrData] = React.useState<string | null>(null);
   const [uniqueId, setUniqueId] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [walletBalance, setWalletBalance] = React.useState<number | null>(null); // Simulated balance
+  const [isBalanceVisible, setIsBalanceVisible] = React.useState(false); // Balance visibility state
 
-  // Fetch user profile data on component mount
+  // Fetch user profile data and simulate balance on component mount
   React.useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -67,6 +73,8 @@ export default function Home() {
         setUserProfile(profile);
         setQrData(generateQrData(profile.nationalId)); // Initial QR data generation
         setUniqueId(generateAlphanumericId()); // Generate unique ID once
+        // Simulate fetching wallet balance
+        setWalletBalance(Math.floor(Math.random() * 50000) + 5000); // Random balance between 5000 and 55000 FCFA
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
         // Handle error appropriately, e.g., show a toast message
@@ -107,10 +115,11 @@ export default function Home() {
            <div className="md:col-span-2 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
                  <Skeleton className="h-48 rounded-lg" />
-                 <div className="space-y-2">
-                     <Skeleton className="h-6 w-24" />
-                     <Skeleton className="h-4 w-3/4" />
-                     <Skeleton className="h-8 w-40 rounded-md" /> {/* Badge skeleton */}
+                 <div className="space-y-4"> {/* Added space-y */}
+                     {/* Skeleton for ID Card */}
+                     <Skeleton className="h-36 rounded-lg" /> {/* Adjusted height */}
+                     {/* Skeleton for Wallet Card */}
+                     <Skeleton className="h-36 rounded-lg" /> {/* Adjusted height */}
                  </div>
               </div>
               {/* Skeleton for Activity and Alerts row */}
@@ -169,9 +178,9 @@ export default function Home() {
           <ProfileCard user={userProfile} />
         </div>
 
-        {/* QR, ID, Activity/Alerts Section (Right Column) */}
+        {/* QR, ID, Wallet, Activity/Alerts Section (Right Column) */}
         <div className="md:col-span-2 space-y-6">
-             {/* Container for QR Code and Unique ID */}
+             {/* Container for QR Code, Unique ID and Wallet */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
                 {/* QR Code Display */}
                 <QRCodeDisplay
@@ -183,20 +192,53 @@ export default function Home() {
                   isLoading={!qrData} // Indicate loading if qrData is null
                 />
 
-                {/* Unique Alphanumeric ID */}
-                <Card className="shadow-md border">
-                  <CardHeader>
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                        <Hash className="h-5 w-5 text-primary" /> ID Unique SenPass
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-2">Votre identifiant numérique unique personnel.</p>
-                    <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
-                        {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
-                    </Badge>
-                 </CardContent>
-                </Card>
+                {/* Container for ID and Wallet */}
+                <div className="space-y-6">
+                    {/* Unique Alphanumeric ID Card */}
+                    <Card className="shadow-md border">
+                    <CardHeader className="pb-3"> {/* Reduced bottom padding */}
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                            <Hash className="h-5 w-5 text-primary" /> ID Unique SenPass
+                        </CardTitle>
+                         <CardDescription className="text-xs">Votre identifiant numérique personnel.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
+                            {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
+                        </Badge>
+                    </CardContent>
+                    </Card>
+
+                    {/* Wallet Balance Card */}
+                    <Card className="shadow-md border">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                <Wallet className="h-5 w-5 text-primary" /> Solde Portefeuille
+                            </CardTitle>
+                            <CardDescription className="text-xs">Votre balance e-wallet SenPass (Simulation).</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex items-center justify-between gap-4">
+                           <span className="text-2xl font-bold tracking-tight">
+                            {walletBalance === null ? (
+                                <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
+                            ) : isBalanceVisible ? (
+                                `${walletBalance.toLocaleString('fr-FR')} FCFA`
+                            ) : (
+                                '**** FCFA'
+                            )}
+                           </span>
+                           <Button
+                             variant="ghost"
+                             size="icon"
+                             onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+                             aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
+                             className="text-muted-foreground hover:text-primary"
+                           >
+                             {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                           </Button>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
 
             {/* Grid for Recent Activity and Important Alerts */}
