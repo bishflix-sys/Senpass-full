@@ -41,11 +41,11 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
   await new Promise(resolve => setTimeout(resolve, 50));
 
   return {
-    name: 'Aminata Fall',
+    name: 'Abdoulaye Sene', // Changed name here
     address: '123 Rue de Thiong, Dakar',
-    email: 'aminata.fall@email.sn',
-    dateOfBirth: '1992-05-15',
-    nationalId: 'SN987654321'
+    email: 'abdoulaye.sene@email.sn', // Updated email to match name for consistency
+    dateOfBirth: '1990-08-21', // Optionally update DOB
+    nationalId: 'SN123456789' // Optionally update National ID
   };
 }
 
