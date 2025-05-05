@@ -29,7 +29,8 @@ import {
   Eye, // Icon for visibility on
   EyeOff, // Icon for visibility off
   CreditCard, // Icon for Pay button
-  MessageSquare // Icon for Chat Trigger
+  MessageSquare, // Icon for Chat Trigger
+  ArrowDownToLine // Icon for Deposit button
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
@@ -42,6 +43,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"; // Import Sheet components
+import { useToast } from "@/hooks/use-toast"; // Import useToast
 
 // Helper function to generate a simple alphanumeric ID
 const generateAlphanumericId = (length = 12) => {
@@ -65,6 +67,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [walletBalance, setWalletBalance] = React.useState<number | null>(null); // Simulated balance
   const [isBalanceVisible, setIsBalanceVisible] = React.useState(false); // Balance visibility state
+  const { toast } = useToast(); // Get toast function
 
   // Fetch user profile data and simulate balance on component mount
   React.useEffect(() => {
@@ -100,6 +103,15 @@ export default function Home() {
      // Cleanup function to clear the interval
      return () => clearInterval(intervalId);
    }, [userProfile]); // Re-run if userProfile changes (though unlikely here)
+
+   // Simulate deposit action
+   const handleDepositSimulation = () => {
+     toast({
+       title: "Simulation de Dépôt",
+       description: "Options de dépôt: Wave, Orange Money. (Simulation)",
+     });
+     // Add further simulation logic if needed, e.g., opening a modal or navigating
+   };
 
   // Loading state UI
   if (isLoading) {
@@ -230,7 +242,7 @@ export default function Home() {
                                   '**** FCFA'
                               )}
                              </span>
-                             <div className="flex items-center gap-2"> {/* Group toggle and pay buttons */}
+                             <div className="flex items-center gap-2 flex-wrap"> {/* Group toggle and action buttons, added flex-wrap */}
                                  <Button
                                    variant="ghost"
                                    size="icon"
@@ -239,6 +251,9 @@ export default function Home() {
                                    className="text-muted-foreground hover:text-primary"
                                  >
                                    {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                 </Button>
+                                 <Button variant="outline" size="sm" onClick={handleDepositSimulation}>
+                                   <ArrowDownToLine className="mr-2 h-4 w-4" /> Déposer
                                  </Button>
                                  <Button asChild variant="outline" size="sm">
                                      <Link href="/payment">
@@ -366,5 +381,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
