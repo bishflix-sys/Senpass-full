@@ -343,9 +343,9 @@ export default function LoginPage() {
       if (success) {
         toast({
           title: "Connexion Développeur réussie!",
-          description: "Redirection vers le portail développeur...", // Or home page for now
+          description: "Redirection vers le portail développeur...",
         });
-        handleAuthenticationSuccess('/'); // Redirect to home for simulation (or a future developer portal)
+        handleAuthenticationSuccess('/developer-dashboard'); // Redirect to developer dashboard
       } else {
          toast({
             title: "Échec de la Connexion Développeur",
