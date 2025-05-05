@@ -167,7 +167,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
            <div className="flex-1">
               <h1 className="text-3xl font-bold text-primary">
-                Bienvenue sur SenPass Lite, {userProfile.name} !
+                Bienvenue sur SenPass, {userProfile.name} ! {/* Changed from SenPass Lite */}
               </h1>
               <p className="text-muted-foreground mt-1">
                 Votre tableau de bord centralisé pour votre identité numérique unique (Simulation).
@@ -374,3 +374,4 @@ export default function Home() {
     </div>
   );
 }
+

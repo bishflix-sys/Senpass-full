@@ -360,7 +360,7 @@ export default function LoginPage() {
 
 
   // Function to generate new QR data
-  const generateQrData = () => `senpass-lite-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Added randomness
+  const generateQrData = () => `senpass-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Changed from senpass-lite-login-simulation
 
   const handleOpenQrDialog = () => {
     const initialQrData = generateQrData();
@@ -768,3 +768,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

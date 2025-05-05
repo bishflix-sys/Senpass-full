@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"; // Import Separator
 import Footer from "@/components/footer"; // Import Footer
 
 export const metadata: Metadata = {
-  title: "SenPass Lite",
+  title: "SenPass", // Changed from SenPass Lite
   description: "Identité numérique nationale du Sénégal (Simulation)",
 };
 
@@ -34,3 +34,4 @@ export default function RootLayout({
     </html>
   );
 }
+
