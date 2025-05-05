@@ -113,8 +113,11 @@ export default function Home() {
                      <Skeleton className="h-8 w-40 rounded-md" /> {/* Badge skeleton */}
                  </div>
               </div>
-             <Skeleton className="h-32 rounded-lg" /> {/* Activity Card Skeleton */}
-             <Skeleton className="h-32 rounded-lg" /> {/* Alerts Card Skeleton */}
+              {/* Skeleton for Activity and Alerts row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                 <Skeleton className="h-32 rounded-lg" /> {/* Activity Card Skeleton */}
+                 <Skeleton className="h-32 rounded-lg" /> {/* Alerts Card Skeleton */}
+              </div>
            </div>
          </div>
           <Separator className="my-6" />
@@ -196,31 +199,34 @@ export default function Home() {
                 </Card>
             </div>
 
-           {/* Recent Activity Card */}
-            <Card className="shadow-sm border">
-              <CardHeader>
-                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-primary" /> Activité récente
-                 </CardTitle>
-              </CardHeader>
-              <CardContent>
-                 <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
-                 {/* Future: List recent logins, verifications etc. */}
-              </CardContent>
-            </Card>
+            {/* Grid for Recent Activity and Important Alerts */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+               {/* Recent Activity Card */}
+                <Card className="shadow-sm border">
+                  <CardHeader>
+                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-primary" /> Activité récente
+                     </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                     <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
+                     {/* Future: List recent logins, verifications etc. */}
+                  </CardContent>
+                </Card>
 
-            {/* Important Alerts Card */}
-            <Card className="shadow-sm border">
-               <CardHeader>
-                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-destructive" /> Alertes importantes
-                 </CardTitle>
-              </CardHeader>
-               <CardContent>
-                 <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
-                 {/* Future: Display security alerts, pending actions etc. */}
-               </CardContent>
-            </Card>
+                {/* Important Alerts Card */}
+                <Card className="shadow-sm border">
+                   <CardHeader>
+                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-destructive" /> Alertes importantes
+                     </CardTitle>
+                  </CardHeader>
+                   <CardContent>
+                     <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
+                     {/* Future: Display security alerts, pending actions etc. */}
+                   </CardContent>
+                </Card>
+            </div>
         </div>
       </div>
 
