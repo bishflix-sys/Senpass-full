@@ -25,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2 } from "lucide-react"; // Added UserPlus, Lock, KeyRound, CaseSensitive, Building2 icons
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml } from "lucide-react"; // Added CodeXml icon
 import {
   Form,
   FormControl,
@@ -54,6 +54,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import RegistrationDialogContent from "@/components/registration-dialog-content"; // Import RegistrationDialogContent
 import BusinessRegistrationDialogContent from "@/components/business-registration-dialog-content"; // Import BusinessRegistrationDialogContent
+import DeveloperRegistrationDialogContent from "@/components/developer-registration-dialog-content"; // Import DeveloperRegistrationDialogContent
 
 // Schema for phone number validation (Individuals)
 const phoneSchema = z.object({
@@ -227,6 +228,7 @@ export default function LoginPage() {
   const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
   const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = React.useState(false); // State for individual registration dialog
   const [isBusinessRegistrationDialogOpen, setIsBusinessRegistrationDialogOpen] = React.useState(false); // State for business registration dialog
+  const [isDeveloperRegistrationDialogOpen, setIsDeveloperRegistrationDialogOpen] = React.useState(false); // State for developer registration dialog
 
   // Form for Individuals (Phone Login)
   const phoneForm = useForm<PhoneFormValues>({
@@ -260,6 +262,7 @@ export default function LoginPage() {
       setIsQrDialogOpen(false);
       setIsRegistrationDialogOpen(false); // Close individual registration dialog
       setIsBusinessRegistrationDialogOpen(false); // Close business registration dialog
+      setIsDeveloperRegistrationDialogOpen(false); // Close developer registration dialog
       setQrCodeData(null); // Clear QR data
 
       // Use a slight delay to allow dialogs to close visually before redirecting
@@ -271,6 +274,7 @@ export default function LoginPage() {
    const handleRegistrationSuccess = React.useCallback(() => {
       setIsRegistrationDialogOpen(false); // Close the individual registration dialog
       setIsBusinessRegistrationDialogOpen(false); // Close the business registration dialog
+      setIsDeveloperRegistrationDialogOpen(false); // Close the developer registration dialog
       // Optionally redirect or show another message
       toast({
           title: "Inscription Réussie!",
@@ -736,6 +740,20 @@ export default function LoginPage() {
                     </Button>
                  </form>
                </Form>
+
+                {/* Developer Registration Link/Dialog */}
+                <div className="text-center pt-4">
+                 <Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}>
+                   <DialogTrigger asChild>
+                     <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
+                       <CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur
+                     </Button>
+                   </DialogTrigger>
+                   {/* Developer Registration Dialog Content */}
+                   {isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}
+                 </Dialog>
+               </div>
+
             </CardContent>
              <CardFooter>
                  <p className="text-xs text-muted-foreground text-center w-full">
