@@ -20,7 +20,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
       <CardHeader className="flex flex-col items-center gap-4 pb-4 text-center"> {/* Center content */}
          <Avatar className="h-20 w-20 border-4 border-primary shadow-sm"> {/* Larger avatar */}
           {/* Placeholder image - replace with actual user image if available */}
-           <AvatarImage src={`https://picsum.photos/seed/${user.email}/120/120`} alt={user.name} data-ai-hint="person portrait" />
+           <AvatarImage src={`https://picsum.photos/seed/${user.email}/120/120`} alt={user.name} data-ai-hint="black person tie" />
            <AvatarFallback className="text-2xl bg-secondary text-secondary-foreground">{initials}</AvatarFallback>
          </Avatar>
         <div>
@@ -50,3 +50,4 @@ export default function ProfileCard({ user }: ProfileCardProps) {
     </Card>
   );
 }
+
