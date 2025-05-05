@@ -28,15 +28,20 @@ import {
   Bot, // Icon for Chatbot
   Eye, // Icon for visibility on
   EyeOff, // Icon for visibility off
-  CreditCard // Icon for Pay button
+  CreditCard, // Icon for Pay button
+  MessageSquare // Icon for Chat Trigger
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"; // Import Card components
 import { Separator } from "@/components/ui/separator"; // Import Separator
-// Accordion removed as chat is now fixed
 import { Button } from "@/components/ui/button"; // Import Button for toggle
-import { cn } from "@/lib/utils"; // Import cn for conditional styling
+import { cn } from "@/lib/utils"; // Import cn
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet"; // Import Sheet components
 
 // Helper function to generate a simple alphanumeric ID
 const generateAlphanumericId = (length = 12) => {
@@ -153,7 +158,7 @@ export default function Home() {
 
   return (
     // Added relative positioning context if needed, though fixed positioning usually doesn't require it.
-    <div className="relative">
+    <div className="relative pb-20"> {/* Added padding-bottom to prevent overlap with fixed chat button */}
       <div className="space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -330,16 +335,36 @@ export default function Home() {
           </div>
         </section>
 
-         {/* BISHOP Chatbot Section - Removed from Accordion */}
-         {/* The chatbot is now placed outside the main content flow */}
+         {/* BISHOP Chatbot Section - Now within a Sheet */}
+         {/* The trigger button is fixed */}
 
       </div>
 
-      {/* Fixed Position Chatbot */}
-       {/* Adjust right, bottom, transform values for precise positioning */}
-       <div className="fixed right-6 bottom-1/2 translate-y-1/2 z-50">
-          <BishopChat />
-       </div>
+      {/* Fixed Position Chatbot Trigger Button */}
+      <Sheet>
+         <SheetTrigger asChild>
+            <Button
+              variant="secondary" // Use secondary or adjust styling
+              size="lg" // Larger button
+              className="fixed right-6 bottom-6 z-50 rounded-full shadow-lg flex items-center gap-2 px-5 py-3 h-auto"
+              aria-label="Ouvrir l'assistant BISHOP"
+            >
+               <Bot className="h-6 w-6" />
+               <span className="text-base font-semibold hidden sm:inline">BISHOP</span>
+            </Button>
+         </SheetTrigger>
+         <SheetContent
+            side="right"
+            className="w-full max-w-md p-0 border-l border-border" // Set max width, remove padding
+            onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus trap issues
+         >
+            {/* Render BishopChat component inside the sheet content */}
+            {/* Adjust BishopChat styles if needed to fit the sheet */}
+            <BishopChat />
+         </SheetContent>
+      </Sheet>
     </div>
   );
 }
+
+    

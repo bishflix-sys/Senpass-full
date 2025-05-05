@@ -74,8 +74,9 @@ export default function BishopChat() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-xl border"> {/* Changed max-w-2xl to max-w-md */}
-      <CardHeader className="flex flex-row items-center gap-3 border-b pb-4">
+     // Removed Card shadow and border as it's now inside a Sheet. Added flex structure.
+    <div className="flex flex-col h-full w-full bg-card">
+      <CardHeader className="flex flex-row items-center gap-3 border-b pb-4 flex-shrink-0">
          <Avatar className="h-10 w-10 border-2 border-primary">
             <AvatarFallback className="bg-primary text-primary-foreground"><Bot size={20} /></AvatarFallback>
          </Avatar>
@@ -84,8 +85,8 @@ export default function BishopChat() {
             <CardDescription>Votre assistant AI pour SenPass</CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="p-0 h-[400px]">
-        <ScrollArea className="h-full w-full p-4" ref={scrollAreaRef}>
+      {/* CardContent removed, ScrollArea takes its place and expands */}
+      <ScrollArea className="flex-grow w-full p-4" ref={scrollAreaRef}>
           <div className="space-y-6 pr-2"> {/* Added padding-right for scrollbar */}
             {messages.map((message) => (
               <div
@@ -132,9 +133,8 @@ export default function BishopChat() {
               </div>
             )}
           </div>
-        </ScrollArea>
-      </CardContent>
-      <CardFooter className="border-t p-4">
+      </ScrollArea>
+      <CardFooter className="border-t p-4 flex-shrink-0">
          <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
             <Input
               value={inputValue}
@@ -150,6 +150,8 @@ export default function BishopChat() {
             </Button>
          </form>
       </CardFooter>
-    </Card>
+    </div>
   );
 }
+
+    
