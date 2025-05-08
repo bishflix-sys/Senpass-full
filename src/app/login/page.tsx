@@ -26,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft } from "lucide-react"; // Added ArrowLeft icon
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft, Landmark } from "lucide-react"; // Added Landmark icon
 import {
   Form,
   FormControl,
@@ -36,6 +36,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Import Select
 import {
   Dialog,
   DialogContent,
@@ -74,6 +81,34 @@ const orgLoginSchema = z.object({
 });
 
 type OrgLoginValues = z.infer<typeof orgLoginSchema>;
+
+// Schema for ministry login validation
+const ministryLoginSchema = z.object({
+  ministryName: z.string().min(1, "Veuillez sélectionner un ministère."),
+  password: z.string().min(6, "Mot de passe requis (min 6 caractères)."),
+});
+type MinistryLoginValues = z.infer<typeof ministryLoginSchema>;
+
+// Placeholder list of Senegalese Ministries (TODO: Replace with the actual 54 ministries)
+const senegalMinistries = [
+  "Ministère de l'Économie, du Plan et de la Coopération",
+  "Ministère des Affaires Étrangères et des Sénégalais de l'Extérieur",
+  "Ministère de la Justice",
+  "Ministère de l'Intérieur",
+  "Ministère des Forces Armées",
+  "Ministère de la Santé et de l'Action Sociale",
+  "Ministère de l'Éducation Nationale",
+  "Ministère de l'Enseignement Supérieur, de la Recherche et de l'Innovation",
+  "Ministère de l'Agriculture, de la Souveraineté Alimentaire et de l'Élevage",
+  "Ministère des Finances et du Budget",
+  "Ministère des Infrastructures, des Transports Terrestres et du Désenclavement",
+  "Ministère de l'Eau et de l'Assainissement",
+  "Ministère de l'Environnement et du Développement Durable",
+  "Ministère de la Femme, de la Famille et de la Protection des Enfants",
+  "Ministère de la Jeunesse, de l'Emploi et de la Construction Citoyenne",
+  // Add more ministries to reach 54 or use a comprehensive list
+];
+
 
 // Component for Facial Recognition Dialog Content
 const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
@@ -256,6 +291,15 @@ export default function LoginPage() {
     },
   });
 
+  // Form for Ministry Login
+  const ministryForm = useForm<MinistryLoginValues>({
+    resolver: zodResolver(ministryLoginSchema),
+    defaultValues: {
+      ministryName: undefined,
+      password: "",
+    },
+  });
+
    const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => { // Default to /dashboard
       // Close dialogs first
       setShowFacialRecognitionDialog(false);
@@ -358,6 +402,34 @@ export default function LoginPage() {
     }, 1500);
   }
 
+  // Submit handler for Ministry Login
+  function onMinistrySubmit(data: MinistryLoginValues) {
+    toast({
+      title: "Vérification Ministère en cours... (Simulation)",
+      description: `Tentative de connexion pour ${data.ministryName}.`,
+    });
+    console.log("Ministry login attempt:", data);
+    // Simulate ministry credential verification and login
+    setTimeout(() => {
+      const success = Math.random() > 0.2; // 80% success rate simulation
+      if (success) {
+        toast({
+          title: "Connexion Ministère réussie!",
+          description: "Redirection vers le portail ministère...",
+        });
+        handleAuthenticationSuccess('/ministry-dashboard'); // Redirect to ministry dashboard
+      } else {
+        toast({
+          title: "Échec de la Connexion Ministère",
+          description: "Identifiants incorrects ou accès non autorisé. Veuillez réessayer.",
+          variant: "destructive",
+        });
+        // Reset password field on failure
+        ministryForm.resetField("password");
+      }
+    }, 1500);
+  }
+
 
   // Function to generate new QR data
   const generateQrData = () => `senpass-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Changed from senpass-lite-login-simulation
@@ -422,15 +494,18 @@ export default function LoginPage() {
         <span>Accès Sécurisé</span>
       </div>
       <Tabs defaultValue="individuals" className="w-full max-w-md"> {/* Slightly narrower max-width */}
-        <TabsList className="grid w-full grid-cols-3 h-12"> {/* Increased height */}
-          <TabsTrigger value="individuals" className="text-base"> {/* Base text size */}
-            <User className="mr-2 h-5 w-5" /> Individus
+        <TabsList className="grid w-full grid-cols-4 h-12"> {/* Increased height and grid-cols-4 */}
+          <TabsTrigger value="individuals" className="text-sm sm:text-base"> {/* Responsive text size */}
+            <User className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Individus
           </TabsTrigger>
-          <TabsTrigger value="business" className="text-base">
-            <Building className="mr-2 h-5 w-5" /> Business
+          <TabsTrigger value="business" className="text-sm sm:text-base">
+            <Building className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Business
           </TabsTrigger>
-          <TabsTrigger value="developers" className="text-base">
-            <Code className="mr-2 h-5 w-5" /> Développeurs
+          <TabsTrigger value="developers" className="text-sm sm:text-base">
+            <Code className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Développeurs
+          </TabsTrigger>
+          <TabsTrigger value="ministries" className="text-sm sm:text-base">
+            <Landmark className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Ministères
           </TabsTrigger>
         </TabsList>
 
@@ -768,6 +843,85 @@ export default function LoginPage() {
             </CardFooter>
           </Card>
         </TabsContent>
+
+        {/* Ministries Tab */}
+        <TabsContent value="ministries">
+          <Card className="shadow-lg border">
+            <CardHeader>
+              <CardTitle className="text-xl">Accès Ministères</CardTitle>
+              <CardDescription>
+                Portail sécurisé pour les institutions ministérielles.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-2">
+              <Form {...ministryForm}>
+                <form onSubmit={ministryForm.handleSubmit(onMinistrySubmit)} className="space-y-4">
+                  <FormField
+                    control={ministryForm.control}
+                    name="ministryName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center text-sm">
+                          <Landmark className="mr-2 h-4 w-4 text-muted-foreground" /> Ministère
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-11 text-base">
+                              <SelectValue placeholder="Sélectionnez un ministère..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {/* TODO: Populate with the full list of 54 ministries */}
+                            {senegalMinistries.map((ministry) => (
+                              <SelectItem key={ministry} value={ministry} className="text-sm">
+                                {ministry}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={ministryForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center text-sm">
+                          <KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                            className="h-11 text-base"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full h-11 text-base" disabled={ministryForm.formState.isSubmitting}>
+                    {ministryForm.formState.isSubmitting ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <LogIn className="mr-2 h-5 w-5" />
+                    )}
+                    Se Connecter (Ministère)
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+            <CardFooter>
+              <p className="text-xs text-muted-foreground text-center w-full">
+                Accès réservé aux personnels autorisés des ministères.
+              </p>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
       </Tabs>
       <p className="mt-8 text-xs text-center text-muted-foreground/80 px-4">
         Toute tentative d'intrusion suspecte votre IP sera tracée par Le Regard Maudit.
