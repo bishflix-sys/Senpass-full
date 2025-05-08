@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -768,10 +769,9 @@ export default function LoginPage() {
           </Card>
         </TabsContent>
       </Tabs>
+      <p className="mt-8 text-xs text-center text-muted-foreground/80 px-4">
+        Toute tentative d'intrusion suspecte votre IP sera tracée par Le Regard Maudit.
+      </p>
     </div>
   );
 }
-
-
-
-
