@@ -185,8 +185,7 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
         </div>
 
         {hasCameraPermission === false && (
-          <Alert variant="destructive">
-             <VideoOff className="h-4 w-4" /> {/* Add icon directly */}
+          <Alert variant="destructive" icon={VideoOff}>
             <AlertTitle>Accès Caméra Refusé</AlertTitle>
             <AlertDescription>
               L'accès à la caméra est nécessaire. Veuillez l'autoriser dans les paramètres de votre navigateur.

@@ -20,8 +20,7 @@ export default function DocumentsPage() {
             Accédez et gérez vos documents officiels stockés de manière sécurisée dans le cloud SenPass.
        </p>
 
-       <Alert variant="default" className="mb-8 bg-blue-50 border-blue-200">
-          <Lock className="h-4 w-4 text-blue-600" />
+       <Alert variant="default" className="mb-8 bg-blue-50 border-blue-200" icon={Lock}>
           <AlertTitle className="text-blue-800">Fonctionnalité Simulée</AlertTitle>
           <AlertDescription className="text-blue-700">
             Cette section représente le coffre-fort numérique où vos documents importants (CNI, actes de naissance, diplômes, etc.) seraient stockés et accessibles. Dans cette simulation, aucun document réel n'est sauvegardé.

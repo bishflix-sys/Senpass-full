@@ -75,8 +75,7 @@ export default function DeveloperDashboardPage() {
 
       <Separator />
 
-      <Alert variant="default" className="mb-6 bg-blue-50 border-blue-200">
-          <Terminal className="h-4 w-4 text-blue-600" />
+      <Alert variant="default" className="mb-6 bg-blue-50 border-blue-200" icon={Terminal}>
           <AlertTitle className="text-blue-800">Espace de Simulation</AlertTitle>
           <AlertDescription className="text-blue-700">
              Ce portail est une simulation. Les clés API et les statistiques sont fictives et ne permettent aucune interaction réelle.
