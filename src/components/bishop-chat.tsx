@@ -82,7 +82,7 @@ export default function BishopChat() {
          </Avatar>
         <div>
             <CardTitle className="text-lg font-semibold text-primary">BISHOP</CardTitle>
-            <CardDescription>Votre assistant AI pour SenPass</CardDescription>
+            <CardDescription>Votre assistant AI</CardDescription>
         </div>
       </CardHeader>
       {/* CardContent removed, ScrollArea takes its place and expands */}
@@ -153,5 +153,3 @@ export default function BishopChat() {
     </div>
   );
 }
-
-    

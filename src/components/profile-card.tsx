@@ -25,7 +25,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
          </Avatar>
         <div>
           <CardTitle className="text-xl text-primary font-semibold">{user.name}</CardTitle>
-           <CardDescription>Profil Utilisateur SenPass</CardDescription>
+           <CardDescription>Profil Utilisateur</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="space-y-4 pt-4">
@@ -50,4 +50,3 @@ export default function ProfileCard({ user }: ProfileCardProps) {
     </Card>
   );
 }
-

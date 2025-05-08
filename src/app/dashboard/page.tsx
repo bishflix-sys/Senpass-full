@@ -168,7 +168,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
            <div className="flex-1">
               <h1 className="text-3xl font-bold text-primary">
-                Bienvenue sur SenPass, {userProfile.name} !
+                Bienvenue, {userProfile.name} !
               </h1>
               <p className="text-muted-foreground mt-1">
                 Votre tableau de bord centralisé pour votre identité numérique unique (Simulation).
@@ -202,7 +202,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                       <Card className="shadow-md border">
                       <CardHeader className="pb-3"> {/* Reduced bottom padding */}
                           <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                              <Hash className="h-5 w-5 text-primary" /> ID Unique SenPass
+                              <Hash className="h-5 w-5 text-primary" /> ID Unique
                           </CardTitle>
                            <CardDescription className="text-xs">Votre identifiant numérique personnel.</CardDescription>
                       </CardHeader>
@@ -219,7 +219,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                                   <Wallet className="h-5 w-5 text-primary" /> Solde Portefeuille
                               </CardTitle>
-                              <CardDescription className="text-xs">Votre balance e-wallet SenPass (Simulation).</CardDescription>
+                              <CardDescription className="text-xs">Votre balance e-wallet (Simulation).</CardDescription>
                           </CardHeader>
                           <CardContent className="flex items-center justify-between flex-wrap gap-4"> {/* Added flex-wrap */}
                              <span className="text-2xl font-bold tracking-tight">
@@ -299,7 +299,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
 
         {/* Features Section */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales de SenPass</h2>
+          <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
              {/* Reordered and added new features */}
              <FeatureCard

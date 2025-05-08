@@ -432,7 +432,7 @@ export default function LoginPage() {
 
 
   // Function to generate new QR data
-  const generateQrData = () => `senpass-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`; // Changed from senpass-lite-login-simulation
+  const generateQrData = () => `platform-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
   const handleOpenQrDialog = () => {
     const initialQrData = generateQrData();
@@ -515,7 +515,7 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Connexion Individu</CardTitle> {/* Adjusted size */}
               <CardDescription>
-                Connectez-vous de manière sécurisée avec votre compte SenPass.
+                Connectez-vous de manière sécurisée avec votre compte.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2"> {/* Added top padding */}
@@ -603,7 +603,7 @@ export default function LoginPage() {
                         <DialogHeader>
                            <DialogTitle className="text-lg">Scanner le QR Code</DialogTitle> {/* Adjusted size */}
                            <DialogDescription>
-                              Scannez avec l'app SenPass. Se rafraîchit toutes les 10s. (Simulation)
+                              Scannez avec l'application. Se rafraîchit toutes les 10s. (Simulation)
                            </DialogDescription>
                         </DialogHeader>
                         <div className="flex items-center justify-center p-6"> {/* Increased padding */}
@@ -652,7 +652,7 @@ export default function LoginPage() {
                    <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
                        <DialogTrigger asChild>
                            <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
-                               <UserPlus className="h-4 w-4" /> S'inscrire à SenPass
+                               <UserPlus className="h-4 w-4" /> S'inscrire
                            </Button>
                        </DialogTrigger>
                        {/* Registration Dialog Content */}
@@ -763,7 +763,7 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Portail Développeur</CardTitle>
               <CardDescription>
-                Accès aux APIs et outils d'intégration SenPass via NINEA/RCCM.
+                Accès aux APIs et outils d'intégration via NINEA/RCCM.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">

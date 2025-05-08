@@ -119,7 +119,7 @@ export default function DepositPage() {
             </Link>
         </div>
         <p className="text-muted-foreground mb-8">
-            Ajoutez des fonds à votre portefeuille SenPass via Mobile Money (Simulation).
+            Ajoutez des fonds à votre portefeuille via Mobile Money (Simulation).
         </p>
 
         {/* Deposit Form */}

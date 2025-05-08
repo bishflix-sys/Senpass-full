@@ -17,7 +17,7 @@ export default function DocumentsPage() {
            </Link>
        </div>
        <p className="text-muted-foreground mb-8">
-            Accédez et gérez vos documents officiels stockés de manière sécurisée dans le cloud SenPass.
+            Accédez et gérez vos documents officiels stockés de manière sécurisée dans le cloud.
        </p>
 
        <Alert variant="default" className="mb-8 bg-blue-50 border-blue-200" icon={Lock}>

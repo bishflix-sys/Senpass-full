@@ -11,14 +11,14 @@ export default function PrivacyPage() {
 
        <Card>
          <CardHeader>
-           <CardTitle>Politique de Confidentialité de SenPass</CardTitle> {/* Changed from SenPass Lite */}
+           <CardTitle>Politique de Confidentialité</CardTitle>
            <CardDescription>
              Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}
            </CardDescription>
          </CardHeader>
          <CardContent className="space-y-4">
-           <p>Cette politique décrit comment SenPass (Simulation) gère les informations.</p> {/* Changed from SenPass Lite */}
-           <p><strong>1. Collecte d'Informations :</strong> SenPass est une application de simulation. Elle <strong>ne collecte, ne stocke et ne traite aucune donnée personnelle réelle</strong> des utilisateurs de manière persistante. Les informations saisies (par exemple, nom, numéro CNI lors de l'inscription simulée) sont utilisées temporairement pour la démonstration et ne sont pas sauvegardées.</p> {/* Changed from SenPass Lite */}
+           <p>Cette politique décrit comment cette plateforme (Simulation) gère les informations.</p>
+           <p><strong>1. Collecte d'Informations :</strong> Cette application est une simulation. Elle <strong>ne collecte, ne stocke et ne traite aucune donnée personnelle réelle</strong> des utilisateurs de manière persistante. Les informations saisies (par exemple, nom, numéro CNI lors de l'inscription simulée) sont utilisées temporairement pour la démonstration et ne sont pas sauvegardées.</p>
            <p><strong>2. Utilisation des Informations :</strong> Les données temporaires saisies sont utilisées uniquement pour simuler les fonctionnalités de l'application (affichage du profil, génération de QR code, etc.) pendant la session active.</p>
            <p><strong>3. Cookies et Stockage Local :</strong> L'application peut utiliser un stockage local minimal (par exemple, pour l'état de connexion simulé ou les préférences de thème) mais ne stocke pas d'informations personnelles identifiables.</p>
            <p><strong>4. Partage d'Informations :</strong> Aucune information n'est partagée avec des tiers, car aucune donnée personnelle réelle n'est collectée.</p>
@@ -33,5 +33,3 @@ export default function PrivacyPage() {
     </div>
   );
 }
-
-

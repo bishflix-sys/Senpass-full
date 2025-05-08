@@ -199,7 +199,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
            <CodeXml className="h-6 w-6" /> Inscription Espace Développeur
         </DialogTitle>
         <DialogDescription>
-          Demandez l'accès aux APIs SenPass. (Simulation)
+          Demandez l'accès aux APIs de la plateforme. (Simulation)
         </DialogDescription>
       </DialogHeader>
 
@@ -297,7 +297,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="test_api">Tester l’API Senpass</SelectItem>
+                      <SelectItem value="test_api">Tester l’API de la plateforme</SelectItem>
                       <SelectItem value="integration">Intégration avec une app</SelectItem>
                       <SelectItem value="sandbox">Utilisation en Sandbox</SelectItem>
                       <SelectItem value="proof_of_concept">Preuve de concept (POC)</SelectItem>
@@ -414,7 +414,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
                   <FormLabel className="font-normal">
                     J'ai lu et j'accepte les{" "}
                     <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
-                       conditions d'utilisation des API SenPass
+                       conditions d'utilisation des APIs
                     </Link>
                     .
                   </FormLabel>

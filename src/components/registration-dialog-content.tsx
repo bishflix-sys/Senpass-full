@@ -147,7 +147,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ o
     if (success) {
       toast({
         title: "Inscription Réussie (Simulation)",
-        description: "Votre compte SenPass a été créé.", // Changed from SenPass Lite
+        description: "Votre compte a été créé.",
       });
       form.reset(); // Reset form on success
       onSuccess(); // Call the success callback (e.g., close dialog)
@@ -167,7 +167,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ o
     <DialogContent className="sm:max-w-lg">
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2 text-xl">
-           <UserPlus className="h-6 w-6" /> S'inscrire à SenPass
+           <UserPlus className="h-6 w-6" /> S'inscrire
         </DialogTitle>
         <DialogDescription>
           Créez votre compte d'identité numérique. (Simulation)
@@ -315,5 +315,3 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ o
 };
 
 export default RegistrationDialogContent;
-
-

@@ -1,6 +1,7 @@
+
 'use server';
 /**
- * @fileOverview A restricted AI chat agent named BISHOP for SenPass.
+ * @fileOverview A restricted AI chat agent named BISHOP.
  *
  * - askBishop - A function that handles the chat interaction.
  * - BishopChatInput - The input type for the askBishop function.
@@ -41,9 +42,9 @@ const bishopChatPrompt = ai.definePrompt({
     schema: BishopChatOutputSchema,
   },
   // System instruction to define the AI's persona and restrictions
-  system: `You are BISHOP, a helpful AI assistant for SenPass, the digital identity platform of Senegal.
-Your knowledge is strictly restricted to SenPass features, usage, related administrative processes in Senegal accessible through SenPass, and general information about digital identity concepts within the Senegalese context.
-Do not answer questions outside this scope. If a question is outside your scope, politely state that you can only help with SenPass related inquiries.
+  system: `You are BISHOP, a helpful AI assistant for the digital identity platform of Senegal.
+Your knowledge is strictly restricted to the platform's features, usage, related administrative processes in Senegal accessible through it, and general information about digital identity concepts within the Senegalese context.
+Do not answer questions outside this scope. If a question is outside your scope, politely state that you can only help with inquiries related to the platform.
 Be concise, helpful, and professional.`,
   // The main prompt template using Handlebars
   prompt: `User message: {{{message}}}
