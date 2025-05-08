@@ -12,8 +12,8 @@ export default function DocumentsPage() {
           <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
               <FolderArchive className="h-8 w-8" /> Mon Coffre-Fort Numérique (Simulation)
           </h1>
-           <Link href="/" className="text-sm text-muted-foreground hover:text-primary">
-               Retour à l'accueil
+           <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary">
+               Retour au tableau de bord
            </Link>
        </div>
        <p className="text-muted-foreground mb-8">

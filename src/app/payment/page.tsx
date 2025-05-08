@@ -31,8 +31,8 @@ export default function SecurePaymentPage() {
             <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
                 <Lock className="h-7 w-7" /> Paiement Sécurisé
             </h1>
-            <Link href="/" className="text-sm text-muted-foreground hover:text-primary">
-                Retour à l'accueil
+            <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary">
+                Retour au tableau de bord
             </Link>
         </div>
         <p className="text-muted-foreground mb-8">

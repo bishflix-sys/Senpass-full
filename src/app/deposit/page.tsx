@@ -96,8 +96,8 @@ export default function DepositPage() {
                 title: "Dépôt Réussi (Simulation)",
                 description: `${data.amount.toLocaleString('fr-FR')} FCFA ont été ajoutés à votre portefeuille. Redirection...`,
             });
-            // Redirect back to home page after success
-            setTimeout(() => router.push('/'), 1500);
+            // Redirect back to dashboard page after success
+            setTimeout(() => router.push('/dashboard'), 1500);
         } else {
             toast({
                 title: "Échec du Dépôt (Simulation)",
@@ -114,8 +114,8 @@ export default function DepositPage() {
             <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
                 <ArrowDownToLine className="h-7 w-7" /> Effectuer un Dépôt
             </h1>
-            <Link href="/" className="text-sm text-muted-foreground hover:text-primary">
-                Retour à l'accueil
+            <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary">
+                Retour au tableau de bord
             </Link>
         </div>
         <p className="text-muted-foreground mb-8">

@@ -255,7 +255,7 @@ export default function LoginPage() {
     },
   });
 
-   const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/') => {
+   const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => { // Default to /dashboard
       // Close dialogs first
       setShowFacialRecognitionDialog(false);
       setIsQrDialogOpen(false);
@@ -293,9 +293,9 @@ export default function LoginPage() {
     setTimeout(() => {
       toast({
         title: "Connexion réussie!",
-        description: "Redirection vers l'accueil...",
+        description: "Redirection vers le tableau de bord...",
       });
-       handleAuthenticationSuccess('/'); // Redirect to individual home
+       handleAuthenticationSuccess('/dashboard'); // Redirect to individual dashboard
     }, 1500); // Shorter delay for phone login simulation
   }
 
@@ -376,7 +376,7 @@ export default function LoginPage() {
                 title: "QR Code Scanné!",
                 description: "Connexion réussie via QR Code. Redirection...",
              });
-             handleAuthenticationSuccess('/'); // Redirect to individual home
+             handleAuthenticationSuccess('/dashboard'); // Redirect to individual dashboard
         } else {
             console.log("QR scan simulation cancelled, dialog closed.");
         }
@@ -563,7 +563,7 @@ export default function LoginPage() {
                          </Button>
                      </DialogTrigger>
                      {/* Conditionally render content to ensure useEffect runs on open */}
-                     {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess('/')} />}
+                     {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess('/dashboard')} />}
                  </Dialog>
               </div>
 
@@ -767,5 +767,6 @@ export default function LoginPage() {
     </div>
   );
 }
+
 
 
