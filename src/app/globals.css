@@ -116,6 +116,21 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Creative motifs with Senegalese flag colors */
+    /* This adds a subtle repeating diagonal stripe pattern using flag colors */
+    background-image: repeating-linear-gradient(
+      -45deg, /* Diagonal angle */
+      hsla(145, 60%, 35%, 0.04), /* Green, soft, very transparent */
+      hsla(145, 60%, 35%, 0.04) 12px, /* Stripe width for green */
+      hsla(55, 70%, 60%, 0.04) 12px,  /* Yellow, soft, very transparent */
+      hsla(55, 70%, 60%, 0.04) 24px, /* Stripe width for yellow */
+      hsla(0, 65%, 55%, 0.04) 24px, /* Red, soft, very transparent */
+      hsla(0, 65%, 55%, 0.04) 36px, /* Stripe width for red */
+      transparent 36px,            /* Transparent part for spacing */
+      transparent 72px             /* Total size of one unit of the pattern before it repeats */
+    );
+    background-size: 100px 100px; /* Controls the size/density of the repeating pattern */
+    
     /* Apply font smoothing for better text rendering */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
