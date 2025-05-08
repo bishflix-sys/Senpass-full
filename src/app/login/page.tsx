@@ -415,7 +415,11 @@ export default function LoginPage() {
   }, [isQrDialogOpen]); // Only depend on dialog state
 
   return (
-    <div className="flex justify-center items-start py-12 min-h-[calc(100vh-10rem)]"> {/* Adjust padding/min-height */}
+    <div className="flex flex-col justify-center items-center py-12 min-h-[calc(100vh-10rem)]"> {/* Adjust padding/min-height */}
+      <div className="flex items-center gap-2 mb-8 text-xl font-semibold text-foreground">
+        <Lock className="h-6 w-6 text-primary" />
+        <span>Accès Sécurisé</span>
+      </div>
       <Tabs defaultValue="individuals" className="w-full max-w-md"> {/* Slightly narrower max-width */}
         <TabsList className="grid w-full grid-cols-3 h-12"> {/* Increased height */}
           <TabsTrigger value="individuals" className="text-base"> {/* Base text size */}
@@ -767,6 +771,7 @@ export default function LoginPage() {
     </div>
   );
 }
+
 
 
 
