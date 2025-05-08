@@ -26,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml } from "lucide-react"; // Added CodeXml icon
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft } from "lucide-react"; // Added ArrowLeft icon
 import {
   Form,
   FormControl,
@@ -772,6 +772,16 @@ export default function LoginPage() {
       <p className="mt-8 text-xs text-center text-muted-foreground/80 px-4">
         Toute tentative d'intrusion suspecte votre IP sera tracée par Le Regard Maudit.
       </p>
+      <div className="mt-4 text-center">
+        <a
+          href="http://127.0.0.1:8000/"
+          className="text-sm text-primary hover:underline flex items-center justify-center gap-1.5"
+          target="_blank" // Opens in a new tab, good for external links
+          rel="noopener noreferrer" // Security measure for target="_blank"
+        >
+          <ArrowLeft className="h-4 w-4" /> Retour au site principal
+        </a>
+      </div>
     </div>
   );
 }
