@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Landmark, Users, FileText, Settings, LogOut, BarChart3 } from "lucide-react";
+import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2 } from "lucide-react"; // Added Banknote, Eye, EyeOff, Loader2
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -17,13 +17,15 @@ export default function MinistryDashboardPage() {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = React.useState(true);
     const [ministryName, setMinistryName] = React.useState<string>("Ministère de l'Exemple"); // Placeholder
+    const [walletBalance, setWalletBalance] = React.useState<number | null>(null);
+    const [isBalanceVisible, setIsBalanceVisible] = React.useState(false);
 
     React.useEffect(() => {
         // Simulate fetching ministry-specific data
         const timer = setTimeout(() => {
             // In a real app, you'd fetch the actual ministry name based on auth
-            // For now, we use a placeholder or could derive from a query param if passed
-            setMinistryName("Ministère de l'Éducation Nationale (Simulation)");
+            setMinistryName("Ministère de l'Économie, du Plan et de la Coopération (Simulation)"); // Example Ministry related to finance
+            setWalletBalance(Math.floor(Math.random() * 1000000000) + 50000000); // Simulate large balance in FCFA
             setIsLoading(false);
         }, 1500);
         return () => clearTimeout(timer);
@@ -78,14 +80,14 @@ export default function MinistryDashboardPage() {
        </Alert>
 
       {/* Main Content Area */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> {/* Adjusted to xl:grid-cols-4 */}
             {/* Card 1: Citizen Data Access (Simulated) */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Users className="h-5 w-5 text-primary" /> Données Citoyennes
                     </CardTitle>
-                    <CardDescription>Consulter les statistiques et données agrégées (anonymisées).</CardDescription>
+                    <CardDescription>Consulter les statistiques et données agrégées.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground text-sm">Accès aux statistiques démographiques, utilisation des services, etc. (Simulation).</p>
@@ -124,6 +126,47 @@ export default function MinistryDashboardPage() {
                      <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Simulation", description: "Affichage des tableaux de bord de performance."})}>
                         Voir les Rapports
                      </Button>
+                </CardContent>
+            </Card>
+
+            {/* Card 4: Wallet Impôts et Domaines */}
+            <Card className="hover:shadow-lg transition-shadow duration-200 border">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Banknote className="h-5 w-5 text-primary" /> Portefeuille Impôts & Domaines
+                    </CardTitle>
+                    <CardDescription>Gérer les fonds et transactions fiscales (Simulation).</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                     <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold tracking-tight">
+                            {walletBalance === null ? (
+                                <Loader2 className="h-6 w-6 animate-spin inline-block" />
+                            ) : isBalanceVisible ? (
+                                `${walletBalance.toLocaleString('fr-FR')} FCFA`
+                            ) : (
+                                '**** FCFA'
+                            )}
+                        </span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+                            aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
+                            className="text-muted-foreground hover:text-primary"
+                        >
+                            {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </Button>
+                     </div>
+                     <div className="flex flex-col sm:flex-row gap-2 mt-2">
+                        <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => toast({title: "Simulation", description: "Affichage de l'historique des transactions."})}>
+                            Transactions
+                        </Button>
+                        <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => toast({title: "Simulation", description: "Ouverture du module de gestion des fonds."})}>
+                            Gérer Fonds
+                        </Button>
+                     </div>
+                     <p className="text-xs text-muted-foreground pt-2">Dernière synchronisation: Aujourd'hui (Simulation)</p>
                 </CardContent>
             </Card>
        </div>
@@ -179,10 +222,11 @@ function MinistryDashboardSkeleton() {
       <Skeleton className="h-20 w-full rounded-lg" />
 
       {/* Main Content Grid Skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> {/* Adjusted to xl:grid-cols-4 */}
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 1 */}
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 2 */}
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 3 */}
+        <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 4 (Wallet) */}
       </div>
 
       <Separator />
@@ -195,3 +239,4 @@ function MinistryDashboardSkeleton() {
     </div>
   );
 }
+
