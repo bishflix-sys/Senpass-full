@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal } from "lucide-react";
+import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal, ShoppingCart } from "lucide-react"; // Added ShoppingCart
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -147,6 +147,30 @@ export default function DeveloperDashboardPage() {
 
         <Separator />
 
+        {/* Payment Simulation Section */}
+        <section>
+            <h2 className="text-2xl font-semibold mb-4">Paiement des Services (Simulation)</h2>
+            <Card className="border shadow-sm">
+                <CardHeader>
+                    <CardTitle>Payer un Service via API (Simulation)</CardTitle>
+                    <CardDescription>Simulez un paiement de service pour vos intégrations.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <Button asChild size="lg" className="w-full sm:w-auto">
+                        <Link href="/select-service">
+                            <ShoppingCart className="mr-2 h-5 w-5" /> Sélectionner un service à payer
+                        </Link>
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Ceci simule le processus de sélection d'un service avant de procéder au paiement.
+                    </p>
+                </CardContent>
+            </Card>
+        </section>
+
+        <Separator />
+
+
         {/* Other Potential Sections */}
         <section>
             <h2 className="text-2xl font-semibold mb-4">Autres Outils et Paramètres</h2>
@@ -209,6 +233,14 @@ function DeveloperDashboardSkeleton() {
         <Skeleton className="h-64 rounded-lg" /> {/* Card Skeleton 2 */}
         <Skeleton className="h-64 rounded-lg" /> {/* Card Skeleton 3 */}
       </div>
+
+      <Separator />
+
+      {/* Payment Section Skeleton */}
+      <section>
+        <Skeleton className="h-8 w-56 mb-4" /> {/* Section Title Skeleton */}
+        <Skeleton className="h-48 rounded-lg" /> {/* Payment Card Skeleton */}
+      </section>
 
       <Separator />
 

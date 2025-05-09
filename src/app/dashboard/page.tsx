@@ -247,7 +247,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                                      </Link>
                                  </Button>
                                  <Button asChild variant="outline" size="sm">
-                                     <Link href="/payment">
+                                     <Link href="/select-service">
                                          <CreditCard className="mr-2 h-4 w-4" /> Payer
                                      </Link>
                                  </Button>

@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower } from "lucide-react"; // Added payment icons
+import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower, ShoppingCart } from "lucide-react"; // Added ShoppingCart for pay service
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -27,14 +27,6 @@ export default function BusinessDashboardPage() {
         }, 1000);
       };
 
-    // Simulate payment action
-    const handlePaymentSimulation = (method: string) => {
-        toast({
-            title: "Simulation de Paiement",
-            description: `Tentative de paiement via ${method}. (Simulation)`,
-        });
-        // Add further simulation logic if needed
-    };
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -117,58 +109,18 @@ export default function BusinessDashboardPage() {
             <h2 className="text-2xl font-semibold mb-4">Paiement des Services (Simulation)</h2>
             <Card className="border shadow-sm">
                 <CardHeader>
-                    <CardTitle>Effectuer un Paiement</CardTitle>
-                    <CardDescription>Simulez un paiement en utilisant l'une des méthodes ci-dessous.</CardDescription>
+                    <CardTitle>Payer un Service</CardTitle>
+                    <CardDescription>Sélectionnez un service ministériel ou autre à payer.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {/* QR Code Payment */}
-                    <div>
-                        <h3 className="text-lg font-medium mb-2 flex items-center gap-2"><QrCode className="h-5 w-5 text-accent" /> Payer par QR Code</h3>
-                        <Button onClick={() => handlePaymentSimulation('QR Code')}>
-                            Scanner le QR Code (Simulation)
-                        </Button>
-                        <p className="text-xs text-muted-foreground mt-1">Simule l'ouverture d'un scanner ou l'affichage d'un code à scanner.</p>
-                    </div>
-
-                    <Separator />
-
-                    {/* Card Payment */}
-                    <div>
-                        <h3 className="text-lg font-medium mb-2 flex items-center gap-2"><CreditCard className="h-5 w-5 text-accent" /> Payer par Carte Bancaire</h3>
-                         <div className="flex flex-wrap gap-4 items-center">
-                             {/* Placeholder for Card Logos */}
-                             <span className="text-sm font-semibold text-muted-foreground">Cartes acceptées:</span>
-                             {/* Replace with actual logos if available */}
-                             <span className="font-bold text-blue-600">VISA</span>
-                             <span className="font-bold text-orange-500">MasterCard</span>
-                             <span className="font-bold text-blue-800">Amex</span>
-                         </div>
-                        <Button onClick={() => handlePaymentSimulation('Carte Bancaire')} className="mt-3">
-                            Payer par Carte (Simulation)
-                        </Button>
-                         <p className="text-xs text-muted-foreground mt-1">Simule la redirection vers une page de paiement par carte.</p>
-                    </div>
-
-                    <Separator />
-
-                     {/* Mobile Money Payment */}
-                     <div>
-                         <h3 className="text-lg font-medium mb-2 flex items-center gap-2"><Smartphone className="h-5 w-5 text-accent" /> Payer par Mobile Money</h3>
-                         <div className="flex flex-wrap gap-4 items-center mb-3">
-                             {/* Placeholder for Mobile Money Logos */}
-                             <span className="text-sm font-semibold text-muted-foreground">Opérateurs:</span>
-                             {/* Replace with actual logos/better representations */}
-                             <span className="font-semibold text-purple-600">Wave</span>
-                             <span className="font-semibold text-orange-600">Orange Money</span>
-                             <span className="font-semibold text-yellow-500">Yas Money</span>
-                             <span className="font-semibold text-cyan-600">Payer</span>
-                             <span className="font-semibold text-gray-500">Autres...</span>
-                         </div>
-                         <Button onClick={() => handlePaymentSimulation('Mobile Money')} className="mt-3">
-                             Payer via Mobile (Simulation)
-                         </Button>
-                          <p className="text-xs text-muted-foreground mt-1">Simule la saisie d'un numéro ou une redirection.</p>
-                     </div>
+                    <Button asChild size="lg" className="w-full sm:w-auto">
+                        <Link href="/select-service">
+                            <ShoppingCart className="mr-2 h-5 w-5" /> Sélectionner un service à payer
+                        </Link>
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Vous serez redirigé pour choisir le service, puis la méthode de paiement.
+                    </p>
                 </CardContent>
             </Card>
         </section>
