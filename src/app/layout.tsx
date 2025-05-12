@@ -1,7 +1,6 @@
 
 "use client"; // Required for usePathname
 
-import type { Metadata } from "next";
 // Font import removed previously due to error, relying on Tailwind's default sans-serif stack.
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -26,6 +25,17 @@ export default function RootLayout({
 
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#4D88E0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="SenPass" />
+        {/* 
+          Ensure you have icons in the public/icons/ directory
+          <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180x180.png" /> 
+        */}
+      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased flex flex-col",
