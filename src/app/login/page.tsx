@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -26,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft, Landmark } from "lucide-react"; // Added Landmark icon
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft, Landmark, ShieldCheck, MessageCircle } from "lucide-react"; // Added ShieldCheck for OTP
 import {
   Form,
   FormControl,
@@ -46,12 +44,12 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose
+  DialogClose,
+  DialogDescription
 } from "@/components/ui/dialog";
 import {
   Alert,
@@ -60,9 +58,11 @@ import {
 } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import RegistrationDialogContent from "@/components/registration-dialog-content"; // Import RegistrationDialogContent
-import BusinessRegistrationDialogContent from "@/components/business-registration-dialog-content"; // Import BusinessRegistrationDialogContent
-import DeveloperRegistrationDialogContent from "@/components/developer-registration-dialog-content"; // Import DeveloperRegistrationDialogContent
+import RegistrationDialogContent from "@/components/registration-dialog-content";
+import BusinessRegistrationDialogContent from "@/components/business-registration-dialog-content";
+import DeveloperRegistrationDialogContent from "@/components/developer-registration-dialog-content";
+
+const SIMULATED_OTP = "000000"; // Standard simulated OTP
 
 // Schema for phone number validation (Individuals)
 const phoneSchema = z.object({
@@ -71,15 +71,13 @@ const phoneSchema = z.object({
     .min(1, "Le numéro de téléphone est requis.")
     .regex(/^\+221\d{9}$/, "Format invalide. Utilisez +221 suivi de 9 chiffres (ex: +221771234567)."),
 });
-
 type PhoneFormValues = z.infer<typeof phoneSchema>;
 
 // Schema for business/developer login validation
 const orgLoginSchema = z.object({
-  registrationNumber: z.string().min(5, "NINEA ou RCCM requis (min 5 caractères)."), // Basic validation
+  registrationNumber: z.string().min(5, "NINEA ou RCCM requis (min 5 caractères)."),
   password: z.string().min(6, "Mot de passe requis (min 6 caractères)."),
 });
-
 type OrgLoginValues = z.infer<typeof orgLoginSchema>;
 
 // Schema for ministry login validation
@@ -89,28 +87,20 @@ const ministryLoginSchema = z.object({
 });
 type MinistryLoginValues = z.infer<typeof ministryLoginSchema>;
 
-// Placeholder list of Senegalese Ministries (TODO: Replace with the actual 54 ministries)
 const senegalMinistries = [
   "Ministère de l'Économie, du Plan et de la Coopération",
   "Ministère des Affaires Étrangères et des Sénégalais de l'Extérieur",
-  "Ministère de la Justice",
-  "Ministère de l'Intérieur",
-  "Ministère des Forces Armées",
-  "Ministère de la Santé et de l'Action Sociale",
-  "Ministère de l'Éducation Nationale",
+  "Ministère de la Justice", "Ministère de l'Intérieur", "Ministère des Forces Armées",
+  "Ministère de la Santé et de l'Action Sociale", "Ministère de l'Éducation Nationale",
   "Ministère de l'Enseignement Supérieur, de la Recherche et de l'Innovation",
   "Ministère de l'Agriculture, de la Souveraineté Alimentaire et de l'Élevage",
   "Ministère des Finances et du Budget",
   "Ministère des Infrastructures, des Transports Terrestres et du Désenclavement",
-  "Ministère de l'Eau et de l'Assainissement",
-  "Ministère de l'Environnement et du Développement Durable",
+  "Ministère de l'Eau et de l'Assainissement", "Ministère de l'Environnement et du Développement Durable",
   "Ministère de la Femme, de la Famille et de la Protection des Enfants",
   "Ministère de la Jeunesse, de l'Emploi et de la Construction Citoyenne",
-  // Add more ministries to reach 54 or use a comprehensive list
 ];
 
-
-// Component for Facial Recognition Dialog Content
 const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = React.useState<boolean | null>(null);
@@ -119,141 +109,74 @@ const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> 
   const streamRef = React.useRef<MediaStream | null>(null);
 
   React.useEffect(() => {
-    let mounted = true; // Track component mount state
-
+    let mounted = true;
     const getCameraPermission = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          console.error('Camera API not supported.');
-           if (mounted) setHasCameraPermission(false);
-           toast({
-              variant: 'destructive',
-              title: 'Erreur Caméra',
-              description: 'Votre navigateur ne supporte pas l\'accès à la caméra.',
-          });
+          if (mounted) setHasCameraPermission(false);
+           toast({ variant: 'destructive', title: 'Erreur Caméra', description: 'Votre navigateur ne supporte pas l\'accès à la caméra.'});
           return;
       }
       try {
         streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
          if (mounted) {
             setHasCameraPermission(true);
-            if (videoRef.current) {
-            videoRef.current.srcObject = streamRef.current;
-            }
+            if (videoRef.current) videoRef.current.srcObject = streamRef.current;
         } else {
-             // If component unmounted before permission granted, stop the stream
             streamRef.current?.getTracks().forEach(track => track.stop());
         }
       } catch (error) {
-        console.error('Error accessing camera:', error);
-         if (mounted) setHasCameraPermission(false);
-        // Toast is shown below in the UI
+        if (mounted) setHasCameraPermission(false);
       }
     };
-
     getCameraPermission();
-
-    // Cleanup function
     return () => {
-        mounted = false; // Mark as unmounted
+        mounted = false;
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
             streamRef.current = null;
-             console.log("Camera stream stopped"); // Log cleanup
         }
-        if(videoRef.current) videoRef.current.srcObject = null; // Clear video source
+        if(videoRef.current) videoRef.current.srcObject = null;
     };
-  }, [toast]); // Added toast dependency
+  }, [toast]);
 
   const handleSimulateScan = () => {
       setIsScanning(true);
-      // Simulate API call for facial recognition
       setTimeout(() => {
-          const success = Math.random() > 0.3; // Simulate 70% success rate
+          const success = Math.random() > 0.3;
           setIsScanning(false);
           if (success) {
-              toast({
-                  title: "Succès",
-                  description: "Reconnaissance faciale réussie ! Redirection...",
-              });
-              onAuthenticated(); // Call the callback to handle redirection
+              toast({ title: "Succès", description: "Reconnaissance faciale réussie ! Redirection..." });
+              onAuthenticated();
           } else {
-              toast({
-                  title: "Échec",
-                  description: "Reconnaissance faciale échouée. Veuillez réessayer.", // Simplified message
-                  variant: "destructive",
-              });
+              toast({ title: "Échec", description: "Reconnaissance faciale échouée. Veuillez réessayer.", variant: "destructive" });
           }
-      }, 2000); // Simulate 2 seconds scan
+      }, 2000);
   };
 
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-lg"> {/* Adjusted size */}
-            <ScanFace className="h-5 w-5" /> Vérification Faciale
-        </DialogTitle>
-        <DialogDescription>
-          Positionnez votre visage face à la caméra et cliquez sur Scanner. (Simulation)
-        </DialogDescription>
+        <DialogTitle className="flex items-center gap-2 text-lg"><ScanFace className="h-5 w-5" /> Vérification Faciale</DialogTitle>
+        <DialogDescription>Positionnez votre visage face à la caméra et cliquez sur Scanner. (Simulation)</DialogDescription>
       </DialogHeader>
-      <div className="space-y-4 my-6"> {/* Added margin */}
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted flex items-center justify-center shadow-inner"> {/* Added shadow */}
+      <div className="space-y-4 my-6">
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted flex items-center justify-center shadow-inner">
            <video ref={videoRef} className={cn("w-full h-full object-cover", { 'hidden': hasCameraPermission === false })} autoPlay muted playsInline />
-            {hasCameraPermission === null && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground space-y-2">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                    <p>Activation caméra...</p>
-                </div>
-            )}
-             {hasCameraPermission === false && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center text-destructive p-4 space-y-2">
-                     <VideoOff className="h-10 w-10" />
-                     <p className="text-center font-semibold">Caméra non accessible</p>
-                     <p className="text-center text-sm">Veuillez autoriser l'accès dans votre navigateur.</p>
-                 </div>
-             )}
-              {isScanning && (
-                 <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center text-primary space-y-2 backdrop-blur-sm"> {/* Added blur */}
-                     <Loader2 className="h-10 w-10 animate-spin" />
-                     <p className="font-medium">Analyse en cours...</p>
-                 </div>
-             )}
+            {hasCameraPermission === null && (<div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground space-y-2"><Loader2 className="h-8 w-8 animate-spin" /><p>Activation caméra...</p></div>)}
+             {hasCameraPermission === false && (<div className="absolute inset-0 flex flex-col items-center justify-center text-destructive p-4 space-y-2"><VideoOff className="h-10 w-10" /><p className="text-center font-semibold">Caméra non accessible</p><p className="text-center text-sm">Veuillez autoriser l'accès dans votre navigateur.</p></div>)}
+              {isScanning && (<div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center text-primary space-y-2 backdrop-blur-sm"><Loader2 className="h-10 w-10 animate-spin" /><p className="font-medium">Analyse en cours...</p></div>)}
         </div>
-
-        {hasCameraPermission === false && (
-          <Alert variant="destructive" icon={VideoOff}>
-            <AlertTitle>Accès Caméra Refusé</AlertTitle>
-            <AlertDescription>
-              L'accès à la caméra est nécessaire. Veuillez l'autoriser dans les paramètres de votre navigateur.
-            </AlertDescription>
-          </Alert>
-        )}
+        {hasCameraPermission === false && (<Alert variant="destructive" icon={VideoOff}><AlertTitle>Accès Caméra Refusé</AlertTitle><AlertDescription>L'accès à la caméra est nécessaire. Veuillez l'autoriser.</AlertDescription></Alert>)}
       </div>
-      <DialogFooter className="sm:justify-center gap-2"> {/* Added gap */}
-         <Button
-            type="button"
-            onClick={handleSimulateScan}
-            disabled={!hasCameraPermission || isScanning}
-            className="w-full sm:w-auto"
-            size="lg" // Larger button
-          >
-            {isScanning ? (
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" /> // Larger icon
-            ) : (
-              <ScanFace className="mr-2 h-5 w-5" /> // Larger icon
-            )}
-            Scanner (Simulation)
+      <DialogFooter className="sm:justify-center gap-2">
+         <Button type="button" onClick={handleSimulateScan} disabled={!hasCameraPermission || isScanning} className="w-full sm:w-auto" size="lg">
+            {isScanning ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ScanFace className="mr-2 h-5 w-5" />} Scanner (Simulation)
           </Button>
-         <DialogClose asChild>
-           <Button type="button" variant="outline" size="lg"> {/* Use outline, larger size */}
-             Annuler
-           </Button>
-         </DialogClose>
+         <DialogClose asChild><Button type="button" variant="outline" size="lg">Annuler</Button></DialogClose>
       </DialogFooter>
     </DialogContent>
   );
 };
-
 
 export default function LoginPage() {
   const { toast } = useToast();
@@ -261,411 +184,233 @@ export default function LoginPage() {
   const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
-  const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = React.useState(false); // State for individual registration dialog
-  const [isBusinessRegistrationDialogOpen, setIsBusinessRegistrationDialogOpen] = React.useState(false); // State for business registration dialog
-  const [isDeveloperRegistrationDialogOpen, setIsDeveloperRegistrationDialogOpen] = React.useState(false); // State for developer registration dialog
+  const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = React.useState(false);
+  const [isBusinessRegistrationDialogOpen, setIsBusinessRegistrationDialogOpen] = React.useState(false);
+  const [isDeveloperRegistrationDialogOpen, setIsDeveloperRegistrationDialogOpen] = React.useState(false);
 
-  // Form for Individuals (Phone Login)
-  const phoneForm = useForm<PhoneFormValues>({
-    resolver: zodResolver(phoneSchema),
-    defaultValues: {
-      phoneNumber: "+221",
-    },
-  });
+  // OTP States
+  const [otpInput, setOtpInput] = React.useState("");
+  const [isOtpLoading, setIsOtpLoading] = React.useState(false);
 
-  // Form for Business Login
-  const businessForm = useForm<OrgLoginValues>({
-    resolver: zodResolver(orgLoginSchema),
-    defaultValues: {
-      registrationNumber: "",
-      password: "",
-    },
-  });
+  // Login Step States
+  const [individualsLoginStep, setIndividualsLoginStep] = React.useState<'phone' | 'otp'>('phone');
+  const [businessLoginStep, setBusinessLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
+  const [developerLoginStep, setDeveloperLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
+  const [ministryLoginStep, setMinistryLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
 
-  // Form for Developer Login
-  const developerForm = useForm<OrgLoginValues>({
-    resolver: zodResolver(orgLoginSchema),
-    defaultValues: {
-      registrationNumber: "",
-      password: "",
-    },
-  });
+  // Store submitted identifiers for OTP step
+  const [submittedPhoneNumber, setSubmittedPhoneNumber] = React.useState<string | null>(null);
+  const [submittedOrgIdentifier, setSubmittedOrgIdentifier] = React.useState<string | null>(null);
+  const [submittedMinistryName, setSubmittedMinistryName] = React.useState<string | null>(null);
 
-  // Form for Ministry Login
-  const ministryForm = useForm<MinistryLoginValues>({
-    resolver: zodResolver(ministryLoginSchema),
-    defaultValues: {
-      ministryName: undefined,
-      password: "",
-    },
-  });
 
-   const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => { // Default to /dashboard
-      // Close dialogs first
-      setShowFacialRecognitionDialog(false);
-      setIsQrDialogOpen(false);
-      setIsRegistrationDialogOpen(false); // Close individual registration dialog
-      setIsBusinessRegistrationDialogOpen(false); // Close business registration dialog
-      setIsDeveloperRegistrationDialogOpen(false); // Close developer registration dialog
-      setQrCodeData(null); // Clear QR data
+  const phoneForm = useForm<PhoneFormValues>({ resolver: zodResolver(phoneSchema), defaultValues: { phoneNumber: "+221" }});
+  const businessForm = useForm<OrgLoginValues>({ resolver: zodResolver(orgLoginSchema), defaultValues: { registrationNumber: "", password: "" }});
+  const developerForm = useForm<OrgLoginValues>({ resolver: zodResolver(orgLoginSchema), defaultValues: { registrationNumber: "", password: "" }});
+  const ministryForm = useForm<MinistryLoginValues>({ resolver: zodResolver(ministryLoginSchema), defaultValues: { ministryName: undefined, password: "" }});
 
-      // Use a slight delay to allow dialogs to close visually before redirecting
-      setTimeout(() => {
-        router.push(targetPath); // Redirect to the specified path
-      }, 300); // 300ms delay
-   }, [router]); // Add router to dependency array
+   const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => {
+      setShowFacialRecognitionDialog(false); setIsQrDialogOpen(false); setIsRegistrationDialogOpen(false);
+      setIsBusinessRegistrationDialogOpen(false); setIsDeveloperRegistrationDialogOpen(false);
+      setQrCodeData(null);
+      // Reset OTP states
+      setOtpInput("");
+      setIndividualsLoginStep('phone'); setBusinessLoginStep('credentials');
+      setDeveloperLoginStep('credentials'); setMinistryLoginStep('credentials');
+      setSubmittedPhoneNumber(null); setSubmittedOrgIdentifier(null); setSubmittedMinistryName(null);
+
+      setTimeout(() => { router.push(targetPath); }, 300);
+   }, [router]);
 
    const handleRegistrationSuccess = React.useCallback(() => {
-      setIsRegistrationDialogOpen(false); // Close the individual registration dialog
-      setIsBusinessRegistrationDialogOpen(false); // Close the business registration dialog
-      setIsDeveloperRegistrationDialogOpen(false); // Close the developer registration dialog
-      // Optionally redirect or show another message
-      toast({
-          title: "Inscription Réussie!",
-          description: "Vous pouvez maintenant vous connecter.",
-          variant: "default" // Use default variant for success
-      });
+      setIsRegistrationDialogOpen(false); setIsBusinessRegistrationDialogOpen(false); setIsDeveloperRegistrationDialogOpen(false);
+      toast({ title: "Inscription Réussie!", description: "Vous pouvez maintenant vous connecter.", variant: "default" });
    }, [toast]);
 
-  // Submit handler for Phone Login (Individuals)
   function onPhoneSubmit(data: PhoneFormValues) {
-    toast({
-      title: "Vérification en cours... (Simulation)",
-      description: `Un code OTP simulé est envoyé à ${data.phoneNumber}.`,
-    });
-    console.log("Phone login attempt:", data);
-    // Simulate OTP verification and login
-    setTimeout(() => {
-      toast({
-        title: "Connexion réussie!",
-        description: "Redirection vers le tableau de bord...",
-      });
-       handleAuthenticationSuccess('/dashboard'); // Redirect to individual dashboard
-    }, 1500); // Shorter delay for phone login simulation
+    toast({ title: "Numéro Vérifié (Simulation)", description: `OTP envoyé à ${data.phoneNumber}. (Code simulé: ${SIMULATED_OTP})` });
+    setSubmittedPhoneNumber(data.phoneNumber);
+    setIndividualsLoginStep('otp');
+    setOtpInput(""); // Clear previous OTP input
   }
 
-  // Submit handler for Business Login
   function onBusinessSubmit(data: OrgLoginValues) {
-    toast({
-      title: "Vérification Business en cours... (Simulation)",
-      description: `Tentative de connexion pour ${data.registrationNumber}.`,
-    });
-    console.log("Business login attempt:", data);
-    // Simulate business credential verification and login
-    setTimeout(() => {
-      // Simulate success/failure
-      const success = Math.random() > 0.2; // 80% success rate simulation
-      if (success) {
-        toast({
-          title: "Connexion Business réussie!",
-          description: "Redirection vers le portail entreprise...",
-        });
-        handleAuthenticationSuccess('/business-dashboard'); // Redirect to business dashboard
-      } else {
-         toast({
-            title: "Échec de la Connexion Business",
-            description: "Identifiants incorrects. Veuillez réessayer.",
-            variant: "destructive",
-         });
-         // Reset password field on failure
-         businessForm.resetField("password");
-      }
-    }, 1500);
+    // Simulate business credential verification
+    const success = Math.random() > 0.2; // 80% success rate simulation
+    if (success) {
+        toast({ title: "Identifiants Business Vérifiés (Simulation)", description: `OTP envoyé pour ${data.registrationNumber}. (Code simulé: ${SIMULATED_OTP})` });
+        setSubmittedOrgIdentifier(data.registrationNumber);
+        setBusinessLoginStep('otp');
+        setOtpInput("");
+    } else {
+        toast({ title: "Échec de la Connexion Business", description: "Identifiants incorrects. Veuillez réessayer.", variant: "destructive" });
+        businessForm.resetField("password");
+    }
   }
 
-  // Submit handler for Developer Login
   function onDeveloperSubmit(data: OrgLoginValues) {
-    toast({
-      title: "Vérification Développeur en cours... (Simulation)",
-      description: `Tentative de connexion pour ${data.registrationNumber}.`,
-    });
-    console.log("Developer login attempt:", data);
-    // Simulate developer credential verification and login
-    setTimeout(() => {
-      // Simulate success/failure (e.g., 70% success rate)
-      const success = Math.random() > 0.3;
-      if (success) {
-        toast({
-          title: "Connexion Développeur réussie!",
-          description: "Redirection vers le portail développeur...",
-        });
-        handleAuthenticationSuccess('/developer-dashboard'); // Redirect to developer dashboard
-      } else {
-         toast({
-            title: "Échec de la Connexion Développeur",
-            description: "Identifiants incorrects. Veuillez réessayer.",
-            variant: "destructive",
-         });
-         // Reset password field on failure
-         developerForm.resetField("password");
-      }
-    }, 1500);
+    const success = Math.random() > 0.3; // 70% success rate
+    if (success) {
+        toast({ title: "Identifiants Développeur Vérifiés (Simulation)", description: `OTP envoyé pour ${data.registrationNumber}. (Code simulé: ${SIMULATED_OTP})` });
+        setSubmittedOrgIdentifier(data.registrationNumber);
+        setDeveloperLoginStep('otp');
+        setOtpInput("");
+    } else {
+        toast({ title: "Échec de la Connexion Développeur", description: "Identifiants incorrects. Veuillez réessayer.", variant: "destructive" });
+        developerForm.resetField("password");
+    }
   }
 
-  // Submit handler for Ministry Login
   function onMinistrySubmit(data: MinistryLoginValues) {
-    toast({
-      title: "Vérification Ministère en cours... (Simulation)",
-      description: `Tentative de connexion pour ${data.ministryName}.`,
-    });
-    console.log("Ministry login attempt:", data);
-    // Simulate ministry credential verification and login
-    setTimeout(() => {
-      const success = Math.random() > 0.2; // 80% success rate simulation
-      if (success) {
-        toast({
-          title: "Connexion Ministère réussie!",
-          description: "Redirection vers le portail ministère...",
-        });
-        handleAuthenticationSuccess('/ministry-dashboard'); // Redirect to ministry dashboard
-      } else {
-        toast({
-          title: "Échec de la Connexion Ministère",
-          description: "Identifiants incorrects ou accès non autorisé. Veuillez réessayer.",
-          variant: "destructive",
-        });
-        // Reset password field on failure
+    const success = Math.random() > 0.2; // 80% success rate
+    if (success) {
+        toast({ title: "Identifiants Ministère Vérifiés (Simulation)", description: `OTP envoyé pour ${data.ministryName}. (Code simulé: ${SIMULATED_OTP})` });
+        setSubmittedMinistryName(data.ministryName);
+        setMinistryLoginStep('otp');
+        setOtpInput("");
+    } else {
+        toast({ title: "Échec de la Connexion Ministère", description: "Identifiants incorrects. Veuillez réessayer.", variant: "destructive" });
         ministryForm.resetField("password");
-      }
-    }, 1500);
+    }
   }
 
-
-  // Function to generate new QR data
-  const generateQrData = () => `platform-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-
-  const handleOpenQrDialog = () => {
-    const initialQrData = generateQrData();
-    setQrCodeData(initialQrData);
-    setIsQrDialogOpen(true); // Open the dialog
-    console.log("QR Code login initiated, data:", initialQrData);
-     // Simulate successful scan after a while (longer than refresh interval)
-     // In a real app, this would be event-driven from the scanning device
-     const scanTimeout = setTimeout(() => {
-        // Check if the dialog is still open before declaring success
-        if (isQrDialogOpenRef.current) { // Use ref to check current state
-             console.log("Simulating successful QR scan...");
-             toast({
-                title: "QR Code Scanné!",
-                description: "Connexion réussie via QR Code. Redirection...",
-             });
-             handleAuthenticationSuccess('/dashboard'); // Redirect to individual dashboard
+  const handleOtpVerification = (targetPath: string) => {
+    setIsOtpLoading(true);
+    setTimeout(() => {
+        setIsOtpLoading(false);
+        if (otpInput === SIMULATED_OTP) {
+            toast({ title: "OTP Vérifié!", description: "Connexion réussie. Redirection...", variant: "default" });
+            handleAuthenticationSuccess(targetPath);
         } else {
-            console.log("QR scan simulation cancelled, dialog closed.");
+            toast({ title: "OTP Incorrect", description: "Veuillez vérifier le code et réessayer.", variant: "destructive" });
+            setOtpInput(""); // Clear OTP input on failure
         }
-     }, 25000); // Simulate 25 seconds for scanning to allow refreshes
-
-     // Store timeout ID to clear it if dialog closes early
-     // Note: This simple approach doesn't use refs, relies on closure
-     // A more robust solution might use a ref to store the timeout ID
+    }, 1000);
   };
 
-  // Ref to track if the QR dialog is open for the timeout callback
+  const generateQrData = () => `platform-login-simulation-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const isQrDialogOpenRef = React.useRef(isQrDialogOpen);
-  React.useEffect(() => {
-      isQrDialogOpenRef.current = isQrDialogOpen;
-  }, [isQrDialogOpen]);
-
-  // Effect to refresh QR code every 10 seconds when the dialog is open
+  React.useEffect(() => { isQrDialogOpenRef.current = isQrDialogOpen; }, [isQrDialogOpen]);
   React.useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
-
-    if (isQrDialogOpen) { // Only run if dialog is open
-      intervalId = setInterval(() => {
-        setQrCodeData(generateQrData());
-        console.log("Refreshing QR Code..."); // Log refresh
-      }, 10000); // Refresh every 10 seconds
-      console.log("QR Code refresh interval started.");
+    if (isQrDialogOpen) {
+      setQrCodeData(generateQrData()); // Initial generation
+      intervalId = setInterval(() => { setQrCodeData(generateQrData()); console.log("Refreshing QR Code..."); }, 10000);
     }
+    return () => { if (intervalId) clearInterval(intervalId); };
+  }, [isQrDialogOpen]);
 
-    // Cleanup function to clear the interval when dialog closes or component unmounts
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-        console.log("Cleared QR Code refresh interval.");
-      }
-    };
-  }, [isQrDialogOpen]); // Only depend on dialog state
+
+  const commonOtpInputSection = (
+    loginStepSetter: React.Dispatch<React.SetStateAction<any>>,
+    credentialStepValue: string,
+    identifierForOtpMessage: string | null,
+    verificationHandler: () => void
+  ) => (
+    <div className="space-y-4 pt-4">
+      <p className="text-sm text-muted-foreground">
+        Un code OTP a été envoyé {identifierForOtpMessage ? `à ${identifierForOtpMessage}` : 'à votre contact enregistré'}. Entrez le code ci-dessous (Simulation: {SIMULATED_OTP}).
+      </p>
+      <div className="space-y-2">
+        <Label htmlFor="otp" className="flex items-center gap-1.5">
+          <ShieldCheck className="h-4 w-4 text-muted-foreground" /> Code OTP
+        </Label>
+        <Input
+          id="otp"
+          type="text"
+          value={otpInput}
+          onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+          maxLength={6}
+          placeholder="000000"
+          className="w-full tabular-nums tracking-widest text-lg h-12"
+          disabled={isOtpLoading}
+        />
+      </div>
+      <div className="flex flex-col sm:flex-row gap-2 pt-2">
+        <Button
+          onClick={() => { loginStepSetter(credentialStepValue); setOtpInput(""); }}
+          variant="outline"
+          className="w-full sm:w-auto"
+          disabled={isOtpLoading}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+        </Button>
+        <Button
+          onClick={verificationHandler}
+          className="w-full sm:flex-1"
+          disabled={otpInput.length !== 6 || isOtpLoading}
+        >
+          {isOtpLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogIn className="mr-2 h-5 w-5" />}
+          Vérifier OTP et Se Connecter
+        </Button>
+      </div>
+       <Button variant="link" size="sm" className="text-xs p-0 h-auto" onClick={() => toast({description: `Nouveau code OTP envoyé (Simulation: ${SIMULATED_OTP})`})} disabled={isOtpLoading}>
+            Renvoyer le code OTP (Simulation)
+       </Button>
+    </div>
+  );
+
 
   return (
-    <div className="flex flex-col justify-center items-center py-12 min-h-[calc(100vh-10rem)]"> {/* Adjust padding/min-height */}
+    <div className="flex flex-col justify-center items-center py-12 min-h-[calc(100vh-10rem)]">
       <div className="flex items-center gap-2 mb-8 text-xl font-semibold text-foreground">
-        <Lock className="h-6 w-6 text-primary" />
-        <span>Accès Sécurisé</span>
+        <Lock className="h-6 w-6 text-primary" /><span>Accès Sécurisé</span>
       </div>
-      <Tabs defaultValue="individuals" className="w-full max-w-md"> {/* Slightly narrower max-width */}
-        <TabsList className="grid w-full grid-cols-4 h-12"> {/* Increased height and grid-cols-4 */}
-          <TabsTrigger value="individuals" className="text-sm sm:text-base"> {/* Responsive text size */}
-            <User className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Individus
-          </TabsTrigger>
-          <TabsTrigger value="business" className="text-sm sm:text-base">
-            <Building className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Business
-          </TabsTrigger>
-          <TabsTrigger value="developers" className="text-sm sm:text-base">
-            <Code className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Développeurs
-          </TabsTrigger>
-          <TabsTrigger value="ministries" className="text-sm sm:text-base">
-            <Landmark className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Ministères
-          </TabsTrigger>
+      <Tabs defaultValue="individuals" className="w-full max-w-md">
+        <TabsList className="grid w-full grid-cols-4 h-12">
+          <TabsTrigger value="individuals" className="text-sm sm:text-base"><User className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Individus</TabsTrigger>
+          <TabsTrigger value="business" className="text-sm sm:text-base"><Building className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Business</TabsTrigger>
+          <TabsTrigger value="developers" className="text-sm sm:text-base"><Code className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Développeurs</TabsTrigger>
+          <TabsTrigger value="ministries" className="text-sm sm:text-base"><Landmark className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Ministères</TabsTrigger>
         </TabsList>
 
         {/* Individuals Tab */}
         <TabsContent value="individuals">
-          <Card className="shadow-lg border"> {/* Added border and shadow */}
+          <Card className="shadow-lg border">
             <CardHeader>
-              <CardTitle className="text-xl">Connexion Individu</CardTitle> {/* Adjusted size */}
+              <CardTitle className="text-xl">Connexion Individu</CardTitle>
               <CardDescription>
-                Connectez-vous de manière sécurisée avec votre compte.
+                {individualsLoginStep === 'phone'
+                  ? "Connectez-vous de manière sécurisée avec votre compte."
+                  : "Veuillez entrer le code OTP reçu."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6 pt-2"> {/* Added top padding */}
-              {/* Phone Number Login Form */}
-              <Form {...phoneForm}>
-                <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
-                  <FormField
-                    control={phoneForm.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm"> {/* Adjusted size */}
-                           <Phone className="mr-2 h-4 w-4 text-muted-foreground" /> Numéro de téléphone (+221)
-                        </FormLabel>
-                        <FormControl>
-                           <div className="flex items-center"> {/* Removed gap, relying on input/span styles */}
-                             <span className="text-base font-medium p-2.5 bg-muted rounded-l-md border border-r-0 border-input h-11 flex items-center text-muted-foreground"> {/* Adjusted size/style */}
-                               +221
-                              </span>
-                             <Input
-                               type="tel" // Use tel type
-                               placeholder="7X XXX XX XX"
-                               {...field}
-                               onChange={(e) => {
-                                 // Keep only digits after +221
-                                 const digits = e.target.value.replace(/\D/g, '');
-                                 // Ensure it starts with 221, then take the next 9 digits
-                                 const numberPart = digits.startsWith('221') ? digits.substring(3, 12) : digits.substring(0, 9);
-                                 field.onChange(`+221${numberPart}`);
-                               }}
-                               className="rounded-l-none flex-1 h-11 text-base tracking-wider" // Adjusted size/style
-                               maxLength={13} // +221 plus 9 digits
-                             />
-                           </div>
-                        </FormControl>
-                        {/* <FormDescription>
-                          Un code OTP sera envoyé pour vérification (Simulation).
-                        </FormDescription> */}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                   <Button type="submit" className="w-full h-11 text-base" disabled={phoneForm.formState.isSubmitting}> {/* Adjusted size/text */}
-                     {phoneForm.formState.isSubmitting ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> // Larger icon
-                     ) : (
-                        <LogIn className="mr-2 h-5 w-5" /> // Larger icon
-                     )}
-                      Continuer par téléphone
-                   </Button>
-                </form>
-              </Form>
-
-              {/* Separator */}
-              <div className="relative my-6"> {/* Added margin */}
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-3 text-muted-foreground"> {/* Use card background */}
-                    Ou utiliser
-                  </span>
-                </div>
-              </div>
-
-              {/* QR Code and Face Login Buttons */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* QR Code Dialog */}
-                <Dialog open={isQrDialogOpen} onOpenChange={(open) => {
-                    setIsQrDialogOpen(open);
-                    if (open) {
-                        setQrCodeData(generateQrData()); // Generate fresh QR on open
-                        handleOpenQrDialog(); // Start the login simulation timeout
-                    } else {
-                        setQrCodeData(null); // Clear data on close
-                        // The timeout check logic remains the same (uses ref)
-                    }
-                 }}>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" className="h-12 text-base" > {/* Adjusted size/text */}
-                           <QrCode className="mr-2 h-5 w-5 text-accent" /> QR Code
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-xs"> {/* Smaller dialog */}
-                        <DialogHeader>
-                           <DialogTitle className="text-lg">Scanner le QR Code</DialogTitle> {/* Adjusted size */}
-                           <DialogDescription>
-                              Scannez avec l'application. Se rafraîchit toutes les 10s. (Simulation)
-                           </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center justify-center p-6"> {/* Increased padding */}
-                           {qrCodeData ? (
-                              <div className="p-2 bg-white rounded-md shadow-md"> {/* White background container */}
-                                <QRCodeCanvas
-                                    value={qrCodeData}
-                                    size={200} // Slightly smaller QR
-                                    bgColor={"#FFFFFF"}
-                                    fgColor={"#00853F"} // Senegal Green
-                                    level={"H"}
-                                    includeMargin={true}
-                                />
-                              </div>
-                           ) : (
-                              <div className="flex flex-col items-center justify-center text-muted-foreground h-[200px] space-y-2">
-                                 <Loader2 className="h-8 w-8 animate-spin" />
-                                 <p>Génération...</p>
-                              </div>
-                           )}
-                        </div>
-                        <DialogFooter className="sm:justify-center">
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline"> {/* Use outline */}
-                                Fermer
-                                </Button>
-                            </DialogClose>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-
-                 {/* Facial Recognition Dialog */}
-                 <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}>
-                     <DialogTrigger asChild>
-                         <Button variant="outline" className="h-12 text-base"> {/* Adjusted size/text */}
-                             <ScanFace className="mr-2 h-5 w-5 text-accent" /> Visage
-                         </Button>
-                     </DialogTrigger>
-                     {/* Conditionally render content to ensure useEffect runs on open */}
-                     {showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess('/dashboard')} />}
-                 </Dialog>
-              </div>
-
-              {/* Registration Link/Dialog */}
-               <div className="text-center pt-4">
-                   <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
-                       <DialogTrigger asChild>
-                           <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
-                               <UserPlus className="h-4 w-4" /> S'inscrire
-                           </Button>
-                       </DialogTrigger>
-                       {/* Registration Dialog Content */}
-                       {isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}
-                   </Dialog>
-               </div>
-
+            <CardContent className="space-y-6 pt-2">
+              {individualsLoginStep === 'phone' ? (
+                <>
+                  <Form {...phoneForm}>
+                    <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
+                      <FormField control={phoneForm.control} name="phoneNumber" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center text-sm"><Phone className="mr-2 h-4 w-4 text-muted-foreground" /> Numéro de téléphone (+221)</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center">
+                              <span className="text-base font-medium p-2.5 bg-muted rounded-l-md border border-r-0 border-input h-11 flex items-center text-muted-foreground">+221</span>
+                              <Input type="tel" placeholder="7X XXX XX XX" {...field} onChange={(e) => { const digits = e.target.value.replace(/\D/g, ''); const numberPart = digits.startsWith('221') ? digits.substring(3, 12) : digits.substring(0, 9); field.onChange(`+221${numberPart}`); }} className="rounded-l-none flex-1 h-11 text-base tracking-wider" maxLength={13} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <Button type="submit" className="w-full h-11 text-base" disabled={phoneForm.formState.isSubmitting}>
+                        {phoneForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP
+                      </Button>
+                    </form>
+                  </Form>
+                  <div className="relative my-6"><div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-3 text-muted-foreground">Ou utiliser</span></div></div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><QrCode className="mr-2 h-5 w-5 text-accent" /> QR Code</Button></DialogTrigger>
+                      <DialogContent className="sm:max-w-xs"><DialogHeader><DialogTitle className="text-lg">Scanner le QR Code</DialogTitle><DialogDescription>Scannez avec l'application. Se rafraîchit toutes les 10s. (Simulation)</DialogDescription></DialogHeader><div className="flex items-center justify-center p-6">{qrCodeData ? <div className="p-2 bg-white rounded-md shadow-md"><QRCodeCanvas value={qrCodeData} size={200} bgColor={"#FFFFFF"} fgColor={"#00853F"} level={"H"} includeMargin={true} /></div> : <div className="flex flex-col items-center justify-center text-muted-foreground h-[200px] space-y-2"><Loader2 className="h-8 w-8 animate-spin" /><p>Génération...</p></div>}</div><DialogFooter className="sm:justify-center"><DialogClose asChild><Button type="button" variant="outline">Fermer</Button></DialogClose></DialogFooter></DialogContent>
+                    </Dialog>
+                    <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><ScanFace className="mr-2 h-5 w-5 text-accent" /> Visage</Button></DialogTrigger>{showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess('/dashboard')} />}</Dialog>
+                  </div>
+                  <div className="text-center pt-4"><Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> S'inscrire</Button></DialogTrigger>{isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
+                </>
+              ) : (
+                commonOtpInputSection(setIndividualsLoginStep, 'phone', submittedPhoneNumber, () => handleOtpVerification('/dashboard'))
+              )}
             </CardContent>
-             <CardFooter>
-                <p className="text-xs text-muted-foreground text-center w-full flex items-center justify-center gap-1.5">
-                   <Lock className="h-3 w-3"/> Connexion sécurisée.
-                </p>
-            </CardFooter>
+            <CardFooter><p className="text-xs text-muted-foreground text-center w-full flex items-center justify-center gap-1.5"><Lock className="h-3 w-3"/> Connexion sécurisée.</p></CardFooter>
           </Card>
         </TabsContent>
 
@@ -675,85 +420,30 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Connexion Entreprise</CardTitle>
               <CardDescription>
-                Accès sécurisé pour les organisations partenaires via NINEA/RCCM.
+                {businessLoginStep === 'credentials'
+                  ? "Accès sécurisé pour les organisations partenaires via NINEA/RCCM."
+                  : "Veuillez entrer le code OTP reçu."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              {/* Business Login Form */}
-              <Form {...businessForm}>
-                 <form onSubmit={businessForm.handleSubmit(onBusinessSubmit)} className="space-y-4">
-                   <FormField
-                     control={businessForm.control}
-                     name="registrationNumber"
-                     render={({ field }) => (
-                       <FormItem>
-                         <FormLabel className="flex items-center text-sm">
-                           <CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM
-                         </FormLabel>
-                         <FormControl>
-                           <Input
-                             placeholder="Ex: 001234567 ou SN.DKR.2023.A.12345"
-                             {...field}
-                             className="h-11 text-base"
-                           />
-                         </FormControl>
-                         <FormMessage />
-                       </FormItem>
-                     )}
-                   />
-                    <FormField
-                     control={businessForm.control}
-                     name="password"
-                     render={({ field }) => (
-                       <FormItem>
-                         <FormLabel className="flex items-center text-sm">
-                           <KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe
-                         </FormLabel>
-                         <FormControl>
-                           <Input
-                             type="password"
-                             placeholder="••••••••"
-                             {...field}
-                             className="h-11 text-base"
-                           />
-                         </FormControl>
-                         <FormMessage />
-                       </FormItem>
-                     )}
-                   />
-                    <Button type="submit" className="w-full h-11 text-base" disabled={businessForm.formState.isSubmitting}>
-                      {businessForm.formState.isSubmitting ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      ) : (
-                        <LogIn className="mr-2 h-5 w-5" />
-                      )}
-                      Se Connecter (Business)
-                    </Button>
-                 </form>
-              </Form>
-
-               {/* Business Registration Link/Dialog */}
-               <div className="text-center pt-4">
-                 <Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}>
-                   <DialogTrigger asChild>
-                     <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
-                       <Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution
-                     </Button>
-                   </DialogTrigger>
-                   {/* Business Registration Dialog Content */}
-                   {isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}
-                 </Dialog>
-               </div>
-
+              {businessLoginStep === 'credentials' ? (
+                <>
+                  <Form {...businessForm}>
+                    <form onSubmit={businessForm.handleSubmit(onBusinessSubmit)} className="space-y-4">
+                      <FormField control={businessForm.control} name="registrationNumber" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM</FormLabel><FormControl><Input placeholder="Ex: 001234567 ou SN.DKR.2023.A.12345" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={businessForm.control} name="password" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe</FormLabel><FormControl><Input type="password" placeholder="••••••••" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
+                      <Button type="submit" className="w-full h-11 text-base" disabled={businessForm.formState.isSubmitting}>
+                        {businessForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP (Business)
+                      </Button>
+                    </form>
+                  </Form>
+                  <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
+                </>
+              ) : (
+                commonOtpInputSection(setBusinessLoginStep, 'credentials', submittedOrgIdentifier, () => handleOtpVerification('/business-dashboard'))
+              )}
             </CardContent>
-            <CardFooter>
-              <p className="text-xs text-muted-foreground text-center w-full">
-                Besoin d'aide ?{" "}
-                 <Link href="#" className="text-primary underline hover:no-underline"> {/* Add link target later */}
-                  Contactez le support
-                 </Link>.
-              </p>
-            </CardFooter>
+            <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
           </Card>
         </TabsContent>
 
@@ -763,84 +453,30 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Portail Développeur</CardTitle>
               <CardDescription>
-                Accès aux APIs et outils d'intégration via NINEA/RCCM.
+                {developerLoginStep === 'credentials'
+                  ? "Accès aux APIs et outils d'intégration via NINEA/RCCM."
+                  : "Veuillez entrer le code OTP reçu."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              {/* Developer Login Form */}
-               <Form {...developerForm}>
-                 <form onSubmit={developerForm.handleSubmit(onDeveloperSubmit)} className="space-y-4">
-                   <FormField
-                     control={developerForm.control}
-                     name="registrationNumber"
-                     render={({ field }) => (
-                       <FormItem>
-                         <FormLabel className="flex items-center text-sm">
-                           <CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM (Développeur)
-                         </FormLabel>
-                         <FormControl>
-                           <Input
-                             placeholder="N° organisation développeur"
-                             {...field}
-                             className="h-11 text-base"
-                           />
-                         </FormControl>
-                         <FormMessage />
-                       </FormItem>
-                     )}
-                   />
-                    <FormField
-                     control={developerForm.control}
-                     name="password"
-                     render={({ field }) => (
-                       <FormItem>
-                         <FormLabel className="flex items-center text-sm">
-                           <KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe (API Key / Secret)
-                         </FormLabel>
-                         <FormControl>
-                           <Input
-                             type="password"
-                             placeholder="••••••••"
-                             {...field}
-                             className="h-11 text-base"
-                           />
-                         </FormControl>
-                         <FormMessage />
-                       </FormItem>
-                     )}
-                   />
-                    <Button type="submit" className="w-full h-11 text-base" disabled={developerForm.formState.isSubmitting}>
-                      {developerForm.formState.isSubmitting ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      ) : (
-                        <LogIn className="mr-2 h-5 w-5" />
-                      )}
-                      Se Connecter (Développeur)
-                    </Button>
-                 </form>
-               </Form>
-
-                {/* Developer Registration Link/Dialog */}
-                <div className="text-center pt-4">
-                 <Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}>
-                   <DialogTrigger asChild>
-                     <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
-                       <CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur
-                     </Button>
-                   </DialogTrigger>
-                   {/* Developer Registration Dialog Content */}
-                   {isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}
-                 </Dialog>
-               </div>
-
+              {developerLoginStep === 'credentials' ? (
+                <>
+                  <Form {...developerForm}>
+                    <form onSubmit={developerForm.handleSubmit(onDeveloperSubmit)} className="space-y-4">
+                      <FormField control={developerForm.control} name="registrationNumber" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM (Développeur)</FormLabel><FormControl><Input placeholder="N° organisation développeur" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
+                      <FormField control={developerForm.control} name="password" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe (API Key / Secret)</FormLabel><FormControl><Input type="password" placeholder="••••••••" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
+                      <Button type="submit" className="w-full h-11 text-base" disabled={developerForm.formState.isSubmitting}>
+                        {developerForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP (Développeur)
+                      </Button>
+                    </form>
+                  </Form>
+                  <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
+                </>
+              ) : (
+                commonOtpInputSection(setDeveloperLoginStep, 'credentials', submittedOrgIdentifier, () => handleOtpVerification('/developer-dashboard'))
+              )}
             </CardContent>
-             <CardFooter>
-                 <p className="text-xs text-muted-foreground text-center w-full">
-                     <Link href="#" className="text-primary underline hover:no-underline"> {/* Add link target later */}
-                       Consultez la documentation API
-                     </Link>.
-                 </p>
-            </CardFooter>
+            <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
           </Card>
         </TabsContent>
 
@@ -850,89 +486,40 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Accès Ministères</CardTitle>
               <CardDescription>
-                Portail sécurisé pour les institutions ministérielles.
+                {ministryLoginStep === 'credentials'
+                  ? "Portail sécurisé pour les institutions ministérielles."
+                  : "Veuillez entrer le code OTP reçu."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              <Form {...ministryForm}>
-                <form onSubmit={ministryForm.handleSubmit(onMinistrySubmit)} className="space-y-4">
-                  <FormField
-                    control={ministryForm.control}
-                    name="ministryName"
-                    render={({ field }) => (
+              {ministryLoginStep === 'credentials' ? (
+                <Form {...ministryForm}>
+                  <form onSubmit={ministryForm.handleSubmit(onMinistrySubmit)} className="space-y-4">
+                    <FormField control={ministryForm.control} name="ministryName" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center text-sm">
-                          <Landmark className="mr-2 h-4 w-4 text-muted-foreground" /> Ministère
-                        </FormLabel>
+                        <FormLabel className="flex items-center text-sm"><Landmark className="mr-2 h-4 w-4 text-muted-foreground" /> Ministère</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="h-11 text-base">
-                              <SelectValue placeholder="Sélectionnez un ministère..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {/* TODO: Populate with the full list of 54 ministries */}
-                            {senegalMinistries.map((ministry) => (
-                              <SelectItem key={ministry} value={ministry} className="text-sm">
-                                {ministry}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ministryForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="flex items-center text-sm">
-                          <KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="••••••••"
-                            {...field}
-                            className="h-11 text-base"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full h-11 text-base" disabled={ministryForm.formState.isSubmitting}>
-                    {ministryForm.formState.isSubmitting ? (
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    ) : (
-                      <LogIn className="mr-2 h-5 w-5" />
-                    )}
-                    Se Connecter (Ministère)
-                  </Button>
-                </form>
-              </Form>
+                          <FormControl><SelectTrigger className="h-11 text-base"><SelectValue placeholder="Sélectionnez un ministère..." /></SelectTrigger></FormControl>
+                          <SelectContent>{senegalMinistries.map((ministry) => (<SelectItem key={ministry} value={ministry} className="text-sm">{ministry}</SelectItem>))}</SelectContent>
+                        </Select><FormMessage />
+                      </FormItem>)} />
+                    <FormField control={ministryForm.control} name="password" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe</FormLabel><FormControl><Input type="password" placeholder="••••••••" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
+                    <Button type="submit" className="w-full h-11 text-base" disabled={ministryForm.formState.isSubmitting}>
+                      {ministryForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP (Ministère)
+                    </Button>
+                  </form>
+                </Form>
+              ) : (
+                commonOtpInputSection(setMinistryLoginStep, 'credentials', submittedMinistryName, () => handleOtpVerification('/ministry-dashboard'))
+              )}
             </CardContent>
-            <CardFooter>
-              <p className="text-xs text-muted-foreground text-center w-full">
-                Accès réservé aux personnels autorisés des ministères.
-              </p>
-            </CardFooter>
+            <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés des ministères.</p></CardFooter>
           </Card>
         </TabsContent>
-
       </Tabs>
-      <p className="mt-8 text-xs text-center text-muted-foreground/80 px-4">
-        Toute tentative d'intrusion suspecte votre IP sera tracée par Le Regard Maudit.
-      </p>
+      <p className="mt-8 text-xs text-center text-muted-foreground/80 px-4">Toute tentative d'intrusion suspecte votre IP sera tracée par Le Regard Maudit.</p>
       <div className="mt-4 text-center">
-        <a
-          href="http://127.0.0.1:8000/"
-          className="text-sm text-primary hover:underline flex items-center justify-center gap-1.5"
-          target="_blank" // Opens in a new tab, good for external links
-          rel="noopener noreferrer" // Security measure for target="_blank"
-        >
+        <a href="http://127.0.0.1:8000/" className="text-sm text-primary hover:underline flex items-center justify-center gap-1.5" target="_blank" rel="noopener noreferrer">
           <ArrowLeft className="h-4 w-4" /> Retour au site principal
         </a>
       </div>
