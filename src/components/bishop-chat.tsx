@@ -77,11 +77,15 @@ export default function BishopChat() {
       toast({
         variant: 'destructive',
         title: 'Erreur de Communication',
-        description: "Impossible de joindre l'assistant BISHOP pour le moment.",
+        description: "Une difficulté technique empêche BISHOP de répondre. Veuillez réessayer plus tard.",
       });
-       setMessages((prev) => [
-           ...prev,
-           { id: uuidv4(), role: 'assistant', content: "Désolé, je n'ai pas pu traiter votre demande." }
+       setMessages((prevMessages) => [
+           ...prevMessages,
+           {
+             id: uuidv4(),
+             role: 'assistant',
+             content: "Oups ! Je rencontre un problème technique. Réessayez dans un instant.",
+           },
        ]);
     } finally {
       setIsLoading(false);
