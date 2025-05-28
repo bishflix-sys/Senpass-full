@@ -8,6 +8,7 @@ import * as z from "zod";
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRouter } from "next/navigation";
 import Link from "next/link"; // Import Link
+import dynamic from "next/dynamic"; // Import dynamic
 import {
   Tabs,
   TabsContent,
@@ -59,9 +60,23 @@ import {
 } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import RegistrationDialogContent from "@/components/registration-dialog-content";
-import BusinessRegistrationDialogContent from "@/components/business-registration-dialog-content";
-import DeveloperRegistrationDialogContent from "@/components/developer-registration-dialog-content";
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
+
+// Dynamically import dialog content components
+const FacialRecognitionDialogContent = dynamic(() => import("@/components/facial-recognition-dialog-content").then(mod => mod.default), {
+  loading: () => <div className="p-6"><Skeleton className="h-64 w-full" /></div>,
+  ssr: false // Typically, camera interactions are client-side only
+});
+const RegistrationDialogContent = dynamic(() => import("@/components/registration-dialog-content"), {
+  loading: () => <div className="p-6"><Skeleton className="h-96 w-full" /></div>,
+});
+const BusinessRegistrationDialogContent = dynamic(() => import("@/components/business-registration-dialog-content"), {
+  loading: () => <div className="p-6"><Skeleton className="h-[500px] w-full" /></div>,
+});
+const DeveloperRegistrationDialogContent = dynamic(() => import("@/components/developer-registration-dialog-content"), {
+  loading: () => <div className="p-6"><Skeleton className="h-[600px] w-full" /></div>,
+});
+
 
 const SIMULATED_OTP = "000000"; // Standard OTP for demonstration
 
@@ -102,82 +117,6 @@ const senegalMinistries = [
   "Ministère de la Jeunesse, de l'Emploi et de la Construction Citoyenne",
 ];
 
-const FacialRecognitionDialogContent: React.FC<{ onAuthenticated: () => void }> = ({ onAuthenticated }) => {
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const [hasCameraPermission, setHasCameraPermission] = React.useState<boolean | null>(null);
-  const [isScanning, setIsScanning] = React.useState(false);
-  const { toast } = useToast();
-  const streamRef = React.useRef<MediaStream | null>(null);
-
-  React.useEffect(() => {
-    let mounted = true;
-    const getCameraPermission = async () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          if (mounted) setHasCameraPermission(false);
-           toast({ variant: 'destructive', title: 'Erreur Caméra', description: 'Votre navigateur ne supporte pas l\'accès à la caméra.'});
-          return;
-      }
-      try {
-        streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
-         if (mounted) {
-            setHasCameraPermission(true);
-            if (videoRef.current) videoRef.current.srcObject = streamRef.current;
-        } else {
-            streamRef.current?.getTracks().forEach(track => track.stop());
-        }
-      } catch (error) {
-        if (mounted) setHasCameraPermission(false);
-      }
-    };
-    getCameraPermission();
-    return () => {
-        mounted = false;
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-        }
-        if(videoRef.current) videoRef.current.srcObject = null;
-    };
-  }, [toast]);
-
-  const handleSimulateScan = () => {
-      setIsScanning(true);
-      setTimeout(() => {
-          const success = Math.random() > 0.3;
-          setIsScanning(false);
-          if (success) {
-              toast({ title: "Succès", description: "Reconnaissance faciale réussie ! Redirection..." });
-              onAuthenticated();
-          } else {
-              toast({ title: "Échec", description: "Reconnaissance faciale échouée. Veuillez réessayer.", variant: "destructive" });
-          }
-      }, 2000);
-  };
-
-  return (
-    <DialogContent className="sm:max-w-md">
-      <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-lg"><ScanFace className="h-5 w-5" /> Vérification Faciale</DialogTitle>
-        <DialogDescription>Positionnez votre visage face à la caméra et cliquez sur Scanner.</DialogDescription>
-      </DialogHeader>
-      <div className="space-y-4 my-6">
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted flex items-center justify-center shadow-inner">
-           <video ref={videoRef} className={cn("w-full h-full object-cover", { 'hidden': hasCameraPermission === false })} autoPlay muted playsInline />
-            {hasCameraPermission === null && (<div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground space-y-2"><Loader2 className="h-8 w-8 animate-spin" /><p>Activation caméra...</p></div>)}
-             {hasCameraPermission === false && (<div className="absolute inset-0 flex flex-col items-center justify-center text-destructive p-4 space-y-2"><VideoOff className="h-10 w-10" /><p className="text-center font-semibold">Caméra non accessible</p><p className="text-center text-sm">Veuillez autoriser l'accès dans votre navigateur.</p></div>)}
-              {isScanning && (<div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center text-primary space-y-2 backdrop-blur-sm"><Loader2 className="h-10 w-10 animate-spin" /><p className="font-medium">Analyse en cours...</p></div>)}
-        </div>
-        {hasCameraPermission === false && (<Alert variant="destructive" icon={VideoOff}><AlertTitle>Accès Caméra Refusé</AlertTitle><AlertDescription>L'accès à la caméra est nécessaire. Veuillez l'autoriser.</AlertDescription></Alert>)}
-      </div>
-      <DialogFooter className="sm:justify-center gap-2">
-         <Button type="button" onClick={handleSimulateScan} disabled={!hasCameraPermission || isScanning} className="w-full sm:w-auto" size="lg">
-            {isScanning ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ScanFace className="mr-2 h-5 w-5" />} Scanner
-          </Button>
-         <DialogClose asChild><Button type="button" variant="outline" size="lg">Annuler</Button></DialogClose>
-      </DialogFooter>
-    </DialogContent>
-  );
-};
 
 export default function LoginPage() {
   const { toast } = useToast();
@@ -310,7 +249,7 @@ export default function LoginPage() {
   ) => (
     <div className="space-y-4 pt-4">
       <p className="text-sm text-muted-foreground">
-        Un code OTP a été envoyé {identifierForOtpMessage ? `à ${identifierForOtpMessage}` : 'à votre contact enregistré'}. Entrez le code ci-dessous (Code: {SIMULATED_OTP}).
+        Un code OTP a été envoyé {identifierForOtpMessage ? `à ${identifierForOtpMessage}` : 'à votre contact enregistré'}. Entrez le code ci-dessous (Code: ${SIMULATED_OTP}).
       </p>
       <div className="space-y-2">
         <Label htmlFor="otp" className="flex items-center gap-1.5">
@@ -527,3 +466,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

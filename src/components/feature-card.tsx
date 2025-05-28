@@ -1,5 +1,6 @@
 
 import type { LucideProps } from "lucide-react";
+import * as React from "react"; // Import React for React.memo
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -10,7 +11,8 @@ interface FeatureCardProps {
   accentIcon?: boolean;
 }
 
-export default function FeatureCard({ icon: Icon, title, description, accentIcon = false }: FeatureCardProps) {
+// Wrap the component with React.memo
+const FeatureCard = React.memo(function FeatureCard({ icon: Icon, title, description, accentIcon = false }: FeatureCardProps) {
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200 border h-full flex flex-col">
       <CardHeader className="flex flex-row items-start gap-4 space-y-0 pb-3"> {/* Adjusted padding */}
@@ -34,4 +36,8 @@ export default function FeatureCard({ icon: Icon, title, description, accentIcon
       */}
     </Card>
   );
-}
+});
+
+export default FeatureCard;
+
+    

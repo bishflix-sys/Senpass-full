@@ -3,13 +3,14 @@
 
 import * as React from "react"; // Import React for hooks
 import Link from "next/link"; // Import Link for navigation
+import dynamic from "next/dynamic"; // Import dynamic
 import { getUserProfile, type UserProfile } from "@/services/identity";
 import ProfileCard from "@/components/profile-card";
 import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
 import LogoutButton from "@/components/logout-button";
 import IdCardDisplay from "@/components/id-card-display"; // Import the new IdCardDisplay
-import BishopChat from "@/components/bishop-chat"; // Import BishopChat
+// import BishopChat from "@/components/bishop-chat"; // Import BishopChat - will be dynamically imported
 import {
   Fingerprint,
   ScanFace,
@@ -44,6 +45,23 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"; // Import Sheet components
 import { useToast } from "@/hooks/use-toast"; // Import useToast
+
+// Dynamically import BishopChat
+const BishopChat = dynamic(() => import("@/components/bishop-chat"), {
+  loading: () => (
+    <div className="flex flex-col h-full">
+      <Skeleton className="h-16 w-full border-b" />
+      <div className="flex-grow p-4 space-y-4">
+        <Skeleton className="h-10 w-3/4" />
+        <Skeleton className="h-10 w-1/2 self-end" />
+        <Skeleton className="h-10 w-3/4" />
+      </div>
+      <Skeleton className="h-16 w-full border-t" />
+    </div>
+  ),
+  ssr: false // Chat is client-side interactive
+});
+
 
 // Helper function to generate a simple alphanumeric ID
 const generateAlphanumericId = (length = 12) => {
@@ -364,12 +382,14 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
             className="w-full max-w-md p-0 border-l border-border" // Set max width, remove padding
             onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus trap issues
          >
-            {/* Render BishopChat component inside the sheet content */}
-            {/* Adjust BishopChat styles if needed to fit the sheet */}
-            <BishopChat />
+            <React.Suspense fallback={<div className="flex flex-col h-full"><Skeleton className="h-16 w-full border-b" /><div className="flex-grow p-4 space-y-4"><Skeleton className="h-10 w-3/4" /><Skeleton className="h-10 w-1/2 self-end" /><Skeleton className="h-10 w-3/4" /></div><Skeleton className="h-16 w-full border-t" /></div>}>
+              <BishopChat />
+            </React.Suspense>
          </SheetContent>
       </Sheet>
     </div>
   );
 }
 
+
+    
