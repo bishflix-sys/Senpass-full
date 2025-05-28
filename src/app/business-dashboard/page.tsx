@@ -41,7 +41,7 @@ export default function BusinessDashboardPage() {
                <Building className="h-7 w-7 sm:h-8 sm:w-8" /> Portail Entreprise
              </h1>
              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-               Tableau de bord pour les partenaires Business SenPass (Simulation).
+               Tableau de bord pour les partenaires Business SenPass.
              </p>
            </div>
         </div>
@@ -65,9 +65,9 @@ export default function BusinessDashboardPage() {
                     <CardDescription>Gérer les demandes d'identité en attente.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">Aucune demande en attente (Simulation).</p>
+                    <p className="text-muted-foreground text-sm">Aucune demande en attente.</p>
                     {/* Placeholder for verification list or stats */}
-                    <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Simulation", description: "Affichage de toutes les demandes."})}>Voir tout</Button>
+                    <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Information", description: "Affichage de toutes les demandes."})}>Voir tout</Button>
                 </CardContent>
             </Card>
 
@@ -80,9 +80,9 @@ export default function BusinessDashboardPage() {
                     <CardDescription>Ajouter ou gérer les accès de vos collaborateurs.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">3 utilisateurs actifs (Simulation).</p>
+                    <p className="text-muted-foreground text-sm">3 utilisateurs actifs.</p>
                     {/* Placeholder for user management actions */}
-                    <Button variant="outline" size="sm" className="mt-2" onClick={() => toast({title: "Simulation", description: "Ouverture du panneau de gestion des accès."})}>Gérer les accès</Button>
+                    <Button variant="outline" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture du panneau de gestion des accès."})}>Gérer les accès</Button>
                 </CardContent>
             </Card>
 
@@ -97,16 +97,16 @@ export default function BusinessDashboardPage() {
                 <CardContent>
                      <p className="text-muted-foreground text-sm">Mettre à jour vos informations.</p>
                     {/* Placeholder for settings link */}
-                    <Button variant="secondary" size="sm" className="mt-2" onClick={() => toast({title: "Simulation", description: "Ouverture des paramètres du compte."})}>Modifier les paramètres</Button>
+                    <Button variant="secondary" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture des paramètres du compte."})}>Modifier les paramètres</Button>
                 </CardContent>
             </Card>
        </div>
 
         <Separator />
 
-        {/* Payment Simulation Section */}
+        {/* Payment Section */}
         <section>
-            <h2 className="text-2xl font-semibold mb-4">Paiement des Services (Simulation)</h2>
+            <h2 className="text-2xl font-semibold mb-4">Paiement des Services</h2>
             <Card className="border shadow-sm">
                 <CardHeader>
                     <CardTitle>Payer un Service</CardTitle>
@@ -132,7 +132,7 @@ export default function BusinessDashboardPage() {
             <h2 className="text-2xl font-semibold mb-4">Intégrations & Services</h2>
             <p className="text-muted-foreground">
                 Ici, vous pourriez voir des sections spécifiques liées aux services que votre entreprise utilise via SenPass,
-                par exemple, l'intégration avec votre système RH, la validation pour des services financiers, etc. (Simulation)
+                par exemple, l'intégration avec votre système RH, la validation pour des services financiers, etc.
             </p>
             {/* Add more specific placeholder content as needed */}
         </section>

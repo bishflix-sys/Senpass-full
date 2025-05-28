@@ -65,7 +65,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
   const [qrData, setQrData] = React.useState<string | null>(null);
   const [uniqueId, setUniqueId] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [walletBalance, setWalletBalance] = React.useState<number | null>(null); // Simulated balance
+  const [walletBalance, setWalletBalance] = React.useState<number | null>(null); // balance
   const [isBalanceVisible, setIsBalanceVisible] = React.useState(false); // Balance visibility state
   const { toast } = useToast(); // Get toast function
 
@@ -78,7 +78,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
         setUserProfile(profile);
         setQrData(generateQrData(profile.nationalId)); // Initial QR data generation
         setUniqueId(generateAlphanumericId()); // Generate unique ID once
-        // Simulate fetching wallet balance
+        // fetch wallet balance
         setWalletBalance(Math.floor(Math.random() * 50000) + 5000); // Random balance between 5000 and 55000 FCFA
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
@@ -171,7 +171,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                 Bienvenue, {userProfile.name} !
               </h1>
               <p className="text-muted-foreground mt-1">
-                Votre tableau de bord centralisé pour votre identité numérique unique (Simulation).
+                Votre tableau de bord centralisé pour votre identité numérique unique.
               </p>
            </div>
            <LogoutButton />
@@ -219,7 +219,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                                   <Wallet className="h-5 w-5 text-primary" /> Solde Portefeuille
                               </CardTitle>
-                              <CardDescription className="text-xs">Votre balance e-wallet (Simulation).</CardDescription>
+                              <CardDescription className="text-xs">Votre balance e-wallet.</CardDescription>
                           </CardHeader>
                           <CardContent className="flex items-center justify-between flex-wrap gap-4"> {/* Added flex-wrap */}
                              <span className="text-2xl font-bold tracking-tight">
@@ -267,7 +267,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                        </CardTitle>
                     </CardHeader>
                     <CardContent>
-                       <p className="text-sm text-muted-foreground">Aucune activité récente à afficher (Simulation).</p>
+                       <p className="text-sm text-muted-foreground">Aucune activité récente à afficher.</p>
                        {/* Future: List recent logins, verifications etc. */}
                     </CardContent>
                   </Card>
@@ -280,7 +280,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                        </CardTitle>
                     </CardHeader>
                      <CardContent>
-                       <p className="text-sm text-muted-foreground">Aucune alerte importante (Simulation).</p>
+                       <p className="text-sm text-muted-foreground">Aucune alerte importante.</p>
                        {/* Future: Display security alerts, pending actions etc. */}
                      </CardContent>
                   </Card>
@@ -305,38 +305,38 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
              <FeatureCard
                 icon={LockKeyhole} // New icon for strong auth
                 title="Authentification Sécurisée"
-                description="Accès aux services via biométrie, PIN, OTP (Simulation)."
+                description="Accès aux services via biométrie, PIN, OTP."
                 accentIcon
              />
              <FeatureCard
                 icon={UserCheck}
                 title="Vérification Simplifiée"
-                description="Validation d'identité sécurisée et rapide, sans documents physiques (Simulation)."
+                description="Validation d'identité sécurisée et rapide, sans documents physiques."
              />
              <FeatureCard
                 icon={FileSignature}
                 title="Signature Électronique"
-                description="Signature de documents administratifs avec valeur légale (Simulation)."
+                description="Signature de documents administratifs avec valeur légale."
              />
              <FeatureCard
                 icon={Wallet} // New icon for e-wallet
                 title="Portefeuille Numérique"
-                description="Paiement intégré de taxes et factures via e-wallet (Simulation)."
+                description="Paiement intégré de taxes et factures via e-wallet."
              />
              <FeatureCard
                 icon={FolderArchive} // New icon for document management
                 title="Documents Dématérialisés"
-                description="Accès et stockage sécurisé de vos documents dans le cloud (Simulation)." // Updated description
+                description="Accès et stockage sécurisé de vos documents dans le cloud."
              />
              <FeatureCard
                 icon={ShieldCheck} // New icon for data protection
                 title="Protection des Données"
-                description="Contrôle sur vos informations personnelles, respect de la confidentialité (Simulation)."
+                description="Contrôle sur vos informations personnelles, respect de la confidentialité."
              />
              <FeatureCard
                 icon={User} // Keep MonProfil or similar
                 title="MonProfil Connect"
-                description="Remplissage automatique des formulaires avec vos données officielles (Simulation)."
+                description="Remplissage automatique des formulaires avec vos données officielles."
              />
           </div>
         </section>

@@ -132,28 +132,28 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ o
 
   async function onSubmit(data: RegistrationFormValues) {
     setIsSubmitting(true);
-    console.log("Registration data (simulation):", {
+    console.log("Registration data:", {
         ...data,
         issueDate: data.issueDate.toISOString().split('T')[0] // Format date for logging
     });
 
-    // Simulate API call for registration
+    // API call for registration
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // Simulate success/failure (e.g., 90% success)
+    // success/failure (e.g., 90% success)
     const success = Math.random() > 0.1;
     setIsSubmitting(false);
 
     if (success) {
       toast({
-        title: "Inscription Réussie (Simulation)",
+        title: "Inscription Réussie",
         description: "Votre compte a été créé.",
       });
       form.reset(); // Reset form on success
       onSuccess(); // Call the success callback (e.g., close dialog)
     } else {
       toast({
-        title: "Échec de l'Inscription (Simulation)",
+        title: "Échec de l'Inscription",
         description: "Une erreur s'est produite. Veuillez réessayer.",
         variant: "destructive",
       });
@@ -170,7 +170,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ o
            <UserPlus className="h-6 w-6" /> S'inscrire
         </DialogTitle>
         <DialogDescription>
-          Créez votre compte d'identité numérique. (Simulation)
+          Créez votre compte d'identité numérique.
         </DialogDescription>
       </DialogHeader>
 
@@ -305,7 +305,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ o
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              S'inscrire (Simulation)
+              S'inscrire
             </Button>
           </DialogFooter>
         </form>

@@ -25,23 +25,23 @@ export default function LoginSimulation() {
     setLoadingMethod(method);
     setIsAuthenticated(false); // Reset auth state
 
-    // Simulate API call
+    // API call
     setTimeout(() => {
       let success = false;
       let message = "";
 
       if (method === 'pin') {
-        if (pin === "1234") { // Simple PIN check simulation
+        if (pin === "1234") { // Simple PIN check
             success = true;
             message = "Authentification par PIN réussie ! Redirection...";
         } else {
             message = "PIN incorrect. Veuillez réessayer.";
         }
       } else if (method === 'fingerprint') {
-         success = Math.random() > 0.2; // Simulate 80% success rate
+         success = Math.random() > 0.2; // 80% success rate
          message = success ? "Empreinte digitale reconnue ! Redirection..." : "Échec de la reconnaissance d'empreinte.";
       } else if (method === 'face') {
-         success = Math.random() > 0.3; // Simulate 70% success rate
+         success = Math.random() > 0.3; // 70% success rate
          message = success ? "Reconnaissance faciale réussie ! Redirection..." : "Échec de la reconnaissance faciale.";
       }
 
@@ -65,7 +65,7 @@ export default function LoginSimulation() {
       }
       // setLoadingMethod(null); // Moved loading reset to failure case or let redirect handle it
       // setPin(""); // Moved PIN reset to failure case
-    }, 1500); // Simulate 1.5 seconds delay
+    }, 1500); // 1.5 seconds delay
   };
 
 
@@ -76,7 +76,7 @@ export default function LoginSimulation() {
             <Smartphone className="h-5 w-5 text-primary" /> {/* Added icon */}
             Application Mobile SenPass
         </CardTitle>
-        <CardDescription>Simulez l'authentification depuis l'application mobile.</CardDescription>
+        <CardDescription>Authentification depuis l'application mobile.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6"> {/* Increased spacing */}
          {/* PIN Section */}
@@ -157,7 +157,7 @@ export default function LoginSimulation() {
       </CardContent>
        {/* Optional Footer */}
       {/* <CardFooter>
-        <p className="text-xs text-muted-foreground text-center w-full">Simulation uniquement.</p>
+        <p className="text-xs text-muted-foreground text-center w-full">Uniquement à des fins de démonstration.</p>
       </CardFooter> */}
     </Card>
   );

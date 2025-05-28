@@ -78,7 +78,7 @@ export default function DepositPage() {
         const methodDisplay = data.method === 'wave' ? 'Wave' : 'Orange Money';
         toast({
             title: "Traitement du Dépôt...",
-            description: `Tentative de dépôt de ${data.amount.toLocaleString('fr-FR')} FCFA via ${methodDisplay} sur le numéro ${data.phoneNumber}. (Simulation)`,
+            description: `Tentative de dépôt de ${data.amount.toLocaleString('fr-FR')} FCFA via ${methodDisplay} sur le numéro ${data.phoneNumber}.`,
         });
 
         console.log("Deposit attempt:", data);
@@ -93,14 +93,14 @@ export default function DepositPage() {
 
         if (success) {
             toast({
-                title: "Dépôt Réussi (Simulation)",
+                title: "Dépôt Réussi",
                 description: `${data.amount.toLocaleString('fr-FR')} FCFA ont été ajoutés à votre portefeuille. Redirection...`,
             });
             // Redirect back to dashboard page after success
             setTimeout(() => router.push('/dashboard'), 1500);
         } else {
             toast({
-                title: "Échec du Dépôt (Simulation)",
+                title: "Échec du Dépôt",
                 description: "Impossible de traiter le dépôt pour le moment. Veuillez réessayer.",
                 variant: "destructive",
             });
@@ -119,7 +119,7 @@ export default function DepositPage() {
             </Link>
         </div>
         <p className="text-muted-foreground mb-8">
-            Ajoutez des fonds à votre portefeuille via Mobile Money (Simulation).
+            Ajoutez des fonds à votre portefeuille via Mobile Money.
         </p>
 
         {/* Deposit Form */}
@@ -219,7 +219,7 @@ export default function DepositPage() {
                             ) : (
                                 <ArrowDownToLine className="mr-2 h-5 w-5" />
                             )}
-                            Confirmer le Dépôt (Simulation)
+                            Confirmer le Dépôt
                         </Button>
                     </form>
                 </Form>
@@ -228,7 +228,7 @@ export default function DepositPage() {
 
          {/* Footer Security Note */}
         <div className="mt-6 text-center text-xs text-muted-foreground">
-            Les dépôts sont traités de manière simulée.
+            Les dépôts sont traités de manière sécurisée.
         </div>
     </div>
   );

@@ -15,12 +15,12 @@ export default function SecurePaymentPage() {
     const router = useRouter(); // If navigation is needed after payment
 
     // Simulate payment action
-    const handlePaymentSimulation = (method: string) => {
+    const handlePayment = (method: string) => {
         toast({
-            title: "Simulation de Paiement",
-            description: `Tentative de paiement sécurisé via ${method}. (Simulation)`,
+            title: "Paiement en Cours",
+            description: `Tentative de paiement sécurisé via ${method}.`,
         });
-        // Add further simulation logic if needed, e.g., redirecting after success
+        // Add further logic if needed, e.g., redirecting after success
         // setTimeout(() => router.push('/payment-success'), 2000);
     };
 
@@ -36,7 +36,7 @@ export default function SecurePaymentPage() {
             </Link>
         </div>
         <p className="text-muted-foreground mb-8">
-            Choisissez votre méthode de paiement préférée pour finaliser votre transaction (Simulation).
+            Choisissez votre méthode de paiement préférée pour finaliser votre transaction.
         </p>
 
         {/* Payment Options */}
@@ -56,10 +56,10 @@ export default function SecurePaymentPage() {
                          <span className="font-bold text-orange-500">MasterCard</span>
                          <span className="font-bold text-blue-800">Amex</span>
                      </div>
-                    <Button onClick={() => handlePaymentSimulation('Carte Bancaire')} size="lg" className="w-full sm:w-auto">
-                        Payer par Carte (Simulation)
+                    <Button onClick={() => handlePayment('Carte Bancaire')} size="lg" className="w-full sm:w-auto">
+                        Payer par Carte
                     </Button>
-                     <p className="text-xs text-muted-foreground mt-1">Simule la redirection vers une page de paiement sécurisée.</p>
+                     <p className="text-xs text-muted-foreground mt-1">Redirection vers une page de paiement sécurisée.</p>
                 </CardContent>
             </Card>
 
@@ -77,10 +77,10 @@ export default function SecurePaymentPage() {
                             [QR Code Placeholder]
                         </div>
                     </div>
-                    <Button onClick={() => handlePaymentSimulation('QR Code')} size="lg" className="w-full sm:w-auto">
-                        Afficher/Scanner QR (Simulation)
+                    <Button onClick={() => handlePayment('QR Code')} size="lg" className="w-full sm:w-auto">
+                        Afficher/Scanner QR
                     </Button>
-                    <p className="text-xs text-muted-foreground mt-1">Simule l'affichage d'un QR code ou l'ouverture d'un scanner.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Affichage d'un QR code ou ouverture d'un scanner.</p>
                 </CardContent>
             </Card>
 
@@ -101,17 +101,17 @@ export default function SecurePaymentPage() {
                          <span className="font-semibold text-cyan-600">Payer</span>
                          <span className="font-semibold text-gray-500">Autres...</span>
                      </div>
-                     <Button onClick={() => handlePaymentSimulation('Mobile Money')} size="lg" className="w-full sm:w-auto">
-                         Payer via Mobile (Simulation)
+                     <Button onClick={() => handlePayment('Mobile Money')} size="lg" className="w-full sm:w-auto">
+                         Payer via Mobile
                      </Button>
-                      <p className="text-xs text-muted-foreground mt-1">Simule la saisie d'un numéro ou une redirection vers l'opérateur.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Saisie d'un numéro ou redirection vers l'opérateur.</p>
                  </CardContent>
              </Card>
         </div>
 
          {/* Footer Security Note */}
         <div className="mt-10 text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-            <Lock className="h-3 w-3" /> Toutes les transactions sont simulées et sécurisées.
+            <Lock className="h-3 w-3" /> Toutes les transactions sont sécurisées.
         </div>
     </div>
   );

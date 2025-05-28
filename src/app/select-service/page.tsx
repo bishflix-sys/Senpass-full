@@ -73,8 +73,8 @@ const ministriesData: Ministry[] = [
     name: "Ministère de l'Éducation Nationale",
     icon: GraduationCap,
     services: [
-      { id: "frais_sco", name: "Frais d'inscription scolaire/universitaire", description: "Payer les frais d'inscription (simulation)." },
-      { id: "cantine", name: "Paiement cantine scolaire", description: "Contribution pour la cantine scolaire (simulation)." },
+      { id: "frais_sco", name: "Frais d'inscription scolaire/universitaire", description: "Payer les frais d'inscription." },
+      { id: "cantine", name: "Paiement cantine scolaire", description: "Contribution pour la cantine scolaire." },
     ],
   },
   {
@@ -82,8 +82,8 @@ const ministriesData: Ministry[] = [
     name: "Ministère de la Santé et de l'Action Sociale",
     icon: HeartPulse,
     services: [
-      { id: "frais_hop", name: "Paiement frais hospitaliers", description: "Régler des frais médicaux ou hospitaliers (simulation)." },
-      { id: "mutuelle", name: "Contribution mutuelle de santé", description: "Cotisation pour votre mutuelle de santé (simulation)." },
+      { id: "frais_hop", name: "Paiement frais hospitaliers", description: "Régler des frais médicaux ou hospitaliers." },
+      { id: "mutuelle", name: "Contribution mutuelle de santé", description: "Cotisation pour votre mutuelle de santé." },
     ],
   },
   {
@@ -111,7 +111,7 @@ export default function SelectServicePage() {
         </Button>
       </div>
       <p className="text-muted-foreground mb-8">
-        Choisissez le ministère et le service pour lequel vous souhaitez effectuer un paiement. (Simulation)
+        Choisissez le ministère et le service pour lequel vous souhaitez effectuer un paiement.
       </p>
 
       <Accordion type="single" collapsible className="w-full space-y-4">

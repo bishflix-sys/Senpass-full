@@ -136,7 +136,7 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
 
   async function onSubmit(data: BusinessRegistrationFormValues) {
     setIsSubmitting(true);
-    console.log("Business Registration data (simulation):", {
+    console.log("Business Registration data:", {
         ...data,
         idIssueDate: data.idIssueDate.toISOString().split('T')[0] // Format date for logging
     });
@@ -150,14 +150,14 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
 
     if (success) {
       toast({
-        title: "Inscription Entreprise Réussie (Simulation)",
+        title: "Inscription Entreprise Réussie",
         description: "Votre compte entreprise/institution a été créé.",
       });
       form.reset(); // Reset form on success
       onSuccess(); // Call the success callback
     } else {
       toast({
-        title: "Échec de l'Inscription Entreprise (Simulation)",
+        title: "Échec de l'Inscription Entreprise",
         description: "Une erreur s'est produite. Vérifiez vos informations et réessayez.",
         variant: "destructive",
       });
@@ -173,7 +173,7 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
            <Building2 className="h-6 w-6" /> Inscription Entreprise / Institution
         </DialogTitle>
         <DialogDescription>
-          Créez un compte partenaire pour votre organisation. (Simulation)
+          Créez un compte partenaire pour votre organisation.
         </DialogDescription>
       </DialogHeader>
 
@@ -340,7 +340,7 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              S'inscrire (Simulation)
+              S'inscrire
             </Button>
           </DialogFooter>
         </form>

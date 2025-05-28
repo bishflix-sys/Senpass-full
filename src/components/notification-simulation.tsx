@@ -55,8 +55,8 @@ const generateRandomNotification = (): Notification => {
       break;
      case 'info':
         title = "Information";
-        message = `Bienvenue sur la simulation SenPass Lite!`;
-        details = `Explorez les fonctionnalités simulées de votre identité numérique.`;
+        message = `Bienvenue sur SenPass!`;
+        details = `Explorez les fonctionnalités de votre identité numérique.`;
         break;
   }
 
@@ -78,14 +78,14 @@ export default function NotificationSimulation() {
 
    // Effect to load initial and generate new notifications
    useEffect(() => {
-      // Load initial notifications (simulated)
+      // Load initial notifications
       setIsLoading(true);
       setTimeout(() => {
          setNotifications(Array.from({ length: 5 }, generateRandomNotification).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())); // Sort initial by date
          setIsLoading(false);
-      }, 1200); // Simulate initial loading delay
+      }, 1200); // Initial loading delay
 
-      // Simulate receiving new notifications periodically
+      // Receive new notifications periodically
       const intervalId = setInterval(() => {
          setNotifications(prev => [generateRandomNotification(), ...prev]
             .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()) // Keep sorted

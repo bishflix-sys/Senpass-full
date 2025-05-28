@@ -165,7 +165,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
 
   async function onSubmit(data: DeveloperRegistrationFormValues) {
     setIsSubmitting(true);
-    console.log("Developer Registration data (simulation):", data);
+    console.log("Developer Registration data:", data);
 
     // Simulate API call for developer registration
     await new Promise(resolve => setTimeout(resolve, 1800));
@@ -176,14 +176,14 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
 
     if (success) {
       toast({
-        title: "Inscription Développeur Réussie (Simulation)",
+        title: "Inscription Développeur Réussie",
         description: "Votre compte développeur a été créé.",
       });
       form.reset(); // Reset form on success
       onSuccess(); // Call the success callback
     } else {
       toast({
-        title: "Échec de l'Inscription Développeur (Simulation)",
+        title: "Échec de l'Inscription Développeur",
         description: "Une erreur s'est produite. Vérifiez vos informations et réessayez.",
         variant: "destructive",
       });
@@ -199,7 +199,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
            <CodeXml className="h-6 w-6" /> Inscription Espace Développeur
         </DialogTitle>
         <DialogDescription>
-          Demandez l'accès aux APIs de la plateforme. (Simulation)
+          Demandez l'accès aux APIs de la plateforme.
         </DialogDescription>
       </DialogHeader>
 
@@ -432,7 +432,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Créer un compte développeur (Simulation)
+              Créer un compte développeur
             </Button>
           </DialogFooter>
         </form>

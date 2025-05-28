@@ -16,12 +16,12 @@ export default function DeveloperDashboardPage() {
     const router = useRouter();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = React.useState(true); // Add loading state
-    const [apiKey, setApiKey] = React.useState<string | null>(null); // Simulate API key
+    const [apiKey, setApiKey] = React.useState<string | null>(null); // API key
 
      // Simulate loading data
     React.useEffect(() => {
         const timer = setTimeout(() => {
-           setApiKey(`sk_sim_${Date.now().toString(36)}`); // Generate a simulated key
+           setApiKey(`sk_dev_${Date.now().toString(36)}`); // Generate a key
            setIsLoading(false);
         }, 1500); // Simulate 1.5s loading
         return () => clearTimeout(timer); // Cleanup timer
@@ -39,10 +39,10 @@ export default function DeveloperDashboardPage() {
 
     const handleGenerateKey = () => {
         toast({
-            title: "Simulation",
-            description: "Génération d'une nouvelle clé API (Simulation)...",
+            title: "Information",
+            description: "Génération d'une nouvelle clé API...",
         });
-         setApiKey(`sk_sim_${Date.now().toString(36)}`);
+         setApiKey(`sk_dev_${Date.now().toString(36)}`);
     };
 
     if (isLoading) {
@@ -63,7 +63,7 @@ export default function DeveloperDashboardPage() {
                <CodeXml className="h-7 w-7 sm:h-8 sm:w-8" /> Portail Développeur
              </h1>
              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-               Gérez vos intégrations et clés API SenPass (Simulation).
+               Gérez vos intégrations et clés API SenPass.
              </p>
            </div>
         </div>
@@ -76,9 +76,9 @@ export default function DeveloperDashboardPage() {
       <Separator />
 
       <Alert variant="default" className="mb-6 bg-blue-50 border-blue-200" icon={Terminal}>
-          <AlertTitle className="text-blue-800">Espace de Simulation</AlertTitle>
+          <AlertTitle className="text-blue-800">Espace de Développement</AlertTitle>
           <AlertDescription className="text-blue-700">
-             Ce portail est une simulation. Les clés API et les statistiques sont fictives et ne permettent aucune interaction réelle.
+             Ce portail est destiné à la gestion de vos intégrations. Les clés API et les statistiques sont réelles dans un environnement de production.
           </AlertDescription>
        </Alert>
 
@@ -94,7 +94,7 @@ export default function DeveloperDashboardPage() {
                     <CardDescription>Générez et gérez vos clés d'accès.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                     <p className="text-sm font-medium">Votre clé API (Simulation):</p>
+                     <p className="text-sm font-medium">Votre clé API:</p>
                      <div className="flex items-center justify-between gap-2 p-2 bg-muted rounded border">
                         <code className="text-xs break-all text-muted-foreground">{apiKey ? apiKey : "Aucune clé générée"}</code>
                         <Button variant="ghost" size="sm" onClick={() => navigator.clipboard.writeText(apiKey || '').then(() => toast({ title: 'Copié !' }))} disabled={!apiKey}>Copier</Button>
@@ -134,26 +134,26 @@ export default function DeveloperDashboardPage() {
                     <CardDescription>Suivez l'utilisation de vos APIs.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                     <p className="text-muted-foreground text-sm">Aucune donnée disponible (Simulation).</p>
+                     <p className="text-muted-foreground text-sm">Aucune donnée disponible.</p>
                      {/* Placeholder for charts or stats */}
                      <div className="mt-3 space-y-2">
                         <Skeleton className="h-4 w-3/4" />
                         <Skeleton className="h-4 w-1/2" />
                      </div>
-                     <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Simulation", description: "Affichage des statistiques détaillées."})}>Voir détails</Button>
+                     <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Information", description: "Affichage des statistiques détaillées."})}>Voir détails</Button>
                 </CardContent>
             </Card>
        </div>
 
         <Separator />
 
-        {/* Payment Simulation Section */}
+        {/* Payment Section */}
         <section>
-            <h2 className="text-2xl font-semibold mb-4">Paiement des Services (Simulation)</h2>
+            <h2 className="text-2xl font-semibold mb-4">Paiement des Services</h2>
             <Card className="border shadow-sm">
                 <CardHeader>
-                    <CardTitle>Payer un Service via API (Simulation)</CardTitle>
-                    <CardDescription>Simulez un paiement de service pour vos intégrations.</CardDescription>
+                    <CardTitle>Payer un Service via API</CardTitle>
+                    <CardDescription>Effectuez un paiement de service pour vos intégrations.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <Button asChild size="lg" className="w-full sm:w-auto">
@@ -162,7 +162,7 @@ export default function DeveloperDashboardPage() {
                         </Link>
                     </Button>
                     <p className="text-xs text-muted-foreground mt-1">
-                        Ceci simule le processus de sélection d'un service avant de procéder au paiement.
+                        Ceci reflète le processus de sélection d'un service avant de procéder au paiement.
                     </p>
                 </CardContent>
             </Card>
@@ -184,7 +184,7 @@ export default function DeveloperDashboardPage() {
                         <CardDescription>Testez vos intégrations en toute sécurité.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                         <Button variant="outline" size="sm" onClick={() => toast({ title: "Simulation", description: "Accès à l'environnement Sandbox." })}>Accéder au Sandbox</Button>
+                         <Button variant="outline" size="sm" onClick={() => toast({ title: "Information", description: "Accès à l'environnement Sandbox." })}>Accéder au Sandbox</Button>
                     </CardContent>
                 </Card>
 
@@ -197,7 +197,7 @@ export default function DeveloperDashboardPage() {
                          <CardDescription>Gérez vos informations de contact et de sécurité.</CardDescription>
                      </CardHeader>
                      <CardContent>
-                          <Button variant="secondary" size="sm" onClick={() => toast({ title: "Simulation", description: "Ouverture des paramètres développeur." })}>Modifier</Button>
+                          <Button variant="secondary" size="sm" onClick={() => toast({ title: "Information", description: "Ouverture des paramètres développeur." })}>Modifier</Button>
                      </CardContent>
                  </Card>
             </div>

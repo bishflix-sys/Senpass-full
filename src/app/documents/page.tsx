@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // 
 
 export const metadata: Metadata = {
   title: 'Mon Coffre-Fort Numérique - SenPass',
-  description: 'Accédez à vos documents officiels stockés de manière sécurisée (Simulation).',
+  description: 'Accédez à vos documents officiels stockés de manière sécurisée.',
 };
 
 export default function DocumentsPage() {
@@ -16,7 +16,7 @@ export default function DocumentsPage() {
     <div className="container mx-auto px-4 py-8">
        <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
-              <FolderArchive className="h-8 w-8" /> Mon Coffre-Fort Numérique (Simulation)
+              <FolderArchive className="h-8 w-8" /> Mon Coffre-Fort Numérique
           </h1>
            <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary">
                Retour au tableau de bord
@@ -27,9 +27,9 @@ export default function DocumentsPage() {
        </p>
 
        <Alert variant="default" className="mb-8 bg-blue-50 border-blue-200" icon={Lock}>
-          <AlertTitle className="text-blue-800">Fonctionnalité Simulée</AlertTitle>
+          <AlertTitle className="text-blue-800">Fonctionnalité de Démonstration</AlertTitle>
           <AlertDescription className="text-blue-700">
-            Cette section représente le coffre-fort numérique où vos documents importants (CNI, actes de naissance, diplômes, etc.) seraient stockés et accessibles. Dans cette simulation, aucun document réel n'est sauvegardé.
+            Cette section représente le coffre-fort numérique où vos documents importants (CNI, actes de naissance, diplômes, etc.) seraient stockés et accessibles. Dans cette démonstration, aucun document réel n'est sauvegardé.
           </AlertDescription>
        </Alert>
 
@@ -43,9 +43,9 @@ export default function DocumentsPage() {
              <CardDescription>Votre CNI numérique.</CardDescription>
            </CardHeader>
            <CardContent className="space-y-3">
-             <p className="text-sm text-muted-foreground">Statut : Valide (Simulation)</p>
+             <p className="text-sm text-muted-foreground">Statut : Valide</p>
              <p className="text-xs text-muted-foreground">Dernière mise à jour : 01/01/2024</p>
-             <Button variant="outline" size="sm" disabled>Voir le document (Simulation)</Button>
+             <Button variant="outline" size="sm" disabled>Voir le document</Button>
            </CardContent>
          </Card>
 
@@ -58,9 +58,9 @@ export default function DocumentsPage() {
              <CardDescription>Extrait de votre acte de naissance.</CardDescription>
            </CardHeader>
            <CardContent className="space-y-3">
-             <p className="text-sm text-muted-foreground">Statut : Disponible (Simulation)</p>
+             <p className="text-sm text-muted-foreground">Statut : Disponible</p>
               <p className="text-xs text-muted-foreground">Délivré le : 15/05/1992</p>
-             <Button variant="outline" size="sm" disabled>Télécharger (Simulation)</Button>
+             <Button variant="outline" size="sm" disabled>Télécharger</Button>
            </CardContent>
          </Card>
 
@@ -74,15 +74,15 @@ export default function DocumentsPage() {
            </CardHeader>
            <CardContent>
              <Button variant="secondary" className="w-full" disabled>
-                Importer (Simulation)
+                Importer
              </Button>
-              <p className="text-xs text-center text-muted-foreground mt-2">Formats supportés: PDF, JPG, PNG (Simulation)</p>
+              <p className="text-xs text-center text-muted-foreground mt-2">Formats supportés: PDF, JPG, PNG</p>
            </CardContent>
          </Card>
        </div>
 
         <div className="mt-10 text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-            <Lock className="h-3 w-3" /> Vos documents sont chiffrés et sécurisés (Simulation).
+            <Lock className="h-3 w-3" /> Vos documents sont chiffrés et sécurisés.
         </div>
     </div>
   );
