@@ -53,22 +53,19 @@ Assistant response:`,
 });
 
 // Define the Genkit flow that uses the prompt
-const bishopChatFlow = ai.defineFlow<
-  typeof BishopChatInputSchema,
-  typeof BishopChatOutputSchema
->(
+// Removed incorrect explicit generics; types are inferred from inputSchema and outputSchema.
+const bishopChatFlow = ai.defineFlow(
   {
     name: 'bishopChatFlow',
     inputSchema: BishopChatInputSchema,
     outputSchema: BishopChatOutputSchema,
   },
-  async (input) => {
+  async (input) => { // input is now correctly typed as BishopChatInput
     // Call the defined prompt with the user's input
     const { output } = await bishopChatPrompt(input);
 
     // Ensure output is not null or undefined before returning
     if (!output) {
-        // Consider throwing an error or returning a default response
         console.error("Bishop chat flow received null output from the prompt.");
         return { response: "Je suis désolé, une erreur interne s'est produite. Veuillez réessayer." };
     }
