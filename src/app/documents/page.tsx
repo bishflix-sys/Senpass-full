@@ -1,9 +1,15 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { FolderArchive, Lock, FileText, FileScan } from "lucide-react"; // Added relevant icons
 import Link from "next/link"; // Import Link
 import { Button } from "@/components/ui/button"; // Import Button
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
+
+export const metadata: Metadata = {
+  title: 'Mon Coffre-Fort Numérique - SenPass',
+  description: 'Accédez à vos documents officiels stockés de manière sécurisée (Simulation).',
+};
 
 export default function DocumentsPage() {
   return (

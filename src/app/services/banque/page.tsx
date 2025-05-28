@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Landmark } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Services Bancaires - SenPass',
+  description: 'Simulation des services bancaires accessibles via SenPass.',
+};
 
 export default function BanquePage() {
   return (

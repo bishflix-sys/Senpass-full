@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Shield } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Police Nationale - SenPass',
+  description: 'Simulation des services de la Police Nationale accessibles via SenPass.',
+};
 
 export default function PolicePage() {
   return (

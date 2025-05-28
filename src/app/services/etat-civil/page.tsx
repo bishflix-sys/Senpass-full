@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'État Civil - SenPass',
+  description: "Simulation des services d'état civil accessibles via SenPass.",
+};
 
 export default function EtatCivilPage() {
   return (

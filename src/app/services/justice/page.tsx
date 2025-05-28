@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Scale } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Justice - SenPass',
+  description: 'Simulation des services judiciaires accessibles via SenPass.',
+};
 
 export default function JusticePage() {
   return (

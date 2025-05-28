@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Briefcase } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Sécurité Sociale - SenPass',
+  description: 'Simulation des services de sécurité sociale accessibles via SenPass.',
+};
 
 export default function SecuPage() {
   return (

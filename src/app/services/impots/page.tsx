@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { FileSpreadsheet } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Impôts et Domaines - SenPass',
+  description: 'Simulation des services fiscaux (Impôts et Domaines) accessibles via SenPass.',
+};
 
 export default function ImpotsPage() {
   return (

@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Droplet } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Service Eau (Sen'Eau) - SenPass",
+  description: "Simulation des services de gestion de l'eau accessibles via SenPass.",
+};
 
 export default function EauPage() {
   return (

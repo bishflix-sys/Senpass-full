@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { GraduationCap } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Scolarité - SenPass',
+  description: 'Simulation des services liés à la scolarité accessibles via SenPass.',
+};
 
 export default function ScolaritePage() {
   return (

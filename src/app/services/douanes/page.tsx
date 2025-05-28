@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Anchor } from "lucide-react"; // Using Anchor as Ship is not available
+
+export const metadata: Metadata = {
+  title: 'Services Douaniers - SenPass',
+  description: 'Simulation des services douaniers accessibles via SenPass.',
+};
 
 export default function DouanesPage() {
   return (

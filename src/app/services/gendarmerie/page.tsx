@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { ShieldAlert } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Gendarmerie - SenPass',
+  description: 'Simulation des services de gendarmerie accessibles via SenPass.',
+};
 
 export default function GendarmeriePage() {
   return (

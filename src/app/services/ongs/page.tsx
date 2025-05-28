@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Users } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'ONGs / Associations - SenPass',
+  description: 'Simulation des services pour ONGs et Associations accessibles via SenPass.',
+};
 
 export default function OngsPage() {
   return (

@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Truck } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Transport - SenPass',
+  description: 'Simulation des services liés au transport accessibles via SenPass.',
+};
 
 export default function TransportPage() {
   return (

@@ -1,7 +1,12 @@
+
 {
   "name": "SenPass",
   "short_name": "SenPass",
   "description": "Identité numérique nationale du Sénégal (Simulation)",
+  "start_url": "/login",
+  "display": "standalone",
+  "background_color": "#F0F4F8",
+  "theme_color": "#4D88E0",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -15,11 +20,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "start_url": "/login",
-  "display": "standalone",
-  "background_color": "#F7FAFE",
-  "theme_color": "#4D88E0",
-  "orientation": "portrait-primary",
-  "scope": "/"
+  ]
 }

@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Conditions d'Utilisation - SenPass",
+  description: "Consultez les conditions d'utilisation de la plateforme SenPass (Simulation).",
+};
 
 export default function TermsPage() {
   return (

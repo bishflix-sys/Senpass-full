@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Signal } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Télécommunications - SenPass',
+  description: 'Simulation des services de télécommunications accessibles via SenPass.',
+};
 
 export default function TelecomPage() {
   return (

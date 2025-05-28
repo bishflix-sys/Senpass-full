@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Home } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Logement - SenPass',
+  description: 'Simulation des services liés au logement accessibles via SenPass.',
+};
 
 export default function LogementPage() {
   return (

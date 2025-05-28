@@ -1,6 +1,12 @@
 
+import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { ShieldCheck } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: 'Politique de Confidentialité - SenPass',
+  description: 'Découvrez la politique de confidentialité de la plateforme SenPass (Simulation).',
+};
 
 export default function PrivacyPage() {
   return (
