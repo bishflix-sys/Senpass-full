@@ -116,30 +116,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Creative motifs with Senegalese flag colors - updated pattern */
-    background-image:
-      repeating-linear-gradient(
-        45deg,
-        hsla(145, 60%, 35%, 0.03), /* Green */
-        hsla(145, 60%, 35%, 0.03) 5px,
-        transparent 5px,
-        transparent 15px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        hsla(55, 70%, 60%, 0.03), /* Yellow */
-        hsla(55, 70%, 60%, 0.03) 5px,
-        transparent 5px,
-        transparent 15px
-      ),
-      repeating-linear-gradient(
-        0deg, /* Horizontal lines for Red */
-        hsla(0, 65%, 55%, 0.02), /* Red, very subtle */
-        hsla(0, 65%, 55%, 0.02) 3px,
-        transparent 3px,
-        transparent 20px
-      );
-    background-size: 60px 60px; /* Controls the size/density of the repeating pattern */
+    /* Removed the complex background-image and background-size for a solid theme background */
     
     /* Apply font smoothing for better text rendering */
     -webkit-font-smoothing: antialiased;
