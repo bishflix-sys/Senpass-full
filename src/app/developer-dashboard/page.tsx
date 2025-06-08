@@ -33,7 +33,7 @@ export default function DeveloperDashboardPage() {
           description: "Vous avez été déconnecté du portail développeur.",
         });
         setTimeout(() => {
-          router.push("/login");
+          router.push("/login?tab=developers");
         }, 1000);
     };
 

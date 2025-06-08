@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { QRCodeCanvas } from 'qrcode.react';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // Import useSearchParams
 import Link from "next/link"; // Import Link
 import dynamic from "next/dynamic"; // Import dynamic
 import {
@@ -79,6 +79,7 @@ const DeveloperRegistrationDialogContent = dynamic(() => import("@/components/de
 
 
 const SIMULATED_OTP = "000000"; // Standard OTP for demonstration
+const VALID_LOGIN_TABS = ['individuals', 'business', 'developers', 'ministries'];
 
 // Schema for phone number validation (Individuals)
 const phoneSchema = z.object({
@@ -121,6 +122,8 @@ const senegalMinistries = [
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams(); // Get search params
+
   const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [showFacialRecognitionDialog, setShowFacialRecognitionDialog] = React.useState(false);
@@ -142,6 +145,10 @@ export default function LoginPage() {
   const [submittedPhoneNumber, setSubmittedPhoneNumber] = React.useState<string | null>(null);
   const [submittedOrgIdentifier, setSubmittedOrgIdentifier] = React.useState<string | null>(null);
   const [submittedMinistryName, setSubmittedMinistryName] = React.useState<string | null>(null);
+
+  // Determine active tab from URL query parameter
+  const requestedTab = searchParams.get('tab');
+  const activeTab = VALID_LOGIN_TABS.includes(requestedTab ?? '') ? requestedTab : 'individuals';
 
 
   const phoneForm = useForm<PhoneFormValues>({ resolver: zodResolver(phoneSchema), defaultValues: { phoneNumber: "+221" }});
@@ -296,7 +303,7 @@ export default function LoginPage() {
       <div className="flex items-center gap-2 mb-8 text-xl font-semibold text-foreground">
         <Lock className="h-6 w-6 text-primary" /><span>Accès Sécurisé</span>
       </div>
-      <Tabs defaultValue="individuals" className="w-full max-w-md">
+      <Tabs defaultValue={activeTab} className="w-full max-w-md">
         <TabsList className="grid w-full grid-cols-4 h-12">
           <TabsTrigger value="individuals" className="text-sm sm:text-base"><User className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Individus</TabsTrigger>
           <TabsTrigger value="business" className="text-sm sm:text-base"><Building className="mr-1 sm:mr-2 h-4 sm:h-5 w-4 sm:w-5" /> Business</TabsTrigger>
@@ -467,4 +474,3 @@ export default function LoginPage() {
   );
 }
 
-    

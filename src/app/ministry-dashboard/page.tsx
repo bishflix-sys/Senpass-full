@@ -37,7 +37,7 @@ export default function MinistryDashboardPage() {
           description: "Vous avez été déconnecté du portail ministère.",
         });
         setTimeout(() => {
-          router.push("/login");
+          router.push("/login?tab=ministries");
         }, 1000);
     };
 

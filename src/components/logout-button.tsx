@@ -17,9 +17,9 @@ export default function LogoutButton() {
       description: "Vous avez été déconnecté avec succès. Redirection...",
     });
 
-    // Redirect to login page after a short delay
+    // Redirect to login page after a short delay, specifying the individuals tab
     setTimeout(() => {
-      router.push("/login");
+      router.push("/login?tab=individuals");
     }, 1000);
   };
 
@@ -30,3 +30,4 @@ export default function LogoutButton() {
     </Button>
   );
 }
+

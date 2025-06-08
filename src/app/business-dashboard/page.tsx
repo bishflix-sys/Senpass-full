@@ -21,9 +21,9 @@ export default function BusinessDashboardPage() {
           description: "Vous avez été déconnecté du portail entreprise.",
         });
 
-        // Redirect to login page after a short delay
+        // Redirect to login page after a short delay, specifying the business tab
         setTimeout(() => {
-          router.push("/login");
+          router.push("/login?tab=business");
         }, 1000);
       };
 
@@ -140,3 +140,4 @@ export default function BusinessDashboardPage() {
     </div>
   );
 }
+
