@@ -101,8 +101,8 @@ export default function BishopChat() {
             <AvatarFallback className="bg-primary text-primary-foreground"><Bot size={20} /></AvatarFallback>
          </Avatar>
         <div>
-            <CardTitle className="text-lg font-semibold text-primary">BISHOP</CardTitle>
-            <CardDescription>Votre assistant IA pour SenPass</CardDescription>
+            <CardTitle className="text-xl font-bold text-primary tracking-tight">BISHOP</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">Votre assistant IA pour SenPass</CardDescription>
         </div>
       </CardHeader>
       <ScrollArea className="flex-grow w-full p-4" ref={scrollAreaRef}>

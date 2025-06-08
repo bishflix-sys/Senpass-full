@@ -20,7 +20,7 @@ interface FacialRecognitionDialogContentProps {
     onAuthenticated: () => void;
 }
 
-const FacialRecognitionDialogContent: React.FC<FacialRecognitionDialogContentProps> = ({ onAuthenticated }) => {
+const FacialRecognitionDialogContent: React.FC<FacialRecognitionDialogContentProps> = React.memo(({ onAuthenticated }) => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = React.useState<boolean | null>(null);
   const [isScanning, setIsScanning] = React.useState(false);
@@ -131,8 +131,7 @@ const FacialRecognitionDialogContent: React.FC<FacialRecognitionDialogContentPro
       </DialogFooter>
     </DialogContent>
   );
-};
+});
 
+FacialRecognitionDialogContent.displayName = 'FacialRecognitionDialogContent';
 export default FacialRecognitionDialogContent;
-
-    

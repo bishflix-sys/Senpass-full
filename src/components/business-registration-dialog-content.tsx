@@ -117,7 +117,7 @@ interface BusinessRegistrationDialogContentProps {
   onSuccess: () => void;
 }
 
-const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogContentProps> = ({ onSuccess }) => {
+const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogContentProps> = React.memo(({ onSuccess }) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -347,6 +347,7 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
       </Form>
     </DialogContent>
   );
-};
+});
 
+BusinessRegistrationDialogContent.displayName = 'BusinessRegistrationDialogContent';
 export default BusinessRegistrationDialogContent;

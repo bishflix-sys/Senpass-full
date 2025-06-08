@@ -115,7 +115,7 @@ interface RegistrationDialogContentProps {
   onSuccess: () => void;
 }
 
-const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ onSuccess }) => {
+const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = React.memo(({ onSuccess }) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -312,6 +312,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = ({ o
       </Form>
     </DialogContent>
   );
-};
+});
 
+RegistrationDialogContent.displayName = 'RegistrationDialogContent';
 export default RegistrationDialogContent;

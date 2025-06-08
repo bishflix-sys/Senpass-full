@@ -143,7 +143,7 @@ interface DeveloperRegistrationDialogContentProps {
   onSuccess: () => void;
 }
 
-const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogContentProps> = ({ onSuccess }) => {
+const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogContentProps> = React.memo(({ onSuccess }) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -439,6 +439,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
       </Form>
     </DialogContent>
   );
-};
+});
 
+DeveloperRegistrationDialogContent.displayName = 'DeveloperRegistrationDialogContent';
 export default DeveloperRegistrationDialogContent;
