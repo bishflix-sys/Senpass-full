@@ -22,6 +22,7 @@ import {
   Loader2,
   Activity,
   AlertTriangle,
+  ShieldAlert, // Added for Security Monitoring
   Wallet,         // Icon for E-Wallet
   ShieldCheck,    // Icon for Data Protection
   FolderArchive,  // Icon for Document Management
@@ -147,9 +148,10 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                  </div>
               </div>
               {/* Skeleton for Activity and Alerts row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                  <Skeleton className="h-32 rounded-lg" /> {/* Activity Card Skeleton */}
                  <Skeleton className="h-32 rounded-lg" /> {/* Alerts Card Skeleton */}
+                 <Skeleton className="h-32 rounded-lg" /> {/* Security Monitoring Card Skeleton */}
               </div>
            </div>
          </div>
@@ -275,8 +277,8 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                   </div>
               </div>
 
-              {/* Grid for Recent Activity and Important Alerts */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* Grid for Recent Activity, Important Alerts, and Security Monitoring */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                  {/* Recent Activity Card */}
                   <Card className="shadow-sm border">
                     <CardHeader>
@@ -300,6 +302,22 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                      <CardContent>
                        <p className="text-sm text-muted-foreground">Aucune alerte importante.</p>
                        {/* Future: Display security alerts, pending actions etc. */}
+                     </CardContent>
+                  </Card>
+
+                  {/* Security Monitoring Card */}
+                  <Card className="shadow-sm border">
+                     <CardHeader>
+                       <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          <ShieldAlert className="h-5 w-5 text-primary" /> Surveillance Sécurité
+                       </CardTitle>
+                    </CardHeader>
+                     <CardContent className="space-y-2">
+                       <p className="text-sm text-muted-foreground">Nos systèmes analysent en continu les activités pour protéger votre compte.</p>
+                       <p className="text-sm font-medium text-green-600">Statut : Protégé</p>
+                       <Button variant="link" size="sm" className="p-0 h-auto text-xs text-primary" onClick={() => toast({title: "Information", description:"Les journaux de sécurité ne sont pas disponibles dans cette version."})} disabled>
+                         Voir les journaux de sécurité
+                       </Button>
                      </CardContent>
                   </Card>
               </div>
@@ -352,9 +370,9 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                 description="Contrôle sur vos informations personnelles, respect de la confidentialité."
              />
              <FeatureCard
-                icon={User} // Keep MonProfil or similar
+                icon={User}
                 title="MonProfil Connect"
-                description="Remplissage automatique des formulaires avec vos données officielles."
+                description="Remplissage intelligent et automatisé des formulaires avec vos données. Apprend de vos habitudes pour simplifier vos démarches."
              />
           </div>
         </section>
@@ -390,6 +408,3 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
     </div>
   );
 }
-
-
-    
