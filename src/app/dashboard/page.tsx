@@ -299,9 +299,9 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                           <AlertTriangle className="h-5 w-5 text-destructive" /> Alertes importantes
                        </CardTitle>
                     </CardHeader>
-                     <CardContent>
-                       <p className="text-sm text-muted-foreground">Aucune alerte importante.</p>
-                       {/* Future: Display security alerts, pending actions etc. */}
+                     <CardContent className="space-y-1">
+                       <p className="text-sm text-muted-foreground">Aucune alerte urgente pour le moment.</p>
+                       <p className="text-xs text-muted-foreground mt-2">SenPass vous notifiera des échéances importantes et des services pertinents à venir.</p>
                      </CardContent>
                   </Card>
 
@@ -309,14 +309,14 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                   <Card className="shadow-sm border">
                      <CardHeader>
                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                          <ShieldAlert className="h-5 w-5 text-primary" /> Surveillance Sécurité
+                          <ShieldAlert className="h-5 w-5 text-primary" /> Surveillance Sécurité Active
                        </CardTitle>
                     </CardHeader>
                      <CardContent className="space-y-2">
-                       <p className="text-sm text-muted-foreground">Nos systèmes analysent en continu les activités pour protéger votre compte.</p>
-                       <p className="text-sm font-medium text-green-600">Statut : Protégé</p>
-                       <Button variant="link" size="sm" className="p-0 h-auto text-xs text-primary" onClick={() => toast({title: "Information", description:"Les journaux de sécurité ne sont pas disponibles dans cette version."})} disabled>
-                         Voir les journaux de sécurité
+                       <p className="text-sm text-muted-foreground">Nos systèmes, incluant une supervision par IA, analysent en continu les activités et l'état de la plateforme pour protéger votre compte et assurer la stabilité des services.</p>
+                       <p className="text-sm font-medium text-green-600">Statut : Protégé et Opérationnel</p>
+                       <Button variant="link" size="sm" className="p-0 h-auto text-xs text-primary" onClick={() => toast({title: "Information", description:"Les journaux de sécurité et de performance ne sont pas disponibles pour cette démonstration."})} disabled>
+                         Voir les journaux
                        </Button>
                      </CardContent>
                   </Card>
@@ -408,3 +408,6 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
     </div>
   );
 }
+
+
+    
