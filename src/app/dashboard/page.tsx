@@ -10,7 +10,6 @@ import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
 import LogoutButton from "@/components/logout-button";
 import IdCardDisplay from "@/components/id-card-display"; // Import the new IdCardDisplay
-// import BishopChat from "@/components/bishop-chat"; // Import BishopChat - will be dynamically imported
 import {
   Fingerprint,
   ScanFace,
