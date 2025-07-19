@@ -154,15 +154,15 @@ export default function LoginPage() {
   const [workosLoginUrl, setWorkosLoginUrl] = React.useState<string>('');
 
   React.useEffect(() => {
-    // This needs to be in a useEffect to access window.location
-    const redirectUri = process.env.NEXT_PUBLIC_WORKOS_REDIRECT_URI || `${window.location.origin}/auth/workos`;
+    // These need to be read from public env variables
+    const redirectUri = process.env.NEXT_PUBLIC_WORKOS_REDIRECT_URI;
     const clientId = process.env.NEXT_PUBLIC_WORKOS_CLIENT_ID;
 
-    if (clientId) {
+    if (clientId && redirectUri) {
       const url = `https://api.workos.com/sso/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&provider=authkit`;
       setWorkosLoginUrl(url);
     } else {
-        console.warn("WorkOS Client ID is not configured. SSO login will be disabled.");
+        console.warn("WorkOS Client ID or Redirect URI is not configured. SSO login will be disabled.");
     }
     
     // Check for WorkOS error on URL
