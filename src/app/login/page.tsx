@@ -26,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft, Landmark, ShieldCheck, MessageCircle } from "lucide-react"; // Added ShieldCheck for OTP
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft, Landmark, ShieldCheck, MessageCircle, KeySquare } from "lucide-react"; // Added KeySquare for SSO
 import {
   Form,
   FormControl,
@@ -149,6 +149,34 @@ export default function LoginPage() {
   // Determine active tab from URL query parameter
   const requestedTab = searchParams.get('tab');
   const activeTab = VALID_LOGIN_TABS.includes(requestedTab ?? '') ? requestedTab : 'individuals';
+
+  // Get WorkOS login URL
+  const [workosLoginUrl, setWorkosLoginUrl] = React.useState<string>('');
+
+  React.useEffect(() => {
+    // This needs to be in a useEffect to access window.location
+    const redirectUri = process.env.NEXT_PUBLIC_WORKOS_REDIRECT_URI || `${window.location.origin}/auth/workos`;
+    const clientId = process.env.NEXT_PUBLIC_WORKOS_CLIENT_ID;
+
+    if (clientId) {
+      const url = `https://api.workos.com/sso/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&provider=authkit`;
+      setWorkosLoginUrl(url);
+    } else {
+        console.warn("WorkOS Client ID is not configured. SSO login will be disabled.");
+    }
+    
+    // Check for WorkOS error on URL
+    const error = searchParams.get('error');
+    const message = searchParams.get('message');
+    if (error && error.startsWith('workos')) {
+        toast({
+            title: "Erreur de Connexion SSO",
+            description: message || "Une erreur est survenue lors de l'authentification.",
+            variant: "destructive"
+        });
+    }
+
+  }, [searchParams, toast]);
 
 
   const phoneForm = useForm<PhoneFormValues>({ resolver: zodResolver(phoneSchema), defaultValues: { phoneNumber: "+221" }});
@@ -349,8 +377,15 @@ export default function LoginPage() {
                     <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><QrCode className="mr-2 h-5 w-5 text-accent" /> QR Code</Button></DialogTrigger>
                       <DialogContent className="sm:max-w-xs"><DialogHeader><DialogTitle className="text-lg">Scanner le QR Code</DialogTitle><DialogDescription>Scannez avec l'application. Se rafraîchit toutes les 10s.</DialogDescription></DialogHeader><div className="flex items-center justify-center p-6">{qrCodeData ? <div className="p-2 bg-white rounded-md shadow-md"><QRCodeCanvas value={qrCodeData} size={200} bgColor={"#FFFFFF"} fgColor={"#00853F"} level={"H"} includeMargin={true} /></div> : <div className="flex flex-col items-center justify-center text-muted-foreground h-[200px] space-y-2"><Loader2 className="h-8 w-8 animate-spin" /><p>Génération...</p></div>}</div><DialogFooter className="sm:justify-center"><DialogClose asChild><Button type="button" variant="outline">Fermer</Button></DialogClose></DialogFooter></DialogContent>
                     </Dialog>
-                    <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><ScanFace className="mr-2 h-5 w-5 text-accent" /> Visage</Button></DialogTrigger>{showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={handleAuthenticationSuccess} />}</Dialog>
+                    <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><ScanFace className="mr-2 h-5 w-5 text-accent" /> Visage</Button></DialogTrigger>{showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess()} />}</Dialog>
                   </div>
+                  <div className="mt-4">
+                    <Button asChild variant="outline" className="w-full h-12 text-base" disabled={!workosLoginUrl}>
+                       <a href={workosLoginUrl}>
+                          <KeySquare className="mr-2 h-5 w-5 text-accent"/> Connexion avec SSO
+                       </a>
+                    </Button>
+                   </div>
                   <div className="text-center pt-4"><Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> S'inscrire</Button></DialogTrigger>{isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
