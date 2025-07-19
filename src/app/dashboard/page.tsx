@@ -366,7 +366,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
              />
              <FeatureCard
                 icon={ShieldCheck} // New icon for data protection
-                title="Protection des Données"
+                title="Protection des Données (RGPD)"
                 description="Contrôle sur vos informations personnelles, respect de la confidentialité."
              />
              <FeatureCard
@@ -408,6 +408,5 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
     </div>
   );
 }
-
 
     

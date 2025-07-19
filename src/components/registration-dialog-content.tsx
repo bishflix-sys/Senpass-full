@@ -105,7 +105,7 @@ const registrationSchema = z.object({
       message: "Veuillez résoudre le contrôle de sécurité.",
   }),
   termsAccepted: z.boolean().refine(val => val === true, {
-    message: "Vous devez accepter les conditions d'utilisation.",
+    message: "Vous devez accepter les conditions et la politique de confidentialité.",
   }),
 });
 
@@ -280,14 +280,17 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    aria-label="Accepter les conditions d'utilisation"
+                    aria-label="Accepter les conditions et la politique de confidentialité"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    J'ai lu et j'accepte les{" "}
+                    Je consens au traitement de mes données et j'accepte les{" "}
                     <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
-                      conditions d'utilisation
+                      Conditions d'Utilisation
+                    </Link> et la {" "}
+                    <Link href="/privacy" target="_blank" className="text-primary underline hover:no-underline">
+                      Politique de Confidentialité
                     </Link>
                     .
                   </FormLabel>
@@ -316,3 +319,5 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
 
 RegistrationDialogContent.displayName = 'RegistrationDialogContent';
 export default RegistrationDialogContent;
+
+    

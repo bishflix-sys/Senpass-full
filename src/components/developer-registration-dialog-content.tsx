@@ -125,7 +125,7 @@ const developerRegistrationSchema = z.object({
       message: "Veuillez résoudre le contrôle de sécurité.",
   }),
   termsAccepted: z.boolean().refine(val => val === true, {
-    message: "Vous devez accepter les conditions d'utilisation des API.",
+    message: "Vous devez accepter les conditions et la politique de confidentialité.",
   }),
 });
 
@@ -407,14 +407,18 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    aria-label="Accepter les conditions d'utilisation des API"
+                    aria-label="Accepter les conditions d'utilisation des API et la politique de confidentialité"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    J'ai lu et j'accepte les{" "}
+                    Je consens au traitement de mes données et j'accepte les{" "}
                     <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
-                       conditions d'utilisation des APIs
+                       Conditions d'Utilisation des APIs
+                    </Link>
+                    {" "} et la {" "}
+                    <Link href="/privacy" target="_blank" className="text-primary underline hover:no-underline">
+                      Politique de Confidentialité
                     </Link>
                     .
                   </FormLabel>
@@ -443,3 +447,5 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
 
 DeveloperRegistrationDialogContent.displayName = 'DeveloperRegistrationDialogContent';
 export default DeveloperRegistrationDialogContent;
+
+    
