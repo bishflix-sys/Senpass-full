@@ -9,6 +9,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { useRouter, useSearchParams } from "next/navigation"; // Import useSearchParams
 import Link from "next/link"; // Import Link
 import dynamic from "next/dynamic"; // Import dynamic
+import { sendOtp, verifyOtpAndSignIn } from "@/actions/workos"; // Import server actions
 import {
   Tabs,
   TabsContent,
@@ -134,6 +135,7 @@ export default function LoginPage() {
   // OTP States
   const [otpInput, setOtpInput] = React.useState("");
   const [isOtpLoading, setIsOtpLoading] = React.useState(false);
+  const [workosSessionId, setWorkosSessionId] = React.useState<string | null>(null);
 
   // Login Step States
   const [individualsLoginStep, setIndividualsLoginStep] = React.useState<'phone' | 'otp'>('phone');
@@ -202,11 +204,26 @@ export default function LoginPage() {
       toast({ title: "Inscription Réussie!", description: "Vous pouvez maintenant vous connecter.", variant: "default" });
    }, [toast]);
 
-  function onPhoneSubmit(data: PhoneFormValues) {
-    toast({ title: "Numéro Vérifié", description: `OTP envoyé à ${data.phoneNumber}. (Code: ${SIMULATED_OTP})` });
-    setSubmittedPhoneNumber(data.phoneNumber);
-    setIndividualsLoginStep('otp');
-    setOtpInput(""); // Clear previous OTP input
+  async function onPhoneSubmit(data: PhoneFormValues) {
+    try {
+      const { sessionId } = await sendOtp(data.phoneNumber);
+      if (sessionId) {
+        setWorkosSessionId(sessionId);
+        toast({ title: "Code envoyé", description: `Un code de vérification a été envoyé à ${data.phoneNumber}.` });
+        setSubmittedPhoneNumber(data.phoneNumber);
+        setIndividualsLoginStep('otp');
+        setOtpInput(""); // Clear previous OTP input
+      } else {
+        throw new Error("La session n'a pas pu être créée.");
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue est survenue.";
+      toast({
+        title: "Échec de l'envoi de l'OTP",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
   }
 
   function onBusinessSubmit(data: OrgLoginValues) {
@@ -249,7 +266,33 @@ export default function LoginPage() {
     }
   }
 
-  const handleOtpVerification = (targetPath: string) => {
+  const handleOtpVerification = async () => {
+    if (!workosSessionId || otpInput.length !== 6) return;
+
+    setIsOtpLoading(true);
+    try {
+      await verifyOtpAndSignIn({ code: otpInput, sessionId: workosSessionId });
+      // The server action will handle the redirect on success,
+      // but we can show a toast here as feedback.
+      toast({
+        title: "Vérification réussie!",
+        description: "Vous êtes maintenant connecté.",
+      });
+      // A redirect will happen from the server action, so no need for client-side redirect here.
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue est survenue.";
+      toast({
+        title: "OTP Incorrect",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setOtpInput(""); // Clear OTP input on failure
+    } finally {
+      setIsOtpLoading(false);
+    }
+  };
+  
+  const handleSimulatedOtpVerification = (targetPath: string) => {
     setIsOtpLoading(true);
     setTimeout(() => {
         setIsOtpLoading(false);
@@ -280,15 +323,17 @@ export default function LoginPage() {
     loginStepSetter: React.Dispatch<React.SetStateAction<any>>,
     credentialStepValue: string,
     identifierForOtpMessage: string | null,
-    verificationHandler: () => void
+    verificationHandler: () => void,
+    isRealOtp: boolean = false
   ) => (
     <div className="space-y-4 pt-4">
       <p className="text-sm text-muted-foreground">
-        Un code OTP a été envoyé {identifierForOtpMessage ? `à ${identifierForOtpMessage}` : 'à votre contact enregistré'}. Entrez le code ci-dessous (Code: ${SIMULATED_OTP}).
+        Un code de vérification a été envoyé {identifierForOtpMessage ? `à ${identifierForOtpMessage}` : 'à votre contact enregistré'}. Entrez le code à 6 chiffres ci-dessous.
+        {!isRealOtp && ` (Code: ${SIMULATED_OTP})`}
       </p>
       <div className="space-y-2">
         <Label htmlFor="otp" className="flex items-center gap-1.5">
-          <ShieldCheck className="h-4 w-4 text-muted-foreground" /> Code OTP
+          <ShieldCheck className="h-4 w-4 text-muted-foreground" /> Code de vérification
         </Label>
         <Input
           id="otp"
@@ -316,11 +361,11 @@ export default function LoginPage() {
           disabled={otpInput.length !== 6 || isOtpLoading}
         >
           {isOtpLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogIn className="mr-2 h-5 w-5" />}
-          Vérifier OTP et Se Connecter
+          Vérifier et Se Connecter
         </Button>
       </div>
-       <Button variant="link" size="sm" className="text-xs p-0 h-auto" onClick={() => toast({description: `Nouveau code OTP envoyé (Code: ${SIMULATED_OTP})`})} disabled={isOtpLoading}>
-            Renvoyer le code OTP
+       <Button variant="link" size="sm" className="text-xs p-0 h-auto" onClick={() => toast({description: `Nouveau code envoyé.`})} disabled={isOtpLoading}>
+            Renvoyer le code
        </Button>
     </div>
   );
@@ -347,7 +392,7 @@ export default function LoginPage() {
               <CardDescription>
                 {individualsLoginStep === 'phone'
                   ? "Connectez-vous de manière sécurisée avec votre compte."
-                  : "Veuillez entrer le code OTP reçu."}
+                  : "Veuillez entrer le code de vérification reçu."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
@@ -368,7 +413,7 @@ export default function LoginPage() {
                         </FormItem>
                       )} />
                       <Button type="submit" className="w-full h-11 text-base" disabled={phoneForm.formState.isSubmitting}>
-                        {phoneForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP
+                        {phoneForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer le code
                       </Button>
                     </form>
                   </Form>
@@ -389,7 +434,7 @@ export default function LoginPage() {
                   <div className="text-center pt-4"><Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> S'inscrire</Button></DialogTrigger>{isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
-                commonOtpInputSection(setIndividualsLoginStep, 'phone', submittedPhoneNumber, () => handleAuthenticationSuccess('/dashboard'))
+                commonOtpInputSection(setIndividualsLoginStep, 'phone', submittedPhoneNumber, handleOtpVerification, true)
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full flex items-center justify-center gap-1.5"><Lock className="h-3 w-3"/> Connexion sécurisée.</p></CardFooter>
@@ -404,7 +449,7 @@ export default function LoginPage() {
               <CardDescription>
                 {businessLoginStep === 'credentials'
                   ? "Accès sécurisé pour les organisations partenaires via NINEA/RCCM."
-                  : "Veuillez entrer le code OTP reçu."}
+                  : "Veuillez entrer le code de vérification reçu."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
@@ -415,14 +460,14 @@ export default function LoginPage() {
                       <FormField control={businessForm.control} name="registrationNumber" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM</FormLabel><FormControl><Input placeholder="Ex: 001234567 ou SN.DKR.2023.A.12345" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
                       <FormField control={businessForm.control} name="password" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe</FormLabel><FormControl><Input type="password" placeholder="••••••••" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
                       <Button type="submit" className="w-full h-11 text-base" disabled={businessForm.formState.isSubmitting}>
-                        {businessForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP
+                        {businessForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer le code
                       </Button>
                     </form>
                   </Form>
                   <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
-                commonOtpInputSection(setBusinessLoginStep, 'credentials', submittedOrgIdentifier, () => handleAuthenticationSuccess('/business-dashboard'))
+                commonOtpInputSection(setBusinessLoginStep, 'credentials', submittedOrgIdentifier, () => handleSimulatedOtpVerification('/business-dashboard'))
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
@@ -437,7 +482,7 @@ export default function LoginPage() {
               <CardDescription>
                 {developerLoginStep === 'credentials'
                   ? "Accès aux APIs et outils d'intégration via NINEA/RCCM."
-                  : "Veuillez entrer le code OTP reçu."}
+                  : "Veuillez entrer le code de vérification reçu."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
@@ -448,14 +493,14 @@ export default function LoginPage() {
                       <FormField control={developerForm.control} name="registrationNumber" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><CaseSensitive className="mr-2 h-4 w-4 text-muted-foreground" /> NINEA / RCCM</FormLabel><FormControl><Input placeholder="N° organisation développeur" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
                       <FormField control={developerForm.control} name="password" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe (API Key / Secret)</FormLabel><FormControl><Input type="password" placeholder="••••••••" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
                       <Button type="submit" className="w-full h-11 text-base" disabled={developerForm.formState.isSubmitting}>
-                        {developerForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP
+                        {developerForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer le code
                       </Button>
                     </form>
                   </Form>
                   <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
-                commonOtpInputSection(setDeveloperLoginStep, 'credentials', submittedOrgIdentifier, () => handleAuthenticationSuccess('/developer-dashboard'))
+                commonOtpInputSection(setDeveloperLoginStep, 'credentials', submittedOrgIdentifier, () => handleSimulatedOtpVerification('/developer-dashboard'))
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
@@ -470,7 +515,7 @@ export default function LoginPage() {
               <CardDescription>
                 {ministryLoginStep === 'credentials'
                   ? "Portail sécurisé pour les institutions ministérielles."
-                  : "Veuillez entrer le code OTP reçu."}
+                  : "Veuillez entrer le code de vérification reçu."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
@@ -487,12 +532,12 @@ export default function LoginPage() {
                       </FormItem>)} />
                     <FormField control={ministryForm.control} name="password" render={({ field }) => (<FormItem><FormLabel className="flex items-center text-sm"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe</FormLabel><FormControl><Input type="password" placeholder="••••••••" {...field} className="h-11 text-base" /></FormControl><FormMessage /></FormItem>)} />
                     <Button type="submit" className="w-full h-11 text-base" disabled={ministryForm.formState.isSubmitting}>
-                      {ministryForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer OTP
+                      {ministryForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer le code
                     </Button>
                   </form>
                 </Form>
               ) : (
-                commonOtpInputSection(setMinistryLoginStep, 'credentials', submittedMinistryName, () => handleAuthenticationSuccess('/ministry-dashboard'))
+                commonOtpInputSection(setMinistryLoginStep, 'credentials', submittedMinistryName, () => handleSimulatedOtpVerification('/ministry-dashboard'))
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés des ministères.</p></CardFooter>
@@ -508,3 +553,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
