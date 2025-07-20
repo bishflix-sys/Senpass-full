@@ -28,6 +28,7 @@ import {
   Target,
   ClipboardList,
   Key,
+  KeyRound,
 } from "lucide-react";
 import {
   Form,
@@ -113,6 +114,7 @@ const CaptchaSimulation: React.FC<{ onChange: (isValid: boolean) => void }> = ({
 const developerRegistrationSchema = z.object({
   fullName: z.string().min(2, "Le nom complet est requis."),
   email: z.string().email("L'adresse e-mail est invalide."),
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
   organizationName: z.string().optional(),
   role: z.string().min(2, "Le rôle/fonction est requis."),
   phoneNumber: z.string().regex(/^\+?\d{7,}$/, "Numéro de téléphone invalide.").optional(), // Basic validation
@@ -152,6 +154,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
     defaultValues: {
       fullName: "",
       email: "",
+      password: "",
       organizationName: "",
       role: "",
       phoneNumber: "",
@@ -177,7 +180,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
     if (success) {
       toast({
         title: "Inscription Développeur Réussie",
-        description: "Votre compte développeur a été créé.",
+        description: "Votre compte développeur a été créé. Un email de vérification a été envoyé.",
       });
       form.reset(); // Reset form on success
       onSuccess(); // Call the success callback
@@ -237,6 +240,18 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
               </FormItem>
             )}
           />
+          
+          {/* Password */}
+          <FormField control={form.control} name="password" render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-1.5"><KeyRound className="h-4 w-4 text-muted-foreground" /> Mot de passe*</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+
 
           {/* Organization Name */}
           <FormField
@@ -447,5 +462,3 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
 
 DeveloperRegistrationDialogContent.displayName = 'DeveloperRegistrationDialogContent';
 export default DeveloperRegistrationDialogContent;
-
-    

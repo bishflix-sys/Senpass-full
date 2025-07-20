@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarIcon, Loader2, UserPlus } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -101,6 +101,8 @@ const registrationSchema = z.object({
   issueDate: z.date({
     required_error: "La date d'émission est requise.",
   }),
+  email: z.string().email("L'adresse e-mail est invalide."),
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
   captchaValid: z.boolean().refine(val => val === true, {
       message: "Veuillez résoudre le contrôle de sécurité.",
   }),
@@ -125,6 +127,8 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
       fullName: "",
       cniOrPassport: "",
       issueDate: undefined,
+      email: "",
+      password: "",
       captchaValid: false,
       termsAccepted: false,
     },
@@ -147,7 +151,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
     if (success) {
       toast({
         title: "Inscription Réussie",
-        description: "Votre compte a été créé.",
+        description: "Votre compte a été créé. Un email de vérification vous a été envoyé.",
       });
       form.reset(); // Reset form on success
       onSuccess(); // Call the success callback (e.g., close dialog)
@@ -252,6 +256,31 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
               </FormItem>
             )}
           />
+          
+            {/* Email */}
+            <FormField control={form.control} name="email" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-muted-foreground" /> Adresse e-mail*</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="exemple@email.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            {/* Password */}
+            <FormField control={form.control} name="password" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1.5"><KeyRound className="h-4 w-4 text-muted-foreground" /> Mot de passe*</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="••••••••" {...field} />
+                </FormControl>
+                <FormDescription>
+                  8 caractères minimum.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )} />
 
            {/* CAPTCHA */}
             <FormField
@@ -319,5 +348,3 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
 
 RegistrationDialogContent.displayName = 'RegistrationDialogContent';
 export default RegistrationDialogContent;
-
-    

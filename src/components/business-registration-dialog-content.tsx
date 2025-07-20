@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarIcon, Loader2, Building2, UserCircle, Hash, Briefcase } from "lucide-react"; // Icons for business registration
+import { Calendar as CalendarIcon, Loader2, Building2, UserCircle, Hash, Briefcase, Mail, KeyRound } from "lucide-react"; // Icons for business registration
 import {
   Form,
   FormControl,
@@ -103,6 +103,8 @@ const businessRegistrationSchema = z.object({
   idIssueDate: z.date({
     required_error: "La date d'émission de la pièce d'identité est requise.",
   }),
+  email: z.string().email("L'adresse e-mail est invalide."),
+  password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
   captchaValid: z.boolean().refine(val => val === true, {
       message: "Veuillez résoudre le contrôle de sécurité.",
   }),
@@ -129,6 +131,8 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
       companyName: "",
       ninea: "",
       idIssueDate: undefined,
+      email: "",
+      password: "",
       captchaValid: false,
       termsAccepted: false,
     },
@@ -151,7 +155,7 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
     if (success) {
       toast({
         title: "Inscription Entreprise Réussie",
-        description: "Votre compte entreprise/institution a été créé.",
+        description: "Votre compte entreprise/institution a été créé. Un email de vérification a été envoyé.",
       });
       form.reset(); // Reset form on success
       onSuccess(); // Call the success callback
@@ -289,6 +293,28 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
             )}
           />
 
+           {/* Email */}
+            <FormField control={form.control} name="email" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-muted-foreground"/> Adresse e-mail du représentant*</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="contact@entreprise.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            {/* Password */}
+            <FormField control={form.control} name="password" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1.5"><KeyRound className="h-4 w-4 text-muted-foreground"/> Mot de passe*</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="••••••••" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
            {/* CAPTCHA */}
             <FormField
                 control={form.control}
@@ -355,5 +381,3 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
 
 BusinessRegistrationDialogContent.displayName = 'BusinessRegistrationDialogContent';
 export default BusinessRegistrationDialogContent;
-
-    

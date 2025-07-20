@@ -59,15 +59,15 @@ export async function signInWithEmailPassword({ email, password }: SignInParams)
 }
 
 /**
- * Sends a one-time password (OTP) to the user's phone number using WorkOS.
- * @param phoneNumber The phone number to send the OTP to (must be in E.164 format).
+ * Sends a one-time password (OTP) to the user's email address using WorkOS.
+ * @param email The email address to send the OTP to.
  * @returns An object containing the authentication session ID.
  */
-export async function sendOtp(phoneNumber: string): Promise<{ sessionId: string }> {
+export async function sendOtp(email: string): Promise<{ sessionId: string }> {
   try {
     const { id, type } = await workos.userManagement.sendMagicAuthCode({
-      type: 'sms',
-      phoneNumber,
+      type: 'email',
+      email,
     });
 
     console.log(`WorkOS passwordless session (${type}) created with ID: ${id}`);
