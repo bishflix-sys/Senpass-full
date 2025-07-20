@@ -62,6 +62,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
+import { verifyOtpAndSignIn } from "@/actions/workos";
 
 // Dynamically import dialog content components
 const FacialRecognitionDialogContent = dynamic(() => import("@/components/facial-recognition-dialog-content"), {
@@ -131,11 +132,13 @@ export default function LoginPage() {
   const [isBusinessRegistrationDialogOpen, setIsBusinessRegistrationDialogOpen] = React.useState(false);
   const [isDeveloperRegistrationDialogOpen, setIsDeveloperRegistrationDialogOpen] = React.useState(false);
 
-  // OTP States
+  // OTP States for business/devs/ministries
   const [otpInput, setOtpInput] = React.useState("");
   const [isOtpLoading, setIsOtpLoading] = React.useState(false);
+  const [otpSessionId, setOtpSessionId] = React.useState<string | null>(null);
 
-  // Login Step States
+
+  // Login Step States for multi-step logins
   const [businessLoginStep, setBusinessLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
   const [developerLoginStep, setDeveloperLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
   const [ministryLoginStep, setMinistryLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
@@ -143,6 +146,7 @@ export default function LoginPage() {
   // Store submitted identifiers for OTP step
   const [submittedOrgIdentifier, setSubmittedOrgIdentifier] = React.useState<string | null>(null);
   const [submittedMinistryName, setSubmittedMinistryName] = React.useState<string | null>(null);
+
 
   // Determine active tab from URL query parameter
   const requestedTab = searchParams.get('tab');
@@ -188,6 +192,7 @@ export default function LoginPage() {
       setQrCodeData(null);
       // Reset OTP states
       setOtpInput("");
+      setOtpSessionId(null);
       setBusinessLoginStep('credentials');
       setDeveloperLoginStep('credentials'); setMinistryLoginStep('credentials');
       setSubmittedOrgIdentifier(null); setSubmittedMinistryName(null);
@@ -202,6 +207,7 @@ export default function LoginPage() {
 
   async function onEmailPasswordSubmit(data: EmailPasswordFormValues) {
     try {
+      emailPasswordForm.formState.isSubmitting;
       await signInWithEmailPassword(data);
       // Redirect is handled by the server action on success
       toast({
@@ -259,19 +265,26 @@ export default function LoginPage() {
     }
   }
 
-  const handleSimulatedOtpVerification = (targetPath: string) => {
-    setIsOtpLoading(true);
-    setTimeout(() => {
-        setIsOtpLoading(false);
-        if (otpInput === SIMULATED_OTP) {
-            toast({ title: "OTP Vérifié!", description: "Connexion réussie. Redirection...", variant: "default" });
-            handleAuthenticationSuccess(targetPath);
-        } else {
-            toast({ title: "OTP Incorrect", description: "Veuillez vérifier le code et réessayer.", variant: "destructive" });
-            setOtpInput(""); // Clear OTP input on failure
+    const handleMultiStepOtpVerification = async (targetPath: string) => {
+        if (!otpSessionId) {
+            toast({ title: "Erreur de Session", description: "L'ID de session OTP est manquant.", variant: "destructive" });
+            return;
         }
-    }, 1000);
-  };
+
+        setIsOtpLoading(true);
+        try {
+            await verifyOtpAndSignIn({ code: otpInput, sessionId: otpSessionId });
+            // Redirect is handled by the server action
+            toast({ title: "OTP Vérifié!", description: "Connexion réussie. Redirection...", variant: "default" });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue est survenue.";
+            toast({ title: "OTP Incorrect", description: errorMessage, variant: "destructive" });
+            setOtpInput(""); // Clear OTP input on failure
+        } finally {
+            setIsOtpLoading(false);
+        }
+    };
+
 
   const generateQrData = () => `platform-login-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const isQrDialogOpenRef = React.useRef(isQrDialogOpen);
@@ -289,7 +302,8 @@ export default function LoginPage() {
   const commonOtpInputSection = (
     loginStepSetter: React.Dispatch<React.SetStateAction<any>>,
     credentialStepValue: string,
-    identifierForOtpMessage: string | null
+    identifierForOtpMessage: string | null,
+    targetPath: string
   ) => (
     <div className="space-y-4 pt-4">
       <p className="text-sm text-muted-foreground">
@@ -320,7 +334,7 @@ export default function LoginPage() {
           <ArrowLeft className="mr-2 h-4 w-4" /> Retour
         </Button>
         <Button
-          onClick={() => handleSimulatedOtpVerification('/dashboard')}
+          onClick={() => handleMultiStepOtpVerification(targetPath)}
           className="w-full sm:flex-1"
           disabled={otpInput.length !== 6 || isOtpLoading}
         >
@@ -433,7 +447,7 @@ export default function LoginPage() {
                   <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
-                commonOtpInputSection(setBusinessLoginStep, 'credentials', submittedOrgIdentifier)
+                commonOtpInputSection(setBusinessLoginStep, 'credentials', submittedOrgIdentifier, '/business-dashboard')
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
@@ -466,7 +480,7 @@ export default function LoginPage() {
                   <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
-                commonOtpInputSection(setDeveloperLoginStep, 'credentials', submittedOrgIdentifier)
+                commonOtpInputSection(setDeveloperLoginStep, 'credentials', submittedOrgIdentifier, '/developer-dashboard')
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
@@ -503,7 +517,7 @@ export default function LoginPage() {
                   </form>
                 </Form>
               ) : (
-                commonOtpInputSection(setMinistryLoginStep, 'credentials', submittedMinistryName)
+                commonOtpInputSection(setMinistryLoginStep, 'credentials', submittedMinistryName, '/ministry-dashboard')
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés des ministères.</p></CardFooter>
