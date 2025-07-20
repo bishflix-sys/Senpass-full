@@ -19,7 +19,7 @@ if (!clientId) {
  */
 export async function sendOtp(phoneNumber: string): Promise<{ sessionId: string }> {
   try {
-    const { id, type } = await workos.userManagement.sendPasswordlessSession({
+    const { id, type } = await workos.userManagement.sendMagicAuthCode({
       type: 'sms',
       phoneNumber,
     });
