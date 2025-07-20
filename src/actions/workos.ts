@@ -75,6 +75,9 @@ export async function sendOtp(email: string): Promise<{ sessionId: string }> {
   } catch (error: any) {
     console.error('WorkOS sendOtp error:', error);
     // You might want to map specific WorkOS errors to user-friendly messages
+    if (error.code === 'email_is_invalid') {
+        throw new Error("L'adresse e-mail fournie est invalide.");
+    }
     throw new Error(error.message || 'Failed to send OTP via WorkOS.');
   }
 }
