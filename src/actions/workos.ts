@@ -74,5 +74,3 @@ export async function verifyOtpAndSignIn({ code, sessionId }: VerifyOtpAndSignIn
   // This must be called outside the try/catch block.
   redirect('/dashboard');
 }
-
-    
