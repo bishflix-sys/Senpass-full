@@ -9,7 +9,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { useRouter, useSearchParams } from "next/navigation"; // Import useSearchParams
 import Link from "next/link"; // Import Link
 import dynamic from "next/dynamic"; // Import dynamic
-import { sendOtp, verifyOtpAndSignIn } from "@/actions/workos"; // Import server actions
+import { signInWithEmailPassword } from "@/actions/workos"; // Import server actions
 import {
   Tabs,
   TabsContent,
@@ -27,7 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft, Landmark, ShieldCheck, MessageCircle, KeySquare } from "lucide-react"; // Added KeySquare for SSO
+import { QrCode, ScanFace, Phone, LogIn, Building, Code, Loader2, VideoOff, User, Lock, UserPlus, KeyRound, CaseSensitive, Building2, CodeXml, ArrowLeft, Landmark, ShieldCheck, MessageCircle, KeySquare, Mail } from "lucide-react"; // Added KeySquare for SSO and Mail
 import {
   Form,
   FormControl,
@@ -82,14 +82,13 @@ const DeveloperRegistrationDialogContent = dynamic(() => import("@/components/de
 const SIMULATED_OTP = "000000"; // Standard OTP for demonstration
 const VALID_LOGIN_TABS = ['individuals', 'business', 'developers', 'ministries'];
 
-// Schema for phone number validation (Individuals)
-const phoneSchema = z.object({
-  phoneNumber: z
-    .string()
-    .min(1, "Le numéro de téléphone est requis.")
-    .regex(/^\+221\d{9}$/, "Format invalide. Utilisez +221 suivi de 9 chiffres (ex: +221771234567)."),
+// Schema for email/password validation (Individuals)
+const emailPasswordSchema = z.object({
+  email: z.string().email("L'adresse e-mail est invalide."),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères."),
 });
-type PhoneFormValues = z.infer<typeof phoneSchema>;
+type EmailPasswordFormValues = z.infer<typeof emailPasswordSchema>;
+
 
 // Schema for business/developer login validation
 const orgLoginSchema = z.object({
@@ -135,16 +134,13 @@ export default function LoginPage() {
   // OTP States
   const [otpInput, setOtpInput] = React.useState("");
   const [isOtpLoading, setIsOtpLoading] = React.useState(false);
-  const [workosSessionId, setWorkosSessionId] = React.useState<string | null>(null);
 
   // Login Step States
-  const [individualsLoginStep, setIndividualsLoginStep] = React.useState<'phone' | 'otp'>('phone');
   const [businessLoginStep, setBusinessLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
   const [developerLoginStep, setDeveloperLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
   const [ministryLoginStep, setMinistryLoginStep] = React.useState<'credentials' | 'otp'>('credentials');
 
   // Store submitted identifiers for OTP step
-  const [submittedPhoneNumber, setSubmittedPhoneNumber] = React.useState<string | null>(null);
   const [submittedOrgIdentifier, setSubmittedOrgIdentifier] = React.useState<string | null>(null);
   const [submittedMinistryName, setSubmittedMinistryName] = React.useState<string | null>(null);
 
@@ -181,7 +177,7 @@ export default function LoginPage() {
   }, [searchParams, toast]);
 
 
-  const phoneForm = useForm<PhoneFormValues>({ resolver: zodResolver(phoneSchema), defaultValues: { phoneNumber: "+221" }});
+  const emailPasswordForm = useForm<EmailPasswordFormValues>({ resolver: zodResolver(emailPasswordSchema), defaultValues: { email: "", password: "" }});
   const businessForm = useForm<OrgLoginValues>({ resolver: zodResolver(orgLoginSchema), defaultValues: { registrationNumber: "", password: "" }});
   const developerForm = useForm<OrgLoginValues>({ resolver: zodResolver(orgLoginSchema), defaultValues: { registrationNumber: "", password: "" }});
   const ministryForm = useForm<MinistryLoginValues>({ resolver: zodResolver(ministryLoginSchema), defaultValues: { ministryName: undefined, password: "" }});
@@ -192,9 +188,9 @@ export default function LoginPage() {
       setQrCodeData(null);
       // Reset OTP states
       setOtpInput("");
-      setIndividualsLoginStep('phone'); setBusinessLoginStep('credentials');
+      setBusinessLoginStep('credentials');
       setDeveloperLoginStep('credentials'); setMinistryLoginStep('credentials');
-      setSubmittedPhoneNumber(null); setSubmittedOrgIdentifier(null); setSubmittedMinistryName(null);
+      setSubmittedOrgIdentifier(null); setSubmittedMinistryName(null);
 
       setTimeout(() => { router.push(targetPath); }, 300);
    }, [router]);
@@ -204,25 +200,22 @@ export default function LoginPage() {
       toast({ title: "Inscription Réussie!", description: "Vous pouvez maintenant vous connecter.", variant: "default" });
    }, [toast]);
 
-  async function onPhoneSubmit(data: PhoneFormValues) {
+  async function onEmailPasswordSubmit(data: EmailPasswordFormValues) {
     try {
-      const { sessionId } = await sendOtp(data.phoneNumber);
-      if (sessionId) {
-        setWorkosSessionId(sessionId);
-        toast({ title: "Code envoyé", description: `Un code de vérification a été envoyé à ${data.phoneNumber}.` });
-        setSubmittedPhoneNumber(data.phoneNumber);
-        setIndividualsLoginStep('otp');
-        setOtpInput(""); // Clear previous OTP input
-      } else {
-        throw new Error("La session n'a pas pu être créée.");
-      }
+      await signInWithEmailPassword(data);
+      // Redirect is handled by the server action on success
+      toast({
+        title: "Connexion en cours...",
+        description: "Vous allez être redirigé vers votre tableau de bord.",
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue est survenue.";
       toast({
-        title: "Échec de l'envoi de l'OTP",
+        title: "Échec de la connexion",
         description: errorMessage,
         variant: "destructive"
       });
+      emailPasswordForm.resetField("password");
     }
   }
 
@@ -266,32 +259,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleOtpVerification = async () => {
-    if (!workosSessionId || otpInput.length !== 6) return;
-
-    setIsOtpLoading(true);
-    try {
-      await verifyOtpAndSignIn({ code: otpInput, sessionId: workosSessionId });
-      // The server action will handle the redirect on success,
-      // but we can show a toast here as feedback.
-      toast({
-        title: "Vérification réussie!",
-        description: "Vous êtes maintenant connecté.",
-      });
-      // A redirect will happen from the server action, so no need for client-side redirect here.
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue est survenue.";
-      toast({
-        title: "OTP Incorrect",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      setOtpInput(""); // Clear OTP input on failure
-    } finally {
-      setIsOtpLoading(false);
-    }
-  };
-  
   const handleSimulatedOtpVerification = (targetPath: string) => {
     setIsOtpLoading(true);
     setTimeout(() => {
@@ -322,14 +289,11 @@ export default function LoginPage() {
   const commonOtpInputSection = (
     loginStepSetter: React.Dispatch<React.SetStateAction<any>>,
     credentialStepValue: string,
-    identifierForOtpMessage: string | null,
-    verificationHandler: () => void,
-    isRealOtp: boolean = false
+    identifierForOtpMessage: string | null
   ) => (
     <div className="space-y-4 pt-4">
       <p className="text-sm text-muted-foreground">
-        Un code de vérification a été envoyé {identifierForOtpMessage ? `à ${identifierForOtpMessage}` : 'à votre contact enregistré'}. Entrez le code à 6 chiffres ci-dessous.
-        {!isRealOtp && ` (Code: ${SIMULATED_OTP})`}
+        Un code de vérification a été envoyé {identifierForOtpMessage ? `à ${identifierForOtpMessage}` : 'à votre contact enregistré'}. Entrez le code à 6 chiffres ci-dessous. (Code: {SIMULATED_OTP})
       </p>
       <div className="space-y-2">
         <Label htmlFor="otp" className="flex items-center gap-1.5">
@@ -356,7 +320,7 @@ export default function LoginPage() {
           <ArrowLeft className="mr-2 h-4 w-4" /> Retour
         </Button>
         <Button
-          onClick={verificationHandler}
+          onClick={() => handleSimulatedOtpVerification('/dashboard')}
           className="w-full sm:flex-1"
           disabled={otpInput.length !== 6 || isOtpLoading}
         >
@@ -390,52 +354,54 @@ export default function LoginPage() {
             <CardHeader>
               <CardTitle className="text-xl">Connexion Individu</CardTitle>
               <CardDescription>
-                {individualsLoginStep === 'phone'
-                  ? "Connectez-vous de manière sécurisée avec votre compte."
-                  : "Veuillez entrer le code de vérification reçu."}
+                Connectez-vous de manière sécurisée avec votre compte.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              {individualsLoginStep === 'phone' ? (
-                <>
-                  <Form {...phoneForm}>
-                    <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
-                      <FormField control={phoneForm.control} name="phoneNumber" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="flex items-center text-sm"><Phone className="mr-2 h-4 w-4 text-muted-foreground" /> Numéro de téléphone (+221)</FormLabel>
-                          <FormControl>
-                            <div className="flex items-center">
-                              <span className="text-base font-medium p-2.5 bg-muted rounded-l-md border border-r-0 border-input h-11 flex items-center text-muted-foreground">+221</span>
-                              <Input type="tel" placeholder="7X XXX XX XX" {...field} onChange={(e) => { const digits = e.target.value.replace(/\D/g, ''); const numberPart = digits.startsWith('221') ? digits.substring(3, 12) : digits.substring(0, 9); field.onChange(`+221${numberPart}`); }} className="rounded-l-none flex-1 h-11 text-base tracking-wider" maxLength={13} />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <Button type="submit" className="w-full h-11 text-base" disabled={phoneForm.formState.isSubmitting}>
-                        {phoneForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />} Envoyer le code
-                      </Button>
-                    </form>
-                  </Form>
-                  <div className="relative my-6"><div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-3 text-muted-foreground">Ou utiliser</span></div></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><QrCode className="mr-2 h-5 w-5 text-accent" /> QR Code</Button></DialogTrigger>
-                      <DialogContent className="sm:max-w-xs"><DialogHeader><DialogTitle className="text-lg">Scanner le QR Code</DialogTitle><DialogDescription>Scannez avec l'application. Se rafraîchit toutes les 10s.</DialogDescription></DialogHeader><div className="flex items-center justify-center p-6">{qrCodeData ? <div className="p-2 bg-white rounded-md shadow-md"><QRCodeCanvas value={qrCodeData} size={200} bgColor={"#FFFFFF"} fgColor={"#00853F"} level={"H"} includeMargin={true} /></div> : <div className="flex flex-col items-center justify-center text-muted-foreground h-[200px] space-y-2"><Loader2 className="h-8 w-8 animate-spin" /><p>Génération...</p></div>}</div><DialogFooter className="sm:justify-center"><DialogClose asChild><Button type="button" variant="outline">Fermer</Button></DialogClose></DialogFooter></DialogContent>
-                    </Dialog>
-                    <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><ScanFace className="mr-2 h-5 w-5 text-accent" /> Visage</Button></DialogTrigger>{showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess()} />}</Dialog>
-                  </div>
-                  <div className="mt-4">
-                    <Button asChild variant="outline" className="w-full h-12 text-base" disabled={!workosLoginUrl}>
-                       <a href={workosLoginUrl}>
-                          <KeySquare className="mr-2 h-5 w-5 text-accent"/> Connexion avec SSO
-                       </a>
-                    </Button>
-                   </div>
-                  <div className="text-center pt-4"><Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> S'inscrire</Button></DialogTrigger>{isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
-                </>
-              ) : (
-                commonOtpInputSection(setIndividualsLoginStep, 'phone', submittedPhoneNumber, handleOtpVerification, true)
-              )}
+              <Form {...emailPasswordForm}>
+                <form onSubmit={emailPasswordForm.handleSubmit(onEmailPasswordSubmit)} className="space-y-4">
+                   <FormField control={emailPasswordForm.control} name="email" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center text-sm"><Mail className="mr-2 h-4 w-4 text-muted-foreground" /> Adresse e-mail</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="exemple@email.com" {...field} className="h-11 text-base" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={emailPasswordForm.control} name="password" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center text-sm"><KeyRound className="mr-2 h-4 w-4 text-muted-foreground" /> Mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} className="h-11 text-base" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <Button type="submit" className="w-full h-11 text-base" disabled={emailPasswordForm.formState.isSubmitting}>
+                    {emailPasswordForm.formState.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogIn className="mr-2 h-5 w-5" />} Se connecter
+                  </Button>
+                </form>
+              </Form>
+
+              <div className="relative my-6"><div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-3 text-muted-foreground">Ou utiliser</span></div></div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><QrCode className="mr-2 h-5 w-5 text-accent" /> QR Code</Button></DialogTrigger>
+                  <DialogContent className="sm:max-w-xs"><DialogHeader><DialogTitle className="text-lg">Scanner le QR Code</DialogTitle><DialogDescription>Scannez avec l'application. Se rafraîchit toutes les 10s.</DialogDescription></DialogHeader><div className="flex items-center justify-center p-6">{qrCodeData ? <div className="p-2 bg-white rounded-md shadow-md"><QRCodeCanvas value={qrCodeData} size={200} bgColor={"#FFFFFF"} fgColor={"#00853F"} level={"H"} includeMargin={true} /></div> : <div className="flex flex-col items-center justify-center text-muted-foreground h-[200px] space-y-2"><Loader2 className="h-8 w-8 animate-spin" /><p>Génération...</p></div>}</div><DialogFooter className="sm:justify-center"><DialogClose asChild><Button type="button" variant="outline">Fermer</Button></DialogClose></DialogFooter></DialogContent>
+                </Dialog>
+                <Dialog open={showFacialRecognitionDialog} onOpenChange={setShowFacialRecognitionDialog}><DialogTrigger asChild><Button variant="outline" className="h-12 text-base"><ScanFace className="mr-2 h-5 w-5 text-accent" /> Visage</Button></DialogTrigger>{showFacialRecognitionDialog && <FacialRecognitionDialogContent onAuthenticated={() => handleAuthenticationSuccess()} />}</Dialog>
+              </div>
+
+              <div className="mt-4">
+                <Button asChild variant="outline" className="w-full h-12 text-base" disabled={!workosLoginUrl}>
+                   <a href={workosLoginUrl}>
+                      <KeySquare className="mr-2 h-5 w-5 text-accent"/> Connexion avec SSO
+                   </a>
+                </Button>
+               </div>
+
+              <div className="text-center pt-4"><Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> S'inscrire</Button></DialogTrigger>{isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full flex items-center justify-center gap-1.5"><Lock className="h-3 w-3"/> Connexion sécurisée.</p></CardFooter>
           </Card>
@@ -467,7 +433,7 @@ export default function LoginPage() {
                   <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
-                commonOtpInputSection(setBusinessLoginStep, 'credentials', submittedOrgIdentifier, () => handleSimulatedOtpVerification('/business-dashboard'))
+                commonOtpInputSection(setBusinessLoginStep, 'credentials', submittedOrgIdentifier)
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
@@ -500,7 +466,7 @@ export default function LoginPage() {
                   <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
                 </>
               ) : (
-                commonOtpInputSection(setDeveloperLoginStep, 'credentials', submittedOrgIdentifier, () => handleSimulatedOtpVerification('/developer-dashboard'))
+                commonOtpInputSection(setDeveloperLoginStep, 'credentials', submittedOrgIdentifier)
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
@@ -537,7 +503,7 @@ export default function LoginPage() {
                   </form>
                 </Form>
               ) : (
-                commonOtpInputSection(setMinistryLoginStep, 'credentials', submittedMinistryName, () => handleSimulatedOtpVerification('/ministry-dashboard'))
+                commonOtpInputSection(setMinistryLoginStep, 'credentials', submittedMinistryName)
               )}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés des ministères.</p></CardFooter>
@@ -553,5 +519,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

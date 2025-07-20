@@ -12,6 +12,52 @@ if (!clientId) {
   throw new Error('WORKOS_CLIENT_ID is not set');
 }
 
+interface SignInParams {
+  email: string;
+  password?: string; // Password might not be needed for all auth types
+}
+
+/**
+ * Authenticates a user with their email and password using WorkOS.
+ * On success, it will redirect the user to the dashboard.
+ * @param params Object containing the email and password.
+ */
+export async function signInWithEmailPassword({ email, password }: SignInParams): Promise<void> {
+  if (!password) {
+    throw new Error('Password is required for this sign-in method.');
+  }
+  
+  try {
+    const { user, accessToken, refreshToken } = await workos.userManagement.authenticateWithPassword({
+      email,
+      password,
+      clientId,
+    });
+
+    console.log('WorkOS user authenticated with password:', user.id);
+
+    // IMPORTANT: In a real application, you would handle session management here.
+    // This typically involves:
+    // 1. Encrypting the accessToken and refreshToken.
+    // 2. Setting them in secure, httpOnly cookies.
+    // 3. Creating a user session in your database if one doesn't exist.
+
+    // For this demonstration, we are skipping robust session management and just redirecting.
+
+  } catch (error: any) {
+    console.error('WorkOS password authentication error:', error);
+    // Provide a more generic error to the user for security.
+    if (error.code === 'invalid_credentials' || error.status === 401) {
+        throw new Error('Les informations de connexion sont incorrectes.');
+    }
+    throw new Error('La connexion a échoué. Veuillez réessayer.');
+  }
+
+  // Redirect to the dashboard on successful authentication.
+  // This must be called outside the try/catch block.
+  redirect('/dashboard');
+}
+
 /**
  * Sends a one-time password (OTP) to the user's phone number using WorkOS.
  * @param phoneNumber The phone number to send the OTP to (must be in E.164 format).
