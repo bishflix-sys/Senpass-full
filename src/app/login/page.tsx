@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image"; // Importer Image
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -217,9 +218,13 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col justify-center items-center py-12 min-h-screen bg-background">
-      <div className="flex items-center gap-2 mb-8 text-xl font-semibold text-foreground">
-        <Lock className="h-6 w-6 text-primary" /><span>Accès Sécurisé SenPass</span>
-      </div>
+       <div className="flex flex-col items-center gap-4 mb-8">
+          <Image src="https://media.licdn.com/dms/image/v2/D4E0BAQEZqb1Jwm5tDQ/company-logo_100_100/B4EZa0hKR.HoAQ-/0/1746785314889?e=1756339200&v=beta&t=Jd6PipGqCyUUvYcM_sEpCtQb_OHUtNBtVYBTk9K2Khw" alt="SenPass Logo" width={60} height={60} className="rounded-xl" />
+          <div className="text-center">
+             <h1 className="text-2xl font-bold text-foreground">SenPass</h1>
+             <p className="text-muted-foreground">Accès Sécurisé à votre Identité Numérique</p>
+          </div>
+       </div>
       <Tabs defaultValue={activeTab} className="w-full max-w-md">
         <TabsList className="grid w-full grid-cols-4 h-12">
           <TabsTrigger value="individuals" className="text-xs sm:text-sm"><User className="mr-1 sm:mr-2 h-4 w-4" /> Particuliers</TabsTrigger>
