@@ -20,7 +20,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
       <CardHeader className="flex flex-col items-center gap-4 pb-4 text-center"> {/* Center content */}
          <Avatar className="h-20 w-20 border-4 border-primary shadow-sm"> {/* Larger avatar */}
           {/* Placeholder image - replace with actual user image if available */}
-           <AvatarImage src={`https://imgs.search.brave.com/ANDIWmberYX6PwF4g1BUL5rgLBAiuD5NwEygrUsYojg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9hZnJv/LWVsZWdhbmNlLmNv/bS9jZG4vc2hvcC9m/aWxlcy9ib3Vib3Ut/YnJvZGUtaG9tbWUt/NDU4XzIwMHgucG5n/P3Y9MTc0NzkxNjg5/Mw`} alt={user.name} />
+           <AvatarImage src={`https://imgs.search.brave.com/4Bh6T9d-9_TQiOWxRmExy4vTQNZu0gff0swwr9JwQeM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMTM1/NDE4NzY0Ny9mci9w/aG90by9ob21tZS1t/dXN1bG1hbi1kZWJv/dXQtZGV2YW50LWxl/LW11ci1kdW5lLW1v/c3F1JUMzJUE5ZS1k/YWthci1zJUMzJUE5/biVDMyVBOWdhbC1h/ZnJpcXVlLmpwZz9z/PTYxMng2MTImdz0w/Jms9MjAmYz1oWURJ/NnM5TENmTU51RVIt/X1JYUGUzM3hTX3NH/dFpvQWpjS0wyTkEy/c2dFPQ`} alt={user.name} />
            <AvatarFallback className="text-2xl bg-secondary text-secondary-foreground">{initials}</AvatarFallback>
          </Avatar>
         <div>
