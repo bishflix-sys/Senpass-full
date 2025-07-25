@@ -75,7 +75,7 @@ export default function IdCardDisplay({
           <div className="flex items-start gap-4">
             {/* User Photo */}
             <Avatar className="h-24 w-20 border-2 border-muted shadow-sm rounded-md">
-              <AvatarImage src={`https://picsum.photos/seed/${user.email}/80/96`} alt={user.name} data-ai-hint="black person tie" className="object-cover rounded-md"/>
+              <AvatarImage src={`https://placehold.co/80x96.png`} alt={user.name} data-ai-hint="black person suit" className="object-cover rounded-md"/>
               <AvatarFallback className="text-lg bg-secondary text-secondary-foreground rounded-md">
                  <User className="h-8 w-8" />
               </AvatarFallback>
@@ -139,4 +139,3 @@ export default function IdCardDisplay({
     </Card>
   );
 }
-
