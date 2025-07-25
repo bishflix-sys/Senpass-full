@@ -51,6 +51,9 @@ Be concise, helpful, and professional.`,
   prompt: `User message: {{{message}}}
 
 Assistant response:`,
+  config: {
+    model: 'googleai/gemini-pro',
+  }
 });
 
 // Define the Genkit flow that uses the prompt
