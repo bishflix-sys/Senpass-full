@@ -85,7 +85,12 @@ export default function LoginPage() {
   const [isBusinessRegistrationDialogOpen, setIsBusinessRegistrationDialogOpen] = React.useState(false);
   const [isDeveloperRegistrationDialogOpen, setIsDeveloperRegistrationDialogOpen] = React.useState(false);
   
+  // State for each login tab
   const [individualLoginState, setIndividualLoginState] = React.useState<LoginState>(initialLoginState);
+  const [businessLoginState, setBusinessLoginState] = React.useState<LoginState>(initialLoginState);
+  const [developerLoginState, setDeveloperLoginState] = React.useState<LoginState>(initialLoginState);
+  const [ministryLoginState, setMinistryLoginState] = React.useState<LoginState>(initialLoginState);
+
 
   // Determine active tab from URL query parameter
   const requestedTab = searchParams.get('tab');
@@ -140,7 +145,7 @@ export default function LoginPage() {
       if (state.otp === SIMULATED_OTP) {
           toast({
               title: "Connexion Réussie!",
-              description: `Redirection vers le portail ${targetPath.split('-')[0]}.`,
+              description: `Redirection vers le portail.`,
           });
           setTimeout(() => router.push(targetPath), 800);
       } else {
@@ -165,8 +170,9 @@ export default function LoginPage() {
             {!state.isOtpSent ? (
                 <div className="space-y-4">
                     <div>
-                      <Label htmlFor="phone">Numéro de téléphone</Label>
+                      <Label htmlFor={`phone-${targetDashboard}`}>Numéro de téléphone</Label>
                       <PhoneNumberInput
+                          id={`phone-${targetDashboard}`}
                           value={state.phoneNumber}
                           onChange={(value) => stateSetter(prev => ({...prev, phoneNumber: value}))}
                           disabled={state.isSubmitting}
@@ -180,9 +186,9 @@ export default function LoginPage() {
             ) : (
                 <div className="space-y-4">
                     <div>
-                        <Label htmlFor="otp">Code OTP</Label>
+                        <Label htmlFor={`otp-${targetDashboard}`}>Code OTP</Label>
                         <Input 
-                            id="otp" 
+                            id={`otp-${targetDashboard}`} 
                             type="text" 
                             placeholder="Entrez le code à 6 chiffres" 
                             value={state.otp} 
@@ -258,7 +264,7 @@ export default function LoginPage() {
               <CardDescription>Accès sécurisé pour les organisations partenaires.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 {renderLoginForm(initialLoginState, ()=> {}, '/business-dashboard',
+                 {renderLoginForm(businessLoginState, setBusinessLoginState, '/business-dashboard',
                     <Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog>
                  )}
             </CardContent>
@@ -274,7 +280,7 @@ export default function LoginPage() {
               <CardDescription>Accès aux APIs et outils d'intégration.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                {renderLoginForm(initialLoginState, ()=> {}, '/developer-dashboard',
+                {renderLoginForm(developerLoginState, setDeveloperLoginState, '/developer-dashboard',
                     <Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog>
                 )}
             </CardContent>
@@ -290,7 +296,7 @@ export default function LoginPage() {
               <CardDescription>Portail sécurisé pour les institutions ministérielles.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 {renderLoginForm(initialLoginState, ()=> {}, '/ministry-dashboard')}
+                 {renderLoginForm(ministryLoginState, setMinistryLoginState, '/ministry-dashboard')}
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés des ministères.</p></CardFooter>
           </Card>
@@ -304,3 +310,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
