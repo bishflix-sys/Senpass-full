@@ -20,7 +20,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
       <CardHeader className="flex flex-col items-center gap-4 pb-4 text-center"> {/* Center content */}
          <Avatar className="h-20 w-20 border-4 border-primary shadow-sm"> {/* Larger avatar */}
           {/* Placeholder image - replace with actual user image if available */}
-           <AvatarImage src={`https://placehold.co/120x120.png`} alt={user.name} data-ai-hint="black person suit" />
+           <AvatarImage src={`https://imgs.search.brave.com/ANDIWmberYX6PwF4g1BUL5rgLBAiuD5NwEygrUsYojg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9hZnJv/LWVsZWdhbmNlLmNv/bS9jZG4vc2hvcC9m/aWxlcy9ib3Vib3Ut/YnJvZGUtaG9tbWUt/NDU4XzIwMHgucG5n/P3Y9MTc0NzkxNjg5/Mw`} alt={user.name} />
            <AvatarFallback className="text-2xl bg-secondary text-secondary-foreground">{initials}</AvatarFallback>
          </Avatar>
         <div>

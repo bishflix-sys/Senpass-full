@@ -75,7 +75,7 @@ export default function IdCardDisplay({
           <div className="flex items-start gap-4">
             {/* User Photo */}
             <Avatar className="h-24 w-20 border-2 border-muted shadow-sm rounded-md">
-              <AvatarImage src={`https://placehold.co/80x96.png`} alt={user.name} data-ai-hint="black person suit" className="object-cover rounded-md"/>
+              <AvatarImage src={`https://imgs.search.brave.com/ANDIWmberYX6PwF4g1BUL5rgLBAiuD5NwEygrUsYojg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9hZnJv/LWVsZWdhbmNlLmNv/bS9jZG4vc2hvcC9m/aWxlcy9ib3Vib3Ut/YnJvZGUtaG9tbWUt/NDU4XzIwMHgucG5n/P3Y9MTc0NzkxNjg5/Mw`} alt={user.name} className="object-cover rounded-md"/>
               <AvatarFallback className="text-lg bg-secondary text-secondary-foreground rounded-md">
                  <User className="h-8 w-8" />
               </AvatarFallback>
