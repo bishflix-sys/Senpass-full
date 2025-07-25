@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link"; // Import Link for logo
+import Image from "next/image";
 
 
 export default function BusinessDashboardPage() {
@@ -33,8 +34,8 @@ export default function BusinessDashboardPage() {
       {/* Header Section with Text Logo */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
-           <Link href="/dashboard" className="flex-shrink-0"> {/* Link text logo to dashboard */}
-             <span className="text-2xl font-bold text-foreground tracking-tight">SENPASS</span>
+           <Link href="/dashboard" className="flex-shrink-0">
+             <Image src="https://media.licdn.com/dms/image/v2/D4E0BAQEZqb1Jwm5tDQ/company-logo_100_100/B4EZa0hKR.HoAQ-/0/1746785314889?e=1756339200&v=beta&t=Jd6PipGqCyUUvYcM_sEpCtQb_OHUtNBtVYBTk9K2Khw" alt="SenPass Logo" width={40} height={40} className="rounded-md" />
            </Link>
            <div className="flex-1">
              <h1 className="text-2xl sm:text-3xl font-bold text-primary flex items-center gap-3">
@@ -140,4 +141,3 @@ export default function BusinessDashboardPage() {
     </div>
   );
 }
-

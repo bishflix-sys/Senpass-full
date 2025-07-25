@@ -14,7 +14,13 @@ const nextConfig = {
         hostname: 'placehold.co',
         port: '',
         pathname: '/**',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.licdn.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   typescript: {
