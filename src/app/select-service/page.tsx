@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Building, Zap, Droplet, Landmark, BookOpen, GraduationCap, HeartPulse, Palette, ShoppingCart, Globe } from "lucide-react";
+import { ArrowLeft, Building, Zap, Droplet, Landmark, BookOpen, GraduationCap, HeartPulse, Palette, ShoppingCart, Globe, Car } from "lucide-react";
 
 interface Service {
   id: string;
@@ -124,7 +124,81 @@ const allCountryServices: CountryServices[] = [
       },
     ],
   },
-  // Add other UEMOA countries here: ML, BF, NE, TG, GW
+  {
+    countryCode: "BF",
+    countryName: "Burkina Faso",
+    flag: "🇧🇫",
+    ministries: [
+      {
+        id: "energie_bf",
+        name: "Ministère de l'Énergie (SONABEL)",
+        icon: Zap,
+        services: [
+          { id: "bf_elec_facture", name: "Facture d'électricité (SONABEL)", description: "Payer votre facture d'électricité." },
+        ],
+      },
+    ],
+  },
+  {
+    countryCode: "GW",
+    countryName: "Guinée-Bissau",
+    flag: "🇬🇼",
+    ministries: [
+      {
+        id: "telecom_gw",
+        name: "Autoridade Reguladora Nacional (ARN)",
+        icon: Globe,
+        services: [
+          { id: "gw_telecom_tax", name: "Taxe sur les télécommunications", description: "Payer la taxe réglementaire." },
+        ],
+      },
+    ],
+  },
+   {
+    countryCode: "ML",
+    countryName: "Mali",
+    flag: "🇲🇱",
+    ministries: [
+      {
+        id: "energie_ml",
+        name: "Énergie du Mali (EDM-SA)",
+        icon: Zap,
+        services: [
+          { id: "ml_elec_facture", name: "Facture d'électricité (EDM)", description: "Payer votre facture d'électricité." },
+        ],
+      },
+    ],
+  },
+  {
+    countryCode: "NE",
+    countryName: "Niger",
+    flag: "🇳🇪",
+    ministries: [
+      {
+        id: "eau_ne",
+        name: "Ministère de l'Hydraulique (SEEN)",
+        icon: Droplet,
+        services: [
+          { id: "ne_eau_facture", name: "Facture d'eau (SEEN)", description: "Payer votre facture d'eau." },
+        ],
+      },
+    ],
+  },
+  {
+    countryCode: "TG",
+    countryName: "Togo",
+    flag: "🇹🇬",
+    ministries: [
+      {
+        id: "transport_tg",
+        name: "Ministère des Transports",
+        icon: Car,
+        services: [
+          { id: "tg_taxe_vehicule", name: "Taxe sur les véhicules", description: "Payer la taxe annuelle sur les véhicules." },
+        ],
+      },
+    ],
+  },
 ];
 
 export default function SelectServicePage() {
@@ -231,4 +305,3 @@ export default function SelectServicePage() {
     </div>
   );
 }
-
