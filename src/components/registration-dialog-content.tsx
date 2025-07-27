@@ -74,7 +74,6 @@ const CaptchaSimulation: React.FC<{ onChange: (isValid: boolean) => void }> = ({
                         {captchaText}
                     </span>
                 </div>
-                <Button type="button" variant="outline" size="sm" onClick={generateCaptcha}>Rafraîchir</Button>
             </div>
             <Input
                 type="text"
@@ -100,8 +99,10 @@ const registrationSchema = z.object({
   fullName: z.string().min(2, "Le nom complet est requis."),
   email: z.string().email("L'adresse e-mail est invalide."),
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
-  cniOrPassport: z.string().optional(),
-  issueDate: z.date().optional(),
+  cniOrPassport: z.string().min(5, "Le numéro de CNI ou Passeport est requis."),
+  issueDate: z.date({
+    required_error: "La date d'émission du document est requise.",
+  }),
   captchaValid: z.boolean().refine(val => val === true, {
       message: "Veuillez résoudre le contrôle de sécurité.",
   }),
@@ -214,18 +215,15 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
 
           <Separator />
           
-          {/* --- Section 2: Optional Identity Verification --- */}
+          {/* --- Section 2: Identity Verification --- */}
            <div className="space-y-4">
-             <h3 className="text-sm font-medium text-muted-foreground">Vérification d'Identité (Optionnel)</h3>
-              <p className="text-xs text-muted-foreground -mt-3">
-                Vous pouvez compléter cette étape maintenant ou plus tard depuis votre tableau de bord pour accéder à tous les services.
-              </p>
+             <h3 className="text-sm font-medium text-muted-foreground">Vérification d'Identité</h3>
              <FormField
               control={form.control}
               name="cniOrPassport"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-1.5"><Hash className="h-4 w-4 text-muted-foreground"/> Numéro CNI ou Passeport</FormLabel>
+                  <FormLabel className="flex items-center gap-1.5"><Hash className="h-4 w-4 text-muted-foreground"/> Numéro CNI ou Passeport*</FormLabel>
                   <FormControl>
                     <Input placeholder="Numéro d'identification officiel" {...field} />
                   </FormControl>
@@ -238,7 +236,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
               name="issueDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date d'émission du document</FormLabel>
+                  <FormLabel>Date d'émission du document*</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>

@@ -73,7 +73,6 @@ const CaptchaSimulation: React.FC<{ onChange: (isValid: boolean) => void }> = ({
                         {captchaText}
                     </span>
                 </div>
-                <Button type="button" variant="outline" size="sm" onClick={generateCaptcha}>Rafraîchir</Button>
             </div>
             <Input
                 type="text"
