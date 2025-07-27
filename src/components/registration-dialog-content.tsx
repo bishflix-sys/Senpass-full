@@ -35,64 +35,6 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Separator } from "./ui/separator";
 
-// Simple CAPTCHA simulation component
-const CaptchaSimulation: React.FC<{ onChange: (isValid: boolean) => void }> = ({ onChange }) => {
-    const [captchaText, setCaptchaText] = React.useState('');
-    const [userInput, setUserInput] = React.useState('');
-    const [isValid, setIsValid] = React.useState<boolean | null>(null);
-
-    const generateCaptcha = React.useCallback(() => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let text = '';
-        for (let i = 0; i < 6; i++) {
-            text += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        setCaptchaText(text);
-        setUserInput(''); // Reset input on new captcha
-        setIsValid(null); // Reset validation status
-        onChange(false); // Notify parent that it's initially invalid
-    }, [onChange]);
-
-    React.useEffect(() => {
-        generateCaptcha();
-    }, [generateCaptcha]);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setUserInput(value);
-        const currentIsValid = value.toLowerCase() === captchaText.toLowerCase();
-        setIsValid(currentIsValid);
-        onChange(currentIsValid); // Notify parent of validity change
-    };
-
-    return (
-        <div className="space-y-2">
-            <div className="flex items-center gap-4">
-                <div className="bg-muted p-3 rounded-md border shadow-inner flex-shrink-0">
-                    <span className="font-mono text-xl tracking-widest select-none italic font-semibold text-foreground/80" style={{ textDecoration: 'line-through', textDecorationColor: 'rgba(120, 120, 120, 0.5)' }}>
-                        {captchaText}
-                    </span>
-                </div>
-            </div>
-            <Input
-                type="text"
-                placeholder="Entrez le texte ci-dessus"
-                value={userInput}
-                onChange={handleInputChange}
-                className={cn(
-                    isValid === true && "border-green-500",
-                    isValid === false && userInput.length > 0 && "border-destructive"
-                )}
-                maxLength={6}
-            />
-            {isValid === false && userInput.length > 0 && (
-                 <p className="text-xs text-destructive">Le texte ne correspond pas.</p>
-             )}
-        </div>
-    );
-};
-
-
 // Registration Form Schema
 const registrationSchema = z.object({
   fullName: z.string().min(2, "Le nom complet est requis."),
@@ -101,9 +43,6 @@ const registrationSchema = z.object({
   cniOrPassport: z.string().min(5, "Le numéro de CNI ou Passeport est requis."),
   issueDate: z.date({
     required_error: "La date d'émission du document est requise.",
-  }),
-  captchaValid: z.boolean().refine(val => val === true, {
-      message: "Veuillez résoudre le contrôle de sécurité.",
   }),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "Vous devez accepter les conditions et la politique de confidentialité.",
@@ -128,7 +67,6 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
       password: "",
       cniOrPassport: "",
       issueDate: undefined,
-      captchaValid: false,
       termsAccepted: false,
     },
   });
@@ -175,7 +113,6 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
       });
     } finally {
         setIsSubmitting(false);
-        form.setValue('captchaValid', false); // Reset captcha on submit attempt
     }
   }
 
@@ -296,19 +233,6 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
 
            {/* --- Section 3: Security & Terms --- */}
            <div className="space-y-6">
-                <FormField
-                    control={form.control}
-                    name="captchaValid"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Contrôle de sécurité*</FormLabel>
-                        <FormControl>
-                            <CaptchaSimulation onChange={field.onChange} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
                 <FormField
                     control={form.control}
                     name="termsAccepted"

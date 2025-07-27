@@ -35,64 +35,6 @@ import { fr } from "date-fns/locale"; // French locale for date picker
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
-// Simple CAPTCHA simulation component (reuse or import if separate)
-const CaptchaSimulation: React.FC<{ onChange: (isValid: boolean) => void }> = ({ onChange }) => {
-    const [captchaText, setCaptchaText] = React.useState('');
-    const [userInput, setUserInput] = React.useState('');
-    const [isValid, setIsValid] = React.useState<boolean | null>(null);
-
-    const generateCaptcha = React.useCallback(() => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let text = '';
-        for (let i = 0; i < 6; i++) {
-            text += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        setCaptchaText(text);
-        setUserInput(''); // Reset input on new captcha
-        setIsValid(null); // Reset validation status
-        onChange(false); // Notify parent that it's initially invalid
-    }, [onChange]);
-
-    React.useEffect(() => {
-        generateCaptcha();
-    }, [generateCaptcha]);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setUserInput(value);
-        const currentIsValid = value.toLowerCase() === captchaText.toLowerCase();
-        setIsValid(currentIsValid);
-        onChange(currentIsValid); // Notify parent of validity change
-    };
-
-    return (
-        <div className="space-y-2">
-            <div className="flex items-center gap-4">
-                <div className="bg-muted p-3 rounded-md border shadow-inner flex-shrink-0">
-                    <span className="font-mono text-xl tracking-widest select-none italic font-semibold text-foreground/80" style={{ textDecoration: 'line-through', textDecorationColor: 'rgba(120, 120, 120, 0.5)' }}>
-                        {captchaText}
-                    </span>
-                </div>
-            </div>
-            <Input
-                type="text"
-                placeholder="Entrez le texte ci-dessus"
-                value={userInput}
-                onChange={handleInputChange}
-                className={cn(
-                    isValid === true && "border-green-500",
-                    isValid === false && userInput.length > 0 && "border-destructive"
-                )}
-                maxLength={6}
-            />
-            {isValid === false && userInput.length > 0 && (
-                 <p className="text-xs text-destructive">Le texte ne correspond pas.</p>
-             )}
-        </div>
-    );
-};
-
-
 // Business Registration Form Schema
 const businessRegistrationSchema = z.object({
   representativeName: z.string().min(2, "Le nom du représentant est requis."),
@@ -104,9 +46,6 @@ const businessRegistrationSchema = z.object({
   }),
   email: z.string().email("L'adresse e-mail est invalide."),
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
-  captchaValid: z.boolean().refine(val => val === true, {
-      message: "Veuillez résoudre le contrôle de sécurité.",
-  }),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "Vous devez accepter les conditions et la politique de confidentialité.",
   }),
@@ -132,7 +71,6 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
       idIssueDate: undefined,
       email: "",
       password: "",
-      captchaValid: false,
       termsAccepted: false,
     },
   });
@@ -164,8 +102,6 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
         description: "Une erreur s'est produite. Vérifiez vos informations et réessayez.",
         variant: "destructive",
       });
-       // Reset captcha validity state on failure
-       form.setValue('captchaValid', false);
     }
   }
 
@@ -313,22 +249,6 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
                 <FormMessage />
               </FormItem>
             )} />
-
-           {/* CAPTCHA */}
-            <FormField
-                control={form.control}
-                name="captchaValid"
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Contrôle de sécurité*</FormLabel>
-                    <FormControl>
-                         {/* Pass field.onChange to update form state */}
-                        <CaptchaSimulation onChange={field.onChange} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
 
           {/* Terms and Conditions */}
           <FormField
