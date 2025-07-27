@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound, UserCircle, Hash } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -34,6 +34,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale"; // French locale for date picker
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { Separator } from "./ui/separator";
 
 // Simple CAPTCHA simulation component
 const CaptchaSimulation: React.FC<{ onChange: (isValid: boolean) => void }> = ({ onChange }) => {
@@ -97,12 +98,10 @@ const CaptchaSimulation: React.FC<{ onChange: (isValid: boolean) => void }> = ({
 // Registration Form Schema
 const registrationSchema = z.object({
   fullName: z.string().min(2, "Le nom complet est requis."),
-  cniOrPassport: z.string().min(5, "Le numéro CNI/Passeport est requis."),
-  issueDate: z.date({
-    required_error: "La date d'émission est requise.",
-  }),
   email: z.string().email("L'adresse e-mail est invalide."),
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
+  cniOrPassport: z.string().optional(),
+  issueDate: z.date().optional(),
   captchaValid: z.boolean().refine(val => val === true, {
       message: "Veuillez résoudre le contrôle de sécurité.",
   }),
@@ -125,10 +124,10 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       fullName: "",
-      cniOrPassport: "",
-      issueDate: undefined,
       email: "",
       password: "",
+      cniOrPassport: "",
+      issueDate: undefined,
       captchaValid: false,
       termsAccepted: false,
     },
@@ -136,10 +135,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
 
   async function onSubmit(data: RegistrationFormValues) {
     setIsSubmitting(true);
-    console.log("Registration data:", {
-        ...data,
-        issueDate: data.issueDate.toISOString().split('T')[0] // Format date for logging
-    });
+    console.log("Registration data:", data);
 
     // API call for registration
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -161,9 +157,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
         description: "Une erreur s'est produite. Veuillez réessayer.",
         variant: "destructive",
       });
-      // Optionally, refresh captcha on failure
-       form.setValue('captchaValid', false); // Reset captcha validity state
-      // Trigger captcha refresh if component allows (needs ref or callback)
+       form.setValue('captchaValid', false);
     }
   }
 
@@ -174,90 +168,27 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
            <UserPlus className="h-6 w-6" /> S'inscrire
         </DialogTitle>
         <DialogDescription>
-          Créez votre compte d'identité numérique.
+          Créez votre compte d'identité numérique en quelques étapes.
         </DialogDescription>
       </DialogHeader>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
-          {/* Full Name */}
-          <FormField
-            control={form.control}
-            name="fullName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nom complet*</FormLabel>
-                <FormControl>
-                  <Input placeholder="Prénom(s) Nom" {...field} />
-                </FormControl>
-                <FormDescription className="text-xs">
-                  Tel qu'il figure sur votre CNI ou Passeport Sénégalais.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* CNI or Passport */}
-          <FormField
-            control={form.control}
-            name="cniOrPassport"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Numéro CNI ou Passeport*</FormLabel>
-                <FormControl>
-                  <Input placeholder="Numéro d'identification" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Issue Date */}
-          <FormField
-            control={form.control}
-            name="issueDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date d'émission*</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "dd/MM/yyyy", { locale: fr })
-                        ) : (
-                          <span>JJ / MM / AAAA</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                      locale={fr} // Use French locale
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-            {/* Email */}
+          {/* --- Section 1: Basic Info --- */}
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5"><UserCircle className="h-4 w-4 text-muted-foreground"/> Nom complet*</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Prénom(s) Nom" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-muted-foreground" /> Adresse e-mail*</FormLabel>
@@ -267,8 +198,6 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
                 <FormMessage />
               </FormItem>
             )} />
-
-            {/* Password */}
             <FormField control={form.control} name="password" render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1.5"><KeyRound className="h-4 w-4 text-muted-foreground" /> Mot de passe*</FormLabel>
@@ -281,53 +210,119 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
                 <FormMessage />
               </FormItem>
             )} />
+          </div>
 
-           {/* CAPTCHA */}
-            <FormField
-                control={form.control}
-                name="captchaValid"
-                render={({ field }) => (
+          <Separator />
+          
+          {/* --- Section 2: Optional Identity Verification --- */}
+           <div className="space-y-4">
+             <h3 className="text-sm font-medium text-muted-foreground">Vérification d'Identité (Optionnel)</h3>
+              <p className="text-xs text-muted-foreground -mt-3">
+                Vous pouvez compléter cette étape maintenant ou plus tard depuis votre tableau de bord pour accéder à tous les services.
+              </p>
+             <FormField
+              control={form.control}
+              name="cniOrPassport"
+              render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Contrôle de sécurité*</FormLabel>
-                    <FormControl>
-                         {/* Pass field.onChange to update form state */}
-                        <CaptchaSimulation onChange={field.onChange} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-
-
-          {/* Terms and Conditions */}
-          <FormField
-            control={form.control}
-            name="termsAccepted"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    aria-label="Accepter les conditions et la politique de confidentialité"
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="font-normal">
-                    Je consens au traitement de mes données et j'accepte les{" "}
-                    <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
-                      Conditions d'Utilisation
-                    </Link> et la {" "}
-                    <Link href="/privacy" target="_blank" className="text-primary underline hover:no-underline">
-                      Politique de Confidentialité
-                    </Link>
-                    .
-                  </FormLabel>
+                  <FormLabel className="flex items-center gap-1.5"><Hash className="h-4 w-4 text-muted-foreground"/> Numéro CNI ou Passeport</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Numéro d'identification officiel" {...field} />
+                  </FormControl>
                   <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="issueDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Date d'émission du document</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "dd/MM/yyyy", { locale: fr })
+                          ) : (
+                            <span>JJ / MM / AAAA</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                        locale={fr} // Use French locale
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <Separator />
+
+           {/* --- Section 3: Security & Terms --- */}
+           <div className="space-y-6">
+                <FormField
+                    control={form.control}
+                    name="captchaValid"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Contrôle de sécurité*</FormLabel>
+                        <FormControl>
+                            <CaptchaSimulation onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="termsAccepted"
+                    render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
+                        <FormControl>
+                        <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            aria-label="Accepter les conditions et la politique de confidentialité"
+                        />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                        <FormLabel className="font-normal">
+                            Je consens au traitement de mes données et j'accepte les{" "}
+                            <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
+                            Conditions d'Utilisation
+                            </Link> et la {" "}
+                            <Link href="/privacy" target="_blank" className="text-primary underline hover:no-underline">
+                            Politique de Confidentialité
+                            </Link>
+                            .
+                        </FormLabel>
+                        <FormMessage />
+                        </div>
+                    </FormItem>
+                    )}
+                />
+           </div>
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
@@ -337,7 +332,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              S'inscrire
+              Créer mon compte
             </Button>
           </DialogFooter>
         </form>
