@@ -11,8 +11,15 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Building, Zap, Droplet, Landmark, BookOpen, GraduationCap, HeartPulse, Palette, ShoppingCart } from "lucide-react"; // Palette for 'Autres Services'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Building, Zap, Droplet, Landmark, BookOpen, GraduationCap, HeartPulse, Palette, ShoppingCart, Globe } from "lucide-react";
 
 interface Service {
   id: string;
@@ -27,82 +34,117 @@ interface Ministry {
   services: Service[];
 }
 
-const ministriesData: Ministry[] = [
+interface CountryServices {
+  countryCode: string;
+  countryName: string;
+  flag: string;
+  ministries: Ministry[];
+}
+
+const allCountryServices: CountryServices[] = [
   {
-    id: "energie",
-    name: "Ministère de l'Énergie (SENELEC)",
-    icon: Zap,
-    services: [
-      { id: "elec_res", name: "Facture d'électricité résidentielle", description: "Payer votre facture SENELEC pour votre domicile." },
-      { id: "elec_pro", name: "Facture d'électricité professionnelle", description: "Régler la facture SENELEC de votre entreprise." },
-      { id: "woyofal", name: "Achat de crédit prépayé Woyofal", description: "Recharger votre compteur Woyofal." },
+    countryCode: "SN",
+    countryName: "Sénégal",
+    flag: "🇸🇳",
+    ministries: [
+      {
+        id: "energie_sn",
+        name: "Ministère de l'Énergie (SENELEC)",
+        icon: Zap,
+        services: [
+          { id: "sn_elec_res", name: "Facture d'électricité résidentielle", description: "Payer votre facture SENELEC pour votre domicile." },
+          { id: "sn_elec_pro", name: "Facture d'électricité professionnelle", description: "Régler la facture SENELEC de votre entreprise." },
+          { id: "sn_woyofal", name: "Achat de crédit prépayé Woyofal", description: "Recharger votre compteur Woyofal." },
+        ],
+      },
+      {
+        id: "hydraulique_sn",
+        name: "Ministère de l'Hydraulique (SEN'EAU / OFOR)",
+        icon: Droplet,
+        services: [
+          { id: "sn_eau_res", name: "Facture d'eau résidentielle", description: "Payer votre facture SEN'EAU pour votre domicile." },
+          { id: "sn_eau_pro", name: "Facture d'eau professionnelle", description: "Régler la facture SEN'EAU de votre entreprise." },
+        ],
+      },
+      {
+        id: "finances_sn",
+        name: "Ministère des Finances (Impôts et Domaines - DGID)",
+        icon: Landmark,
+        services: [
+          { id: "sn_ir", name: "Paiement Impôt sur le Revenu", description: "Régler votre impôt sur le revenu." },
+          { id: "sn_tva", name: "Paiement Taxe sur la Valeur Ajoutée (TVA)", description: "Déclarer et payer la TVA." },
+        ],
+      },
     ],
   },
   {
-    id: "hydraulique",
-    name: "Ministère de l'Hydraulique (SEN'EAU / OFOR)",
-    icon: Droplet,
-    services: [
-      { id: "eau_res", name: "Facture d'eau résidentielle", description: "Payer votre facture SEN'EAU pour votre domicile." },
-      { id: "eau_pro", name: "Facture d'eau professionnelle", description: "Régler la facture SEN'EAU de votre entreprise." },
-      { id: "assainissement", name: "Paiement service assainissement", description: "Contribution pour les services d'assainissement." },
+    countryCode: "CI",
+    countryName: "Côte d'Ivoire",
+    flag: "🇨🇮",
+    ministries: [
+      {
+        id: "energie_ci",
+        name: "Ministère de l'Énergie (CIE)",
+        icon: Zap,
+        services: [
+          { id: "ci_elec_res", name: "Facture d'électricité (CIE)", description: "Payer votre facture d'électricité." },
+          { id: "ci_cash_power", name: "Achat de crédit Cash Power", description: "Recharger votre compteur prépayé." },
+        ],
+      },
+      {
+        id: "finances_ci",
+        name: "Ministère des Finances (DGI)",
+        icon: Landmark,
+        services: [
+          { id: "ci_impot_foncier", name: "Paiement Impôt Foncier", description: "Régler votre impôt foncier." },
+        ],
+      },
     ],
   },
   {
-    id: "finances",
-    name: "Ministère des Finances (Impôts et Domaines - DGID)",
-    icon: Landmark,
-    services: [
-      { id: "ir", name: "Paiement Impôt sur le Revenu", description: "Régler votre impôt sur le revenu." },
-      { id: "tva", name: "Paiement Taxe sur la Valeur Ajoutée (TVA)", description: "Déclarer et payer la TVA." },
-      { id: "patente", name: "Paiement Patente", description: "Payer votre patente annuelle." },
-      { id: "timbre", name: "Achat Timbre fiscal", description: "Acheter des timbres fiscaux numériques." },
+    countryCode: "BJ",
+    countryName: "Bénin",
+    flag: "🇧🇯",
+    ministries: [
+      {
+        id: "eau_bj",
+        name: "Ministère de l'Eau (SONEB)",
+        icon: Droplet,
+        services: [
+          { id: "bj_eau_facture", name: "Facture d'eau (SONEB)", description: "Payer votre facture d'eau." },
+        ],
+      },
+       {
+        id: "finances_bj",
+        name: "Ministère des Finances (DGI)",
+        icon: Landmark,
+        services: [
+          { id: "bj_taxe_tvm", name: "Paiement Taxe sur les Véhicules à Moteur (TVM)", description: "Régler la TVM pour votre véhicule." },
+        ],
+      },
     ],
   },
-  {
-    id: "collectivites",
-    name: "Ministère des Collectivités Territoriales (Mairies)",
-    icon: Building,
-    services: [
-      { id: "taxe_mun", name: "Taxe municipale (enlèvement des ordures)", description: "Payer la taxe d'enlèvement des ordures ménagères." },
-      { id: "droit_marche", name: "Droit de place (marché)", description: "Payer les droits de place pour les marchés." },
-    ],
-  },
-  {
-    id: "education",
-    name: "Ministère de l'Éducation Nationale",
-    icon: GraduationCap,
-    services: [
-      { id: "frais_sco", name: "Frais d'inscription scolaire/universitaire", description: "Payer les frais d'inscription." },
-      { id: "cantine", name: "Paiement cantine scolaire", description: "Contribution pour la cantine scolaire." },
-    ],
-  },
-  {
-    id: "sante",
-    name: "Ministère de la Santé et de l'Action Sociale",
-    icon: HeartPulse,
-    services: [
-      { id: "frais_hop", name: "Paiement frais hospitaliers", description: "Régler des frais médicaux ou hospitaliers." },
-      { id: "mutuelle", name: "Contribution mutuelle de santé", description: "Cotisation pour votre mutuelle de santé." },
-    ],
-  },
-  {
-    id: "autres",
-    name: "Autres Services Publics",
-    icon: Palette,
-    services: [
-      { id: "contravention", name: "Paiement contravention routière (ANASER)", description: "Régler une amende routière." },
-      { id: "pass_reno", name: "Renouvellement documents (ex: Passeport)", description: "Payer les frais de renouvellement de documents." },
-    ],
-  },
+  // Add other UEMOA countries here: ML, BF, NE, TG, GW
 ];
 
 export default function SelectServicePage() {
+  const [selectedCountry, setSelectedCountry] = React.useState<string>("SN");
+  const [servicesForCountry, setServicesForCountry] = React.useState<Ministry[]>(
+    allCountryServices.find(c => c.countryCode === "SN")?.ministries || []
+  );
+
+  const handleCountryChange = (countryCode: string) => {
+    setSelectedCountry(countryCode);
+    setServicesForCountry(
+      allCountryServices.find(c => c.countryCode === countryCode)?.ministries || []
+    );
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
-          <ShoppingCart className="h-8 w-8" /> Sélectionner un Service à Payer
+          <ShoppingCart className="h-8 w-8" /> Sélectionner un Service
         </h1>
         <Button variant="outline" asChild size="sm">
           <Link href="/dashboard">
@@ -111,41 +153,76 @@ export default function SelectServicePage() {
         </Button>
       </div>
       <p className="text-muted-foreground mb-8">
-        Choisissez le ministère et le service pour lequel vous souhaitez effectuer un paiement.
+        Choisissez d'abord le pays, puis le service pour lequel vous souhaitez effectuer un paiement.
       </p>
 
+      {/* Country Selector */}
+      <Card className="mb-8 shadow-sm border">
+        <CardContent className="p-6">
+            <div className="flex flex-col space-y-2">
+                <Label htmlFor="country-select" className="flex items-center gap-2 font-semibold">
+                    <Globe className="h-5 w-5 text-primary" />
+                    Pays
+                </Label>
+                <Select value={selectedCountry} onValueChange={handleCountryChange}>
+                    <SelectTrigger id="country-select">
+                        <SelectValue placeholder="Sélectionnez un pays..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {allCountryServices.map((country) => (
+                            <SelectItem key={country.countryCode} value={country.countryCode}>
+                                <div className="flex items-center gap-2">
+                                    <span>{country.flag}</span>
+                                    <span>{country.countryName}</span>
+                                </div>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+        </CardContent>
+      </Card>
+
+
+      {/* Services List */}
       <Accordion type="single" collapsible className="w-full space-y-4">
-        {ministriesData.map((ministry) => (
-          <AccordionItem value={ministry.id} key={ministry.id} className="border rounded-lg shadow-sm bg-card">
-            <AccordionTrigger className="p-4 text-lg font-medium hover:bg-muted/50 rounded-t-lg">
-              <div className="flex items-center gap-3">
-                <ministry.icon className="h-6 w-6 text-primary" />
-                <span>{ministry.name}</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="p-0">
-              <div className="divide-y divide-border">
-                {ministry.services.map((service) => (
-                  <div key={service.id} className="p-4 hover:bg-muted/30">
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                      <div>
-                        <h4 className="font-semibold text-card-foreground">{service.name}</h4>
-                        {service.description && (
-                          <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
-                        )}
+        {servicesForCountry.length > 0 ? (
+          servicesForCountry.map((ministry) => (
+            <AccordionItem value={ministry.id} key={ministry.id} className="border rounded-lg shadow-sm bg-card">
+              <AccordionTrigger className="p-4 text-lg font-medium hover:bg-muted/50 rounded-t-lg">
+                <div className="flex items-center gap-3 text-left">
+                  <ministry.icon className="h-6 w-6 text-primary flex-shrink-0" />
+                  <span>{ministry.name}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="p-0">
+                <div className="divide-y divide-border">
+                  {ministry.services.map((service) => (
+                    <div key={service.id} className="p-4 hover:bg-muted/30">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                        <div>
+                          <h4 className="font-semibold text-card-foreground">{service.name}</h4>
+                          {service.description && (
+                            <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
+                          )}
+                        </div>
+                        <Button asChild variant="secondary" size="sm" className="mt-2 sm:mt-0 flex-shrink-0">
+                          <Link href={`/payment?service_id=${service.id}&country_code=${selectedCountry}`}>
+                            Payer ce service
+                          </Link>
+                        </Button>
                       </div>
-                      <Button asChild variant="secondary" size="sm" className="mt-2 sm:mt-0 flex-shrink-0">
-                        <Link href={`/payment?service_id=${service.id}&ministry_id=${ministry.id}`}>
-                          Payer ce service
-                        </Link>
-                      </Button>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))
+        ) : (
+            <div className="text-center text-muted-foreground py-10">
+                <p>Aucun service disponible pour le pays sélectionné.</p>
+            </div>
+        )}
       </Accordion>
 
       <div className="mt-10 text-center text-xs text-muted-foreground">
@@ -155,4 +232,3 @@ export default function SelectServicePage() {
   );
 }
 
-    

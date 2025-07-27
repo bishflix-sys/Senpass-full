@@ -3,14 +3,12 @@
 
 import * as React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowDownToLine, Smartphone, Loader2 } from "lucide-react"; // Use Smartphone for Mobile Money
+import { ArrowDownToLine, Smartphone, Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -30,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import PhoneNumberInput from "@/components/phone-number-input"; // Import the new component
 
 // Schema for deposit validation
 const depositSchema = z.object({
@@ -41,19 +40,18 @@ const depositSchema = z.object({
     required_error: "Veuillez sélectionner une méthode de dépôt.",
   }),
   phoneNumber: z.string()
-    .min(1, "Le numéro de téléphone est requis.")
-    .regex(/^\+221\d{9}$/, "Format invalide. Utilisez +221 suivi de 9 chiffres (ex: +221771234567).")
-    .optional() // Make it optional initially, validate based on method
+    .min(9, "Le numéro de téléphone est requis.") // Adjusted for international format
+    .refine(phone => /^\+\d{10,}$/.test(phone), "Format de numéro de téléphone invalide.")
 }).refine((data) => {
-    // Require phone number if a mobile money method is selected
     if ((data.method === "wave" || data.method === "orange_money") && !data.phoneNumber) {
         return false;
     }
     return true;
 }, {
     message: "Le numéro de téléphone est requis pour cette méthode.",
-    path: ["phoneNumber"], // Specify the field this refinement applies to
+    path: ["phoneNumber"],
 });
+
 
 type DepositFormValues = z.infer<typeof depositSchema>;
 
@@ -72,7 +70,6 @@ export default function DepositPage() {
         },
     });
 
-    // Simulate deposit action
     const onSubmit = async (data: DepositFormValues) => {
         setIsSubmitting(true);
         const methodDisplay = data.method === 'wave' ? 'Wave' : 'Orange Money';
@@ -83,12 +80,8 @@ export default function DepositPage() {
 
         console.log("Deposit attempt:", data);
 
-        // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Simulate success or failure
-        const success = Math.random() > 0.1; // 90% success rate
-
+        const success = Math.random() > 0.1;
         setIsSubmitting(false);
 
         if (success) {
@@ -96,7 +89,6 @@ export default function DepositPage() {
                 title: "Dépôt Réussi",
                 description: `${data.amount.toLocaleString('fr-FR')} FCFA ont été ajoutés à votre portefeuille. Redirection...`,
             });
-            // Redirect back to dashboard page after success
             setTimeout(() => router.push('/dashboard'), 1500);
         } else {
             toast({
@@ -108,8 +100,7 @@ export default function DepositPage() {
     };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-lg"> {/* Constrain width */}
-        {/* Header */}
+    <div className="container mx-auto px-4 py-8 max-w-lg">
         <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold text-primary flex items-center gap-3">
                 <ArrowDownToLine className="h-7 w-7" /> Effectuer un Dépôt
@@ -122,7 +113,6 @@ export default function DepositPage() {
             Ajoutez des fonds à votre portefeuille via Mobile Money.
         </p>
 
-        {/* Deposit Form */}
         <Card className="shadow-lg border">
             <CardHeader>
                 <CardTitle>Déposer des fonds</CardTitle>
@@ -171,7 +161,6 @@ export default function DepositPage() {
                                           <Smartphone className="h-4 w-4 text-orange-600"/> Orange Money
                                        </span>
                                   </SelectItem>
-                                  {/* Add other methods like Yas Money, Payer here later */}
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -179,7 +168,6 @@ export default function DepositPage() {
                           )}
                         />
 
-                         {/* Conditionally render phone number based on selected method */}
                          {(form.watch("method") === "wave" || form.watch("method") === "orange_money") && (
                            <FormField
                               control={form.control}
@@ -188,23 +176,10 @@ export default function DepositPage() {
                                 <FormItem>
                                   <FormLabel className="flex items-center gap-1.5"><Smartphone className="h-4 w-4 text-muted-foreground"/> Numéro de téléphone Mobile Money</FormLabel>
                                   <FormControl>
-                                     <div className="flex items-center">
-                                        <span className="text-base font-medium p-2.5 bg-muted rounded-l-md border border-r-0 border-input h-11 flex items-center text-muted-foreground">
-                                          +221
-                                        </span>
-                                        <Input
-                                            type="tel"
-                                            placeholder="7X XXX XX XX"
-                                            {...field}
-                                            onChange={(e) => {
-                                                const digits = e.target.value.replace(/\D/g, '');
-                                                const numberPart = digits.startsWith('221') ? digits.substring(3, 12) : digits.substring(0, 9);
-                                                field.onChange(`+221${numberPart}`);
-                                            }}
-                                            className="rounded-l-none flex-1 h-11 text-base tracking-wider"
-                                            maxLength={13}
-                                        />
-                                      </div>
+                                      <PhoneNumberInput
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                      />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -226,12 +201,9 @@ export default function DepositPage() {
             </CardContent>
         </Card>
 
-         {/* Footer Security Note */}
         <div className="mt-6 text-center text-xs text-muted-foreground">
             Les dépôts sont traités de manière sécurisée.
         </div>
     </div>
   );
 }
-
-    
