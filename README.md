@@ -30,6 +30,21 @@ Connexions API standardisées pour les partenaires.
 
 Conformité avec les standards RGPD et ceux de la Smart Africa Alliance.
 
+## 🔐 Sécurisation des systèmes d'identification numérique : un pilier de la confiance digitale
+
+À l’ère numérique, protéger les systèmes d’identification est essentiel pour éviter les fuites de données, préserver la confiance des utilisateurs et prévenir les cyberattaques.
+
+### Principales bonnes pratiques :
+- **Analyse des risques** : identifier les failles et points d’accès critiques.
+- **Authentification forte** : privilégier la MFA et une gestion rigoureuse des identifiants.
+- **Contrôle des accès** : définir les rôles et limiter les droits au strict nécessaire.
+- **Surveillance active** : détecter et réagir aux activités suspectes.
+- **Blocage automatisé** : activer des défenses en temps réel.
+- **Chiffrement** : sécuriser les échanges avec TLS/SSL.
+- **Sensibilisation** : former les utilisateurs aux risques, notamment le phishing.
+- **Mises à jour** : corriger les vulnérabilités rapidement.
+- **Réponse aux incidents** : planifier les actions d’urgence et la reprise.
+
 👥 Utilisateurs cibles
 Citoyens sénégalais : accès simplifié à leurs droits et services.
 
@@ -52,4 +67,3 @@ Extension aux diasporas sénégalaises.
 
 📄 Licence
 Ce projet est développé sous la supervision de l’État du Sénégal. Toute reproduction ou réutilisation nécessite autorisation officielle.
-
