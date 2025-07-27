@@ -10,11 +10,11 @@ adminApp();
 
 // Schema for registration data validation
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  fullName: z.string().min(2),
-  cniOrPassport: z.string().min(5),
-  issueDate: z.string().date(), // Expecting 'YYYY-MM-DD' string
+  email: z.string().email({ message: "Adresse e-mail invalide." }),
+  password: z.string().min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." }),
+  fullName: z.string().min(2, { message: "Le nom complet est requis." }),
+  cniOrPassport: z.string().min(5, { message: "Le numéro CNI/Passeport est requis." }),
+  issueDate: z.string().min(1, { message: "La date d'émission est requise." }), // Accept as string, as sent by client
 });
 
 export async function POST(request: Request) {
@@ -23,7 +23,11 @@ export async function POST(request: Request) {
     const validation = registerSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json({ error: 'Invalid input', details: validation.error.formErrors }, { status: 400 });
+      // Return a more detailed error response
+      return NextResponse.json({ 
+          error: 'Invalid input', 
+          details: validation.error.flatten().fieldErrors 
+      }, { status: 400 });
     }
 
     const { email, password, fullName, cniOrPassport, issueDate } = validation.data;
@@ -53,9 +57,9 @@ export async function POST(request: Request) {
 
     // Handle specific Firebase errors
     if (error.code === 'auth/email-already-exists') {
-        return NextResponse.json({ error: error.code }, { status: 409 }); // 409 Conflict
+        return NextResponse.json({ error: 'Cet e-mail est déjà utilisé.', code: 'auth/email-already-exists' }, { status: 409 }); // 409 Conflict
     }
 
-    return NextResponse.json({ error: 'An internal error occurred' }, { status: 500 });
+    return NextResponse.json({ error: 'Une erreur interne est survenue.' }, { status: 500 });
   }
 }
