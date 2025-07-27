@@ -1,8 +1,7 @@
-
 "use client";
 
 import * as React from "react";
-import Image from "next/image"; // Importer Image
+import Image from "next/image";
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -24,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, LogIn, Building, Code, Loader2, User, Lock, UserPlus, Building2, CodeXml, ArrowLeft, Landmark, MessageCircle, KeyRound, Phone } from "lucide-react";
+import { QrCode, ScanFace, LogIn, Building, Code, Loader2, User, Lock, UserPlus, Building2, CodeXml, ArrowLeft, Landmark, Mail, KeyRound } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +36,6 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import PhoneNumberInput from "@/components/phone-number-input";
 
 // Dynamically import dialog content components
 const FacialRecognitionDialogContent = dynamic(() => import("@/components/facial-recognition-dialog-content"), {
@@ -56,23 +54,6 @@ const DeveloperRegistrationDialogContent = dynamic(() => import("@/components/de
 
 
 const VALID_LOGIN_TABS = ['individuals', 'business', 'developers', 'ministries'];
-const SIMULATED_OTP = "123456"; // For demonstration purposes
-
-type LoginState = {
-    phoneNumber: string;
-    otp: string;
-    isOtpSent: boolean;
-    isSubmitting: boolean;
-    isOtpSubmitting: boolean;
-};
-
-const initialLoginState: LoginState = {
-    phoneNumber: "+221",
-    otp: "",
-    isOtpSent: false,
-    isSubmitting: false,
-    isOtpSubmitting: false,
-};
 
 export default function LoginPage() {
   const { toast } = useToast();
@@ -86,12 +67,10 @@ export default function LoginPage() {
   const [isBusinessRegistrationDialogOpen, setIsBusinessRegistrationDialogOpen] = React.useState(false);
   const [isDeveloperRegistrationDialogOpen, setIsDeveloperRegistrationDialogOpen] = React.useState(false);
   
-  // State for each login tab
-  const [individualLoginState, setIndividualLoginState] = React.useState<LoginState>(initialLoginState);
-  const [businessLoginState, setBusinessLoginState] = React.useState<LoginState>(initialLoginState);
-  const [developerLoginState, setDeveloperLoginState] = React.useState<LoginState>(initialLoginState);
-  const [ministryLoginState, setMinistryLoginState] = React.useState<LoginState>(initialLoginState);
-
+  // State for the individuals login form
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
 
   // Determine active tab from URL query parameter
   const requestedTab = searchParams.get('tab');
@@ -121,100 +100,54 @@ export default function LoginPage() {
     }
     return () => { if (intervalId) clearInterval(intervalId); };
   }, [isQrDialogOpen]);
-
-  const handleSendOtp = async (stateSetter: React.Dispatch<React.SetStateAction<LoginState>>) => {
-      stateSetter(prev => ({ ...prev, isSubmitting: true }));
-      toast({
-          title: "Envoi de l'OTP...",
-          description: "Un code de vérification est envoyé (simulation).",
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
-
-      stateSetter(prev => ({ ...prev, isSubmitting: false, isOtpSent: true }));
-      toast({
-          title: "Code Envoyé!",
-          description: `Pour la démo, le code est : ${SIMULATED_OTP}`,
-      });
-  };
   
-  const handleVerifyOtp = async (state: LoginState, stateSetter: React.Dispatch<React.SetStateAction<LoginState>>, targetPath: string) => {
-      stateSetter(prev => ({ ...prev, isOtpSubmitting: true }));
+  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (state.otp === SIMULATED_OTP) {
-          toast({
-              title: "Connexion Réussie!",
-              description: `Redirection vers le portail.`,
-          });
-          setTimeout(() => router.push(targetPath), 800);
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Connexion Réussie!",
+          description: "Redirection vers votre tableau de bord.",
+        });
+        router.push('/dashboard');
       } else {
-          toast({
-              title: "Échec de la Connexion",
-              description: "Le code OTP est incorrect.",
-              variant: "destructive",
-          });
-          stateSetter(prev => ({ ...prev, isOtpSubmitting: false }));
+        toast({
+          title: "Échec de la Connexion",
+          description: data.error || "Les informations de connexion sont incorrectes.",
+          variant: "destructive",
+        });
       }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur de communication est survenue. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-
-  const renderLoginForm = (
-    state: LoginState,
-    stateSetter: React.Dispatch<React.SetStateAction<LoginState>>,
-    targetDashboard: string,
-    registrationTrigger?: React.ReactNode
-  ) => {
-    return (
-        <div className="space-y-4">
-            {!state.isOtpSent ? (
-                <div className="space-y-4">
-                    <div>
-                      <Label htmlFor={`phone-${targetDashboard}`}>Numéro de téléphone</Label>
-                      <PhoneNumberInput
-                          id={`phone-${targetDashboard}`}
-                          value={state.phoneNumber}
-                          onChange={(value) => stateSetter(prev => ({...prev, phoneNumber: value}))}
-                          disabled={state.isSubmitting}
-                      />
-                    </div>
-                    <Button onClick={() => handleSendOtp(stateSetter)} className="w-full h-11 text-base" disabled={state.isSubmitting || state.phoneNumber.length < 10}>
-                        {state.isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <MessageCircle className="mr-2 h-5 w-5" />}
-                        Envoyer le code
-                    </Button>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    <div>
-                        <Label htmlFor={`otp-${targetDashboard}`}>Code OTP</Label>
-                        <Input 
-                            id={`otp-${targetDashboard}`} 
-                            type="text" 
-                            placeholder="Entrez le code à 6 chiffres" 
-                            value={state.otp} 
-                            onChange={(e) => stateSetter(prev => ({...prev, otp: e.target.value}))}
-                            maxLength={6}
-                            className="text-center tracking-widest text-lg h-12"
-                            disabled={state.isOtpSubmitting}
-                        />
-                    </div>
-                    <Button onClick={() => handleVerifyOtp(state, stateSetter, targetDashboard)} className="w-full h-11 text-base" disabled={state.isOtpSubmitting || state.otp.length !== 6}>
-                        {state.isOtpSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogIn className="mr-2 h-5 w-5" />}
-                        Se connecter
-                    </Button>
-                    <Button variant="link" size="sm" onClick={() => stateSetter(prev => ({...prev, isOtpSent: false, otp: ''}))} className="w-full text-primary">
-                        Changer de numéro
-                    </Button>
-                </div>
-            )}
-             {registrationTrigger && (
-                 <div className="text-center pt-2">{registrationTrigger}</div>
-            )}
-        </div>
-    );
+  const createSimulatedLoginHandler = (path: string) => () => {
+    toast({
+        title: "Connexion en cours...",
+        description: `Cette section est en démonstration. Redirection vers ${path.split('-')[0]}.`
+    });
+    setTimeout(() => {
+        router.push(path);
+    }, 800);
   };
-
 
   return (
     <div className="flex flex-col justify-center items-center py-12 min-h-screen bg-background">
@@ -243,9 +176,47 @@ export default function LoginPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              {renderLoginForm(individualLoginState, setIndividualLoginState, '/dashboard', 
-                 <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> Pas encore de compte ? S'inscrire</Button></DialogTrigger>{isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog>
-              )}
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center gap-1.5"><Mail className="h-4 w-4"/> E-mail</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="exemple@email.sn" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required 
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="flex items-center gap-1.5"><KeyRound className="h-4 w-4"/> Mot de passe</Label>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading} 
+                  />
+                </div>
+                <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <LogIn className="mr-2 h-5 w-5" />}
+                  Se connecter
+                </Button>
+              </form>
+              
+              <div className="text-center pt-2">
+                <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5">
+                      <UserPlus className="h-4 w-4" /> Pas encore de compte ? S'inscrire
+                    </Button>
+                  </DialogTrigger>
+                  {isRegistrationDialogOpen && <RegistrationDialogContent onSuccess={handleRegistrationSuccess} />}
+                </Dialog>
+              </div>
 
               <div className="relative my-6"><div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-3 text-muted-foreground">Ou utiliser une autre méthode</span></div></div>
               
@@ -269,9 +240,10 @@ export default function LoginPage() {
               <CardDescription>Accès sécurisé pour les organisations partenaires.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 {renderLoginForm(businessLoginState, setBusinessLoginState, '/business-dashboard',
-                    <Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog>
-                 )}
+                 <Button onClick={createSimulatedLoginHandler('/business-dashboard')} className="w-full h-11 text-base">
+                    <LogIn className="mr-2 h-5 w-5" /> Accéder au portail Entreprise
+                 </Button>
+                 <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
           </Card>
@@ -285,9 +257,10 @@ export default function LoginPage() {
               <CardDescription>Accès aux APIs et outils d'intégration.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                {renderLoginForm(developerLoginState, setDeveloperLoginState, '/developer-dashboard',
-                    <Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog>
-                )}
+                <Button onClick={createSimulatedLoginHandler('/developer-dashboard')} className="w-full h-11 text-base">
+                    <LogIn className="mr-2 h-5 w-5" /> Accéder au portail Développeur
+                 </Button>
+                 <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
           </Card>
@@ -301,7 +274,9 @@ export default function LoginPage() {
               <CardDescription>Portail sécurisé pour les institutions ministérielles.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 {renderLoginForm(ministryLoginState, setMinistryLoginState, '/ministry-dashboard')}
+                 <Button onClick={createSimulatedLoginHandler('/ministry-dashboard')} className="w-full h-11 text-base">
+                    <LogIn className="mr-2 h-5 w-5" /> Accéder au portail Ministère
+                 </Button>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés des ministères.</p></CardFooter>
           </Card>
@@ -315,5 +290,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
