@@ -347,7 +347,7 @@ const DeveloperRegistrationDialogContent: React.FC<DeveloperRegistrationDialogCo
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    Je consens au traitement de mes données et j'accepte les{" "}
+                    J'accepte les{" "}
                     <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
                        Conditions d'Utilisation des APIs
                     </Link>

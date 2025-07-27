@@ -265,7 +265,7 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    Je consens au traitement des données de mon organisation et j'accepte les{" "}
+                     J'accepte les{" "}
                     <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
                       Conditions d'Utilisation
                     </Link>{" "}
