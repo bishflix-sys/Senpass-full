@@ -10,6 +10,7 @@ import ServiceShortcuts from "@/components/service-shortcuts";
 import FeatureCard from "@/components/feature-card";
 import LogoutButton from "@/components/logout-button";
 import IdCardDisplay from "@/components/id-card-display"; // Import the new IdCardDisplay
+import NotificationSimulation from "@/components/notification-simulation"; // Import NotificationSimulation
 import {
   Fingerprint,
   ScanFace,
@@ -147,11 +148,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                  </div>
               </div>
               {/* Skeleton for Activity and Alerts row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                 <Skeleton className="h-32 rounded-lg" /> {/* Activity Card Skeleton */}
-                 <Skeleton className="h-32 rounded-lg" /> {/* Alerts Card Skeleton */}
-                 <Skeleton className="h-32 rounded-lg" /> {/* Security Monitoring Card Skeleton */}
-              </div>
+               <Skeleton className="h-72 rounded-lg" /> {/* Notification Card Skeleton */}
            </div>
          </div>
           <Separator className="my-6" />
@@ -276,50 +273,8 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
                   </div>
               </div>
 
-              {/* Grid for Recent Activity, Important Alerts, and Security Monitoring */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                 {/* Recent Activity Card */}
-                  <Card className="shadow-sm border">
-                    <CardHeader>
-                       <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                          <Activity className="h-5 w-5 text-primary" /> Activité récente
-                       </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                       <p className="text-sm text-muted-foreground">Aucune activité récente à afficher.</p>
-                       {/* Future: List recent logins, verifications etc. */}
-                    </CardContent>
-                  </Card>
-
-                  {/* Important Alerts Card */}
-                  <Card className="shadow-sm border">
-                     <CardHeader>
-                       <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                          <AlertTriangle className="h-5 w-5 text-destructive" /> Alertes importantes
-                       </CardTitle>
-                    </CardHeader>
-                     <CardContent className="space-y-1">
-                       <p className="text-sm text-muted-foreground">Aucune alerte urgente pour le moment.</p>
-                       <p className="text-xs text-muted-foreground mt-2">SenPass vous notifiera des échéances importantes et des services pertinents à venir.</p>
-                     </CardContent>
-                  </Card>
-
-                  {/* Security Monitoring Card */}
-                  <Card className="shadow-sm border">
-                     <CardHeader>
-                       <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                          <ShieldAlert className="h-5 w-5 text-primary" /> Surveillance Sécurité Active
-                       </CardTitle>
-                    </CardHeader>
-                     <CardContent className="space-y-2">
-                       <p className="text-sm text-muted-foreground">Nos systèmes, incluant une supervision par IA, analysent en continu les activités et l'état de la plateforme pour protéger votre compte et assurer la stabilité des services.</p>
-                       <p className="text-sm font-medium text-green-600">Statut : Protégé et Opérationnel</p>
-                       <Button variant="link" size="sm" className="p-0 h-auto text-xs text-primary" onClick={() => toast({title: "Information", description:"Les journaux de sécurité et de performance ne sont pas disponibles pour cette démonstration."})} disabled>
-                         Voir les journaux
-                       </Button>
-                     </CardContent>
-                  </Card>
-              </div>
+               {/* Notifications Card */}
+               <NotificationSimulation />
           </div>
         </div>
 
