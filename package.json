@@ -43,6 +43,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "firebase": "^11.3.0",
+    "firebase-admin": "^12.3.0",
     "geist": "^1.4.1",
     "genkit": "^1.6.2",
     "lucide-react": "^0.475.0",

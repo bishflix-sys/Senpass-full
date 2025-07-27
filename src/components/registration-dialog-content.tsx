@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound, UserCircle, Hash } from "lucide-react";
 import {
@@ -136,29 +135,47 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
 
   async function onSubmit(data: RegistrationFormValues) {
     setIsSubmitting(true);
-    console.log("Registration data:", data);
-
-    // API call for registration
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // success/failure (e.g., 90% success)
-    const success = Math.random() > 0.1;
-    setIsSubmitting(false);
-
-    if (success) {
-      toast({
-        title: "Inscription Réussie",
-        description: "Votre compte a été créé. Un email de vérification vous a été envoyé.",
+    
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          issueDate: format(data.issueDate, "yyyy-MM-dd") // Format date for API
+        }),
       });
-      form.reset(); // Reset form on success
-      onSuccess(); // Call the success callback (e.g., close dialog)
-    } else {
-      toast({
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Inscription Réussie",
+          description: "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
+        });
+        form.reset();
+        onSuccess();
+      } else {
+        // Handle specific errors from the backend
+        const errorMessage = result.error === 'auth/email-already-exists' 
+            ? "Cette adresse e-mail est déjà utilisée." 
+            : "Une erreur s'est produite. Veuillez réessayer.";
+        toast({
+          title: "Échec de l'Inscription",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+       console.error("Registration error:", error);
+       toast({
         title: "Échec de l'Inscription",
-        description: "Une erreur s'est produite. Veuillez réessayer.",
+        description: "Une erreur de communication est survenue.",
         variant: "destructive",
       });
-       form.setValue('captchaValid', false);
+    } finally {
+        setIsSubmitting(false);
+        form.setValue('captchaValid', false); // Reset captcha on submit attempt
     }
   }
 
