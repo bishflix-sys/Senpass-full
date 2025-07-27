@@ -7,13 +7,11 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarIcon, Loader2, Building2, UserCircle, Hash, Briefcase, Mail, KeyRound } from "lucide-react"; // Icons for business registration
+import { Loader2, Building2, UserCircle, Briefcase, Mail, KeyRound } from "lucide-react"; // Icons for business registration
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,27 +25,17 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale"; // French locale for date picker
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
 // Business Registration Form Schema
 const businessRegistrationSchema = z.object({
   representativeName: z.string().min(2, "Le nom du représentant est requis."),
-  representativeId: z.string().min(5, "Le numéro d'identification (NIN/CNIB) est requis."),
   companyName: z.string().min(2, "Le nom de l'entreprise est requis."),
-  ninea: z.string().min(5, "Le NINEA est requis."), // Add specific NINEA format later if needed
-  idIssueDate: z.date({
-    required_error: "La date d'émission de la pièce d'identité est requise.",
-  }),
   email: z.string().email("L'adresse e-mail est invalide."),
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
   termsAccepted: z.boolean().refine(val => val === true, {
-    message: "Vous devez accepter les conditions et la politique de confidentialité.",
+    message: "Vous devez accepter les conditions.",
   }),
 });
 
@@ -65,10 +53,7 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
     resolver: zodResolver(businessRegistrationSchema),
     defaultValues: {
       representativeName: "",
-      representativeId: "",
       companyName: "",
-      ninea: "",
-      idIssueDate: undefined,
       email: "",
       password: "",
       termsAccepted: false,
@@ -77,28 +62,23 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
 
   async function onSubmit(data: BusinessRegistrationFormValues) {
     setIsSubmitting(true);
-    console.log("Business Registration data:", {
-        ...data,
-        idIssueDate: data.idIssueDate.toISOString().split('T')[0] // Format date for logging
-    });
+    console.log("Business Registration data:", data);
 
-    // Simulate API call for business registration
-    await new Promise(resolve => setTimeout(resolve, 1800)); // Slightly longer delay
+    await new Promise(resolve => setTimeout(resolve, 1800));
 
-    // Simulate success/failure
     const success = Math.random() > 0.15;
     setIsSubmitting(false);
 
     if (success) {
       toast({
         title: "Inscription Entreprise Réussie",
-        description: "Votre compte entreprise/institution a été créé. Un email de vérification a été envoyé.",
+        description: "Votre compte a été créé. Un email de vérification a été envoyé.",
       });
-      form.reset(); // Reset form on success
-      onSuccess(); // Call the success callback
+      form.reset();
+      onSuccess();
     } else {
       toast({
-        title: "Échec de l'Inscription Entreprise",
+        title: "Échec de l'Inscription",
         description: "Une erreur s'est produite. Vérifiez vos informations et réessayez.",
         variant: "destructive",
       });
@@ -106,10 +86,10 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
   }
 
   return (
-    <DialogContent className="sm:max-w-lg">
+    <DialogContent className="sm:max-w-md">
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2 text-xl">
-           <Building2 className="h-6 w-6" /> Inscription Entreprise / Institution
+           <Building2 className="h-6 w-6" /> Inscription Entreprise
         </DialogTitle>
         <DialogDescription>
           Créez un compte partenaire pour votre organisation.
@@ -117,47 +97,13 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
       </DialogHeader>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
-          {/* Representative Name */}
-          <FormField
-            control={form.control}
-            name="representativeName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-1.5"><UserCircle className="h-4 w-4 text-muted-foreground"/> Nom complet du représentant légal*</FormLabel>
-                <FormControl>
-                  <Input placeholder="Prénom(s) Nom" {...field} />
-                </FormControl>
-                <FormDescription className="text-xs">
-                  Tel qu'indiqué sur la pièce d'identité officielle.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Representative ID */}
-          <FormField
-            control={form.control}
-            name="representativeId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-1.5"><Hash className="h-4 w-4 text-muted-foreground"/> Numéro d'identification national (NIN ou CNIB)*</FormLabel>
-                <FormControl>
-                  <Input placeholder="Numéro d'identification personnel" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Company Name */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
           <FormField
             control={form.control}
             name="companyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-1.5"><Briefcase className="h-4 w-4 text-muted-foreground"/> Nom de l'entreprise / Institution*</FormLabel>
+                <FormLabel className="flex items-center gap-1.5"><Briefcase className="h-4 w-4 text-muted-foreground"/> Nom de l'entreprise*</FormLabel>
                 <FormControl>
                   <Input placeholder="Nom officiel de l'organisation" {...field} />
                 </FormControl>
@@ -166,72 +112,23 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
             )}
           />
 
-          {/* NINEA */}
           <FormField
             control={form.control}
-            name="ninea"
+            name="representativeName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-1.5"><Hash className="h-4 w-4 text-muted-foreground"/> NINEA*</FormLabel>
+                <FormLabel className="flex items-center gap-1.5"><UserCircle className="h-4 w-4 text-muted-foreground"/> Nom du représentant*</FormLabel>
                 <FormControl>
-                  <Input placeholder="Numéro d'identification national des entreprises" {...field} />
+                  <Input placeholder="Prénom(s) Nom" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          {/* ID Issue Date */}
-          <FormField
-            control={form.control}
-            name="idIssueDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date d'émission de la pièce d'identité*</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "dd/MM/yyyy", { locale: fr })
-                        ) : (
-                          <span>JJ / MM / AAAA</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1950-01-01") // Adjusted min date
-                      }
-                      initialFocus
-                      locale={fr} // Use French locale
-                    />
-                  </PopoverContent>
-                </Popover>
-                 <FormDescription className="text-xs">
-                    Date d'émission de la pièce d'identité du représentant légal.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-           {/* Email */}
-            <FormField control={form.control} name="email" render={({ field }) => (
+          
+           <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-muted-foreground"/> Adresse e-mail du représentant*</FormLabel>
+                <FormLabel className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-muted-foreground"/> Adresse e-mail*</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="contact@entreprise.com" {...field} />
                 </FormControl>
@@ -239,7 +136,6 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
               </FormItem>
             )} />
 
-            {/* Password */}
             <FormField control={form.control} name="password" render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1.5"><KeyRound className="h-4 w-4 text-muted-foreground"/> Mot de passe*</FormLabel>
@@ -250,26 +146,24 @@ const BusinessRegistrationDialogContent: React.FC<BusinessRegistrationDialogCont
               </FormItem>
             )} />
 
-          {/* Terms and Conditions */}
           <FormField
             control={form.control}
             name="termsAccepted"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 pt-2">
                 <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    aria-label="Accepter les conditions et la politique de confidentialité"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
-                  <FormLabel className="font-normal">
+                  <FormLabel className="font-normal text-sm">
                      J'accepte les{" "}
                     <Link href="/terms" target="_blank" className="text-primary underline hover:no-underline">
-                      Conditions d'Utilisation
+                      Conditions
                     </Link>{" "}
-                     et la {" "}
+                     & la {" "}
                     <Link href="/privacy" target="_blank" className="text-primary underline hover:no-underline">
                       Politique de Confidentialité
                     </Link>

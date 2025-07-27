@@ -56,6 +56,77 @@ const DeveloperRegistrationDialogContent = dynamic(() => import("@/components/de
 
 const VALID_LOGIN_TABS = ['individuals', 'business', 'developers', 'ministries'];
 
+// Generic Login Form Component
+const LoginForm = ({
+  userType,
+  targetPath,
+}: {
+  userType: string;
+  targetPath: string;
+}) => {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    toast({
+      title: "Vérification en cours...",
+      description: `Tentative de connexion au portail ${userType}.`,
+    });
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Simulate success
+    toast({
+      title: `Connexion ${userType} Réussie!`,
+      description: "Redirection vers votre tableau de bord.",
+    });
+
+    router.push(targetPath);
+    setIsLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleLogin} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor={`${userType}-email`} className="flex items-center gap-1.5"><Mail className="h-4 w-4"/> E-mail</Label>
+        <Input 
+          id={`${userType}-email`}
+          type="email" 
+          placeholder="exemple@email.com" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required 
+          disabled={isLoading}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor={`${userType}-password`} className="flex items-center gap-1.5"><KeyRound className="h-4 w-4"/> Mot de passe</Label>
+        <Input 
+          id={`${userType}-password`}
+          type="password" 
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isLoading} 
+        />
+      </div>
+      <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+        {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <LogIn className="mr-2 h-5 w-5" />}
+        Se connecter
+      </Button>
+    </form>
+  );
+};
+
+
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
@@ -138,16 +209,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const createSimulatedLoginHandler = (path: string) => () => {
-    toast({
-        title: "Connexion en cours...",
-        description: `Cette section est en démonstration. Redirection vers ${path.split('-')[0]}.`
-    });
-    setTimeout(() => {
-        router.push(path);
-    }, 800);
   };
 
   return (
@@ -241,10 +302,8 @@ export default function LoginPage() {
               <CardDescription>Accès sécurisé pour les organisations partenaires.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 <Button onClick={createSimulatedLoginHandler('/business-dashboard')} className="w-full h-11 text-base">
-                    <LogIn className="mr-2 h-5 w-5" /> Accéder au portail Entreprise
-                 </Button>
-                 <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise/institution</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
+                 <LoginForm userType="Entreprise" targetPath="/business-dashboard" />
+                 <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
           </Card>
@@ -258,9 +317,7 @@ export default function LoginPage() {
               <CardDescription>Accès aux APIs et outils d'intégration.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                <Button onClick={createSimulatedLoginHandler('/developer-dashboard')} className="w-full h-11 text-base">
-                    <LogIn className="mr-2 h-5 w-5" /> Accéder au portail Développeur
-                 </Button>
+                 <LoginForm userType="Développeur" targetPath="/developer-dashboard" />
                  <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
@@ -272,14 +329,12 @@ export default function LoginPage() {
           <Card className="shadow-lg border">
             <CardHeader>
               <CardTitle className="text-xl">Accès Ministères</CardTitle>
-              <CardDescription>Portail sécurisé pour les institutions ministérielles.</CardDescription>
+              <CardDescription>Portail sécurisé pour les institutions.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 <Button onClick={createSimulatedLoginHandler('/ministry-dashboard')} className="w-full h-11 text-base">
-                    <LogIn className="mr-2 h-5 w-5" /> Accéder au portail Ministère
-                 </Button>
+                 <LoginForm userType="Ministère" targetPath="/ministry-dashboard" />
             </CardContent>
-            <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés des ministères.</p></CardFooter>
+            <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés.</p></CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
