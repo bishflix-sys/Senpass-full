@@ -8,30 +8,31 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Input, type InputProps } from "@/components/ui/input";
 import { ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AsYouType, isValidPhoneNumber, type CountryCode } from "libphonenumber-js";
 
 interface Country {
-  value: string;
+  value: CountryCode;
   label: string;
   dialCode: string;
   flag: string;
 }
 
 const countries: Country[] = [
-    { value: "sn", label: "Sénégal", dialCode: "+221", flag: "🇸🇳" },
-    { value: "ci", label: "Côte d'Ivoire", dialCode: "+225", flag: "🇨🇮" },
-    { value: "ml", label: "Mali", dialCode: "+223", flag: "🇲🇱" },
-    { value: "bj", label: "Bénin", dialCode: "+229", flag: "🇧🇯" },
-    { value: "bf", label: "Burkina Faso", dialCode: "+226", flag: "🇧🇫" },
-    { value: "ne", label: "Niger", dialCode: "+227", flag: "🇳🇪" },
-    { value: "tg", label: "Togo", dialCode: "+228", flag: "🇹🇬" },
-    { value: "gw", label: "Guinée-Bissau", dialCode: "+245", flag: "🇬🇼" },
-    { value: "fr", label: "France", dialCode: "+33", flag: "🇫🇷" },
-    { value: "us", label: "United States", dialCode: "+1", flag: "🇺🇸" },
-    { value: "gb", label: "United Kingdom", dialCode: "+44", flag: "🇬🇧" },
+    { value: "SN", label: "Sénégal", dialCode: "+221", flag: "🇸🇳" },
+    { value: "CI", label: "Côte d'Ivoire", dialCode: "+225", flag: "🇨🇮" },
+    { value: "ML", label: "Mali", dialCode: "+223", flag: "🇲🇱" },
+    { value: "BJ", label: "Bénin", dialCode: "+229", flag: "🇧🇯" },
+    { value: "BF", label: "Burkina Faso", dialCode: "+226", flag: "🇧🇫" },
+    { value: "NE", label: "Niger", dialCode: "+227", flag: "🇳🇪" },
+    { value: "TG", label: "Togo", dialCode: "+228", flag: "🇹🇬" },
+    { value: "GW", label: "Guinée-Bissau", dialCode: "+245", flag: "🇬🇼" },
+    { value: "FR", label: "France", dialCode: "+33", flag: "🇫🇷" },
+    { value: "US", label: "United States", dialCode: "+1", flag: "🇺🇸" },
+    { value: "GB", label: "United Kingdom", dialCode: "+44", flag: "🇬🇧" },
 ];
 
 interface PhoneNumberInputProps extends Omit<InputProps, 'onChange' | 'value'> {
-  value: string;
+  value: string; // Should be the full E.164 number, e.g., "+221771234567"
   onChange: (value: string) => void;
 }
 
@@ -39,31 +40,43 @@ const PhoneNumberInput = React.forwardRef<HTMLInputElement, PhoneNumberInputProp
   ({ className, value, onChange, ...props }, ref) => {
     const [open, setOpen] = React.useState(false);
     
-    // Find the country that matches the start of the phone number value
-    const countryFromValue = countries.find(c => value.startsWith(c.dialCode));
-    const [selectedCountry, setSelectedCountry] = React.useState<Country>(countryFromValue || countries[0]);
+    // Determine selected country and national number from the E.164 value
+    const getCountryAndNationalNumber = (e164Number: string) => {
+        const asYouType = new AsYouType();
+        asYouType.input(e164Number);
+        const country = asYouType.getCountry();
+        const nationalNumber = asYouType.getNationalNumber();
+        const selected = countries.find(c => c.value === country);
+        return { selected, nationalNumber };
+    };
+    
+    const { selected: initialCountry, nationalNumber: initialNationalNumber } = getCountryAndNationalNumber(value);
 
-    // Update selected country if the value changes from the outside (e.g. form reset)
+    const [selectedCountry, setSelectedCountry] = React.useState<Country>(initialCountry || countries.find(c => c.value === 'SN')!);
+    const [nationalNumber, setNationalNumber] = React.useState(initialNationalNumber || '');
+
+    // Update internal state if the external value changes
     React.useEffect(() => {
-        const newCountry = countries.find(c => value.startsWith(c.dialCode)) || countries[0];
-        setSelectedCountry(newCountry);
+        const { selected, nationalNumber } = getCountryAndNationalNumber(value);
+        if (selected) {
+            setSelectedCountry(selected);
+        }
+        setNationalNumber(nationalNumber);
     }, [value]);
 
 
     const handleCountrySelect = (country: Country) => {
       setSelectedCountry(country);
-      const nationalNumber = value.replace(selectedCountry.dialCode, "");
-      onChange(country.dialCode + nationalNumber);
+      const newE164Number = `${country.dialCode}${nationalNumber.replace(/\D/g, '')}`;
+      onChange(newE164Number);
       setOpen(false);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      let inputValue = e.target.value.replace(/[^+\d]/g, ''); // Allow only digits and +
-      // Ensure the dial code is always present at the start
-      if (!inputValue.startsWith(selectedCountry.dialCode)) {
-        inputValue = selectedCountry.dialCode + inputValue.replace(/\D/g, "");
-      }
-      onChange(inputValue);
+    const handleNationalNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const formatted = new AsYouType(selectedCountry.value).input(e.target.value);
+      setNationalNumber(formatted);
+      const newE164Number = `${selectedCountry.dialCode}${e.target.value.replace(/\D/g, '')}`;
+      onChange(newE164Number);
     };
 
     return (
@@ -108,15 +121,20 @@ const PhoneNumberInput = React.forwardRef<HTMLInputElement, PhoneNumberInputProp
             </Command>
           </PopoverContent>
         </Popover>
-        <Input
-          ref={ref}
-          type="tel"
-          className={cn("rounded-l-none", className)}
-          value={value}
-          onChange={handleInputChange}
-          placeholder="Numéro de téléphone"
-          {...props}
-        />
+        <div className="relative flex-1">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                {selectedCountry.dialCode}
+            </div>
+            <Input
+              ref={ref}
+              type="tel"
+              className={cn("rounded-l-none pl-16", className)} // Adjust padding for the dial code
+              value={nationalNumber}
+              onChange={handleNationalNumberChange}
+              placeholder="77 123 45 67"
+              {...props}
+            />
+        </div>
       </div>
     );
   }

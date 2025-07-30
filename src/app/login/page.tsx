@@ -7,6 +7,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { isValidPhoneNumber, type CountryCode } from 'libphonenumber-js';
 import {
   Tabs,
   TabsContent,
@@ -24,7 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ScanFace, LogIn, Building, Code, Loader2, User, Lock, UserPlus, Building2, CodeXml, ArrowLeft, Landmark, Mail, KeyRound } from "lucide-react";
+import { QrCode, ScanFace, LogIn, Building, Code, Loader2, User, Lock, UserPlus, Building2, CodeXml, ArrowLeft, Landmark, Mail, KeyRound, Smartphone, MessageSquare } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import PhoneNumberInput from "@/components/phone-number-input"; // Import the component
 
 // Dynamically import dialog content components
 const FacialRecognitionDialogContent = dynamic(() => import("@/components/facial-recognition-dialog-content"), {
@@ -126,6 +128,87 @@ const LoginForm = ({
   );
 };
 
+const PhoneLoginForm = () => {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [phoneNumber, setPhoneNumber] = React.useState("+221"); // Default to Senegal
+  const [otp, setOtp] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [otpSent, setOtpSent] = React.useState(false);
+  const [expectedOtp, setExpectedOtp] = React.useState("");
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValidPhoneNumber(phoneNumber)) {
+        toast({ title: "Erreur", description: "Veuillez entrer un numéro de téléphone valide.", variant: "destructive" });
+        return;
+    }
+    setIsLoading(true);
+    try {
+        const response = await fetch('/api/auth/phone-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phoneNumber }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            toast({ title: "Code envoyé", description: data.message });
+            setOtpSent(true);
+            setExpectedOtp(data.otp); // For demo purpose only
+        } else {
+            toast({ title: "Erreur", description: data.error, variant: "destructive" });
+        }
+    } catch (error) {
+        toast({ title: "Erreur", description: "Impossible d'envoyer le code. Réessayez.", variant: "destructive" });
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => {
+        if (otp === expectedOtp && otp !== "") {
+            toast({ title: "Connexion Réussie!", description: "Redirection vers votre tableau de bord." });
+            router.push('/dashboard');
+        } else {
+            toast({ title: "Échec", description: "Le code est incorrect.", variant: "destructive" });
+        }
+        setIsLoading(false);
+    }, 1000);
+  };
+
+  return (
+    <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp} className="space-y-4">
+        {!otpSent ? (
+            <>
+                <div className="space-y-2">
+                    <Label htmlFor="phone" className="flex items-center gap-1.5"><Smartphone className="h-4 w-4"/> Numéro de téléphone</Label>
+                    <PhoneNumberInput id="phone" value={phoneNumber} onChange={setPhoneNumber} disabled={isLoading} />
+                </div>
+                <Button type="submit" className="w-full h-11 text-base" disabled={isLoading || !isValidPhoneNumber(phoneNumber)}>
+                    {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <MessageSquare className="mr-2 h-5 w-5" />}
+                    Envoyer le code
+                </Button>
+            </>
+        ) : (
+            <>
+                <div className="space-y-2">
+                    <Label htmlFor="otp" className="flex items-center gap-1.5"><KeyRound className="h-4 w-4"/> Code de vérification (OTP)</Label>
+                    <Input id="otp" type="text" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} required disabled={isLoading} inputMode="numeric" />
+                </div>
+                <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <LogIn className="mr-2 h-5 w-5" />}
+                    Se connecter
+                </Button>
+                <Button variant="link" size="sm" onClick={() => setOtpSent(false)} className="w-full">Changer de numéro</Button>
+            </>
+        )}
+    </form>
+  );
+};
+
 
 export default function LoginPage() {
   const { toast } = useToast();
@@ -147,6 +230,8 @@ export default function LoginPage() {
   // Determine active tab from URL query parameter
   const requestedTab = searchParams.get('tab');
   const activeTab = VALID_LOGIN_TABS.includes(requestedTab ?? '') ? requestedTab : 'individuals';
+  const [activeIndividualTab, setActiveIndividualTab] = React.useState('email');
+
 
    const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => {
       setShowFacialRecognitionDialog(false);
@@ -238,36 +323,47 @@ export default function LoginPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-1.5"><Mail className="h-4 w-4"/> E-mail</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="exemple@email.sn" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required 
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="flex items-center gap-1.5"><KeyRound className="h-4 w-4"/> Mot de passe</Label>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    disabled={isLoading} 
-                  />
-                </div>
-                <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <LogIn className="mr-2 h-5 w-5" />}
-                  Se connecter
-                </Button>
-              </form>
+                <Tabs value={activeIndividualTab} onValueChange={setActiveIndividualTab} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="email">E-mail</TabsTrigger>
+                        <TabsTrigger value="phone">Téléphone</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="email" className="pt-4">
+                        <form onSubmit={handleLoginSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                            <Label htmlFor="email" className="flex items-center gap-1.5"><Mail className="h-4 w-4"/> E-mail</Label>
+                            <Input 
+                                id="email" 
+                                type="email" 
+                                placeholder="exemple@email.sn" 
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required 
+                                disabled={isLoading}
+                            />
+                            </div>
+                            <div className="space-y-2">
+                            <Label htmlFor="password" className="flex items-center gap-1.5"><KeyRound className="h-4 w-4"/> Mot de passe</Label>
+                            <Input 
+                                id="password" 
+                                type="password" 
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                disabled={isLoading} 
+                            />
+                            </div>
+                            <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+                            {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <LogIn className="mr-2 h-5 w-5" />}
+                            Se connecter
+                            </Button>
+                        </form>
+                    </TabsContent>
+                    <TabsContent value="phone" className="pt-4">
+                        <PhoneLoginForm />
+                    </TabsContent>
+                </Tabs>
               
               <div className="text-center pt-2">
                 <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
