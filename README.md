@@ -15,20 +15,27 @@ Fonctionnalité	Description
 💳 Identité numérique unique	Attribution d’un identifiant numérique personnel et inaltérable.
 🔐 Authentification sécurisée	Accès aux services via des moyens modernes (biométrie, OTP, mot de passe).
 🏛️ Accès aux services publics	Portail centralisé pour la santé, l'éducation, l’état civil, les impôts, etc.
-✍️ Signature électronique	Signature légale de documents numériques.
-💼 Portefeuille numérique	Paiement sécurisé des frais administratifs et services.
-🔒 Contrôle des données personnelles	L’utilisateur gère ses données selon des normes de protection strictes.
-🔗 Interopérabilité	Intégration fluide avec les systèmes des ministères, collectivités, banques, etc.
-📂 Archivage de documents officiels	Accès sécurisé aux documents personnels (CNI, extrait de naissance, etc.).
+✍️ Signature électronique qualifiée	Signature légale de documents numériques (conforme eIDAS).
+💼 Portefeuille numérique	Paiement sécurisé des frais administratifs et services via e-wallet.
+🔒 Contrôle des données (RGPD)	L’utilisateur gère et audite l'accès à ses données personnelles.
+🔗 Interopérabilité & API	Intégration fluide avec les systèmes partenaires (ministères, banques...).
+📂 Coffre-fort numérique	Accès et archivage sécurisé de documents officiels (CNI, etc.).
+📱 Accès hors-ligne	Vérification d'identité basique sans connexion internet.
+🔍 Détection de doublons	Utilisation de la biométrie pour garantir un enrôlement unique.
+🔔 Notifications en temps réel	Alertes de sécurité et d'activité sur le compte.
 
 🏗️ Architecture technique
-Basée sur une infrastructure cloud sécurisée.
+Basée sur une infrastructure cloud sécurisée et souveraine.
 
-Intégration d’un système de gestion d’identité (IAM).
+Intégration d’un système de gestion d’identité (IAM) avancé.
 
-Connexions API standardisées pour les partenaires.
+API standardisées et Sandbox pour les développeurs partenaires.
 
-Conformité avec les standards RGPD et ceux de la Smart Africa Alliance.
+Conformité avec les standards RGPD, eIDAS et ceux de la Smart Africa Alliance.
+
+Moteur de règles métier pour une configuration agile des processus.
+
+Principe de "Privacy by Design" : pseudonymisation, minimisation des données.
 
 ## 🔐 Sécurisation des systèmes d'identification numérique : un pilier de la confiance digitale
 

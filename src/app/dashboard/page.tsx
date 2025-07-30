@@ -362,5 +362,3 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
     </div>
   );
 }
-
-    
