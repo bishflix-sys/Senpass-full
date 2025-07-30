@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2 } from "lucide-react"; // Added Banknote, Eye, EyeOff, Loader2
+import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -17,16 +17,14 @@ export default function MinistryDashboardPage() {
     const router = useRouter();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = React.useState(true);
-    const [ministryName, setMinistryName] = React.useState<string>("Ministère de l'Exemple"); // Placeholder
+    const [ministryName, setMinistryName] = React.useState<string>("Ministère de l'Exemple");
     const [walletBalance, setWalletBalance] = React.useState<number | null>(null);
     const [isBalanceVisible, setIsBalanceVisible] = React.useState(false);
 
     React.useEffect(() => {
-        // Simulate fetching ministry-specific data
         const timer = setTimeout(() => {
-            // In a real app, you'd fetch the actual ministry name based on auth
-            setMinistryName("Ministère de l'Économie, du Plan et de la Coopération"); // Example Ministry related to finance
-            setWalletBalance(Math.floor(Math.random() * 1000000000) + 50000000); // Simulate large balance in FCFA
+            setMinistryName("Ministère de l'Économie, du Plan et de la Coopération");
+            setWalletBalance(Math.floor(Math.random() * 1000000000) + 50000000);
             setIsLoading(false);
         }, 1500);
         return () => clearTimeout(timer);
@@ -71,8 +69,7 @@ export default function MinistryDashboardPage() {
 
       <Separator />
 
-      <Alert variant="default" className="bg-blue-50 border-blue-200">
-          <Landmark className="h-4 w-4 text-blue-700" />
+      <Alert variant="default" className="bg-blue-50 border-blue-200" icon={Landmark}>
           <AlertTitle className="text-blue-800">Espace Ministériel</AlertTitle>
           <AlertDescription className="text-blue-700">
              Ce portail donne accès aux outils et données accessibles aux ministères via SenPass.
@@ -81,7 +78,7 @@ export default function MinistryDashboardPage() {
        </Alert>
 
       {/* Main Content Area */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> {/* Adjusted to xl:grid-cols-4 */}
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Card 1: Citizen Data Access */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
@@ -209,7 +206,7 @@ function MinistryDashboardSkeleton() {
       {/* Header Skeleton */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-8 w-32" /> {/* Logo Skeleton */}
+          <Skeleton className="h-10 w-10 rounded-md" /> {/* Logo Skeleton */}
           <div className="flex-1 space-y-2">
             <Skeleton className="h-8 w-64" /> {/* Title Skeleton */}
             <Skeleton className="h-4 w-80" /> {/* Description Skeleton */}
@@ -223,7 +220,7 @@ function MinistryDashboardSkeleton() {
       <Skeleton className="h-20 w-full rounded-lg" />
 
       {/* Main Content Grid Skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> {/* Adjusted to xl:grid-cols-4 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 1 */}
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 2 */}
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 3 */}

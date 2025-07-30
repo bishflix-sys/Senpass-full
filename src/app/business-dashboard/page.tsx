@@ -2,14 +2,14 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower, ShoppingCart } from "lucide-react"; // Added ShoppingCart for pay service
+import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower, ShoppingCart, Terminal } from "lucide-react"; // Added Terminal for Alert
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link"; // Import Link for logo
+import Link from "next/link";
 import Image from "next/image";
-
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"; // Added Alert
 
 export default function BusinessDashboardPage() {
     const router = useRouter();
@@ -52,8 +52,15 @@ export default function BusinessDashboardPage() {
         </Button>
       </div>
 
-
       <Separator />
+
+      <Alert variant="default" className="mb-6 bg-blue-50 border-blue-200" icon={Terminal}>
+          <AlertTitle className="text-blue-800">Espace de Démonstration</AlertTitle>
+          <AlertDescription className="text-blue-700">
+             Ce portail est destiné à la gestion de vos services partenaires. Les fonctionnalités sont simulées.
+          </AlertDescription>
+       </Alert>
+
 
       {/* Main Content Area */}
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

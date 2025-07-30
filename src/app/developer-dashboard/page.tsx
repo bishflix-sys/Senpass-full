@@ -2,30 +2,30 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal, ShoppingCart } from "lucide-react"; // Added ShoppingCart
+import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton"; // For loading state
+import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import Image from "next/image";
 
 export default function DeveloperDashboardPage() {
     const router = useRouter();
     const { toast } = useToast();
-    const [isLoading, setIsLoading] = React.useState(true); // Add loading state
-    const [apiKey, setApiKey] = React.useState<string | null>(null); // API key
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [apiKey, setApiKey] = React.useState<string | null>(null);
 
      // Simulate loading data
     React.useEffect(() => {
         const timer = setTimeout(() => {
-           setApiKey(`sk_dev_${Date.now().toString(36)}`); // Generate a key
+           setApiKey(`sk_dev_${Date.now().toString(36)}`);
            setIsLoading(false);
-        }, 1500); // Simulate 1.5s loading
-        return () => clearTimeout(timer); // Cleanup timer
+        }, 1500);
+        return () => clearTimeout(timer);
     }, []);
 
     const handleLogout = () => {
@@ -215,7 +215,7 @@ function DeveloperDashboardSkeleton() {
       {/* Header Skeleton */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-8 w-32" /> {/* Logo Skeleton */}
+           <Skeleton className="h-10 w-10 rounded-md" /> {/* Logo Skeleton */}
           <div className="flex-1 space-y-2">
             <Skeleton className="h-8 w-64" /> {/* Title Skeleton */}
             <Skeleton className="h-4 w-80" /> {/* Description Skeleton */}
