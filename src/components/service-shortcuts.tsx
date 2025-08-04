@@ -19,6 +19,7 @@ import {
   Anchor,         // Douanes (Ship not available)
   Users,          // ONGs
   FolderArchive,  // Icon for Documents
+  BookUser,       // Icon for Contacts
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils"; // Import cn
@@ -33,7 +34,9 @@ const services = [
   { title: "Impôts/Domaines", icon: FileSpreadsheet, description: "Déclarations...", href: "/services/impots" },
   { title: "Justice", icon: Scale, description: "Procédures...", href: "/services/justice" },
   { title: "Transport", icon: Truck, description: "Permis, titres...", href: "/services/transport" },
-  { title: "Mes Documents", icon: FolderArchive, description: "Coffre-fort...", href: "/documents" }, // Added Documents shortcut
+  { title: "Mes Documents", icon: FolderArchive, description: "Coffre-fort...", href: "/documents" },
+  { title: "Contacts", icon: BookUser, description: "Répertoire...", href: "/contacts" },
+
 
   // Private/Utilities
   { title: "Énergie", icon: Zap, description: "Senelec...", href: "/services/energie" }, // Shortened title
