@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower, ShoppingCart, Terminal } from "lucide-react"; // Added Terminal for Alert
+import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower, ShoppingCart, Terminal, MapPin } from "lucide-react"; // Added Terminal for Alert and MapPin
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -10,6 +10,14 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import Image from "next/image";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"; // Added Alert
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
+
+const LocationMap = dynamic(() => import('@/components/location-map'), {
+  loading: () => <Skeleton className="h-[400px] w-full" />,
+  ssr: false
+});
+
 
 export default function BusinessDashboardPage() {
     const router = useRouter();
@@ -109,6 +117,20 @@ export default function BusinessDashboardPage() {
                 </CardContent>
             </Card>
        </div>
+       
+        <Separator />
+
+        {/* Map Section */}
+        <section>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                <MapPin className="h-6 w-6" /> Services à Proximité
+            </h2>
+             <Card className="border shadow-sm">
+                <CardContent className="p-4">
+                    <LocationMap />
+                </CardContent>
+            </Card>
+        </section>
 
         <Separator />
 

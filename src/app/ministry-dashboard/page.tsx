@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
+import dynamic from 'next/dynamic';
+
+const LocationMap = dynamic(() => import('@/components/location-map'), {
+  loading: () => <Skeleton className="h-[400px] w-full" />,
+  ssr: false
+});
 
 export default function MinistryDashboardPage() {
     const router = useRouter();
@@ -168,6 +174,20 @@ export default function MinistryDashboardPage() {
                 </CardContent>
             </Card>
        </div>
+       
+       <Separator />
+
+        {/* Map Section */}
+        <section>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                <MapPin className="h-6 w-6" /> Carte des Agences Gouvernementales
+            </h2>
+             <Card className="border shadow-sm">
+                <CardContent className="p-4">
+                    <LocationMap />
+                </CardContent>
+            </Card>
+        </section>
 
         <Separator />
 
@@ -226,6 +246,14 @@ function MinistryDashboardSkeleton() {
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 3 */}
         <Skeleton className="h-56 rounded-lg" /> {/* Card Skeleton 4 (Wallet) */}
       </div>
+
+      <Separator />
+
+      {/* Map Skeleton */}
+      <section>
+        <Skeleton className="h-8 w-56 mb-4" /> {/* Section Title Skeleton */}
+        <Skeleton className="h-96 rounded-lg" />
+      </section>
 
       <Separator />
 

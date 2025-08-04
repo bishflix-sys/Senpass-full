@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal, ShoppingCart } from "lucide-react";
+import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal, ShoppingCart, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,12 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as React from "react";
 import Image from "next/image";
+import dynamic from 'next/dynamic';
+
+const LocationMap = dynamic(() => import('@/components/location-map'), {
+  loading: () => <Skeleton className="h-[400px] w-full" />,
+  ssr: false
+});
 
 export default function DeveloperDashboardPage() {
     const router = useRouter();
@@ -145,6 +151,20 @@ export default function DeveloperDashboardPage() {
                 </CardContent>
             </Card>
        </div>
+       
+        <Separator />
+        
+        {/* Map Section */}
+        <section>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                <MapPin className="h-6 w-6" /> Points de Service Partenaires
+            </h2>
+             <Card className="border shadow-sm">
+                <CardContent className="p-4">
+                    <LocationMap />
+                </CardContent>
+            </Card>
+        </section>
 
         <Separator />
 
@@ -235,6 +255,14 @@ function DeveloperDashboardSkeleton() {
         <Skeleton className="h-64 rounded-lg" /> {/* Card Skeleton 3 */}
       </div>
 
+      <Separator />
+      
+      {/* Map Skeleton */}
+      <section>
+        <Skeleton className="h-8 w-56 mb-4" /> {/* Section Title Skeleton */}
+        <Skeleton className="h-96 rounded-lg" />
+      </section>
+      
       <Separator />
 
       {/* Payment Section Skeleton */}
