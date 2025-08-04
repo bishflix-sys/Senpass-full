@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // This is required to allow the Next.js dev server to be accessed from the Project IDX preview window.
+    // The glob pattern is required to allow all possible ports that may be used by the dev server.
+    allowedDevOrigins: ["*.cloudworkstations.dev"],
+  },
   /* config options here */
   images: {
     remotePatterns: [
