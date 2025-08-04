@@ -10,17 +10,30 @@ export default function LogoutButton() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogout = () => {
-    // Simulate logout process (clear tokens, session, etc.)
-    toast({
-      title: "Déconnexion",
-      description: "Vous avez été déconnecté avec succès. Redirection...",
-    });
+  const handleLogout = async () => {
+    try {
+      // Call the API route to clear the session cookie
+      await fetch('/api/auth/logout', { method: 'POST' });
+      
+      toast({
+        title: "Déconnexion",
+        description: "Vous avez été déconnecté avec succès. Redirection...",
+      });
 
-    // Redirect to login page after a short delay, specifying the individuals tab
-    setTimeout(() => {
-      router.push("/login?tab=individuals");
-    }, 1000);
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        router.push("/login?tab=individuals");
+        router.refresh(); // Force a refresh to ensure logged-out state is reflected
+      }, 1000);
+
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast({
+        title: "Erreur de Déconnexion",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -30,4 +43,3 @@ export default function LogoutButton() {
     </Button>
   );
 }
-

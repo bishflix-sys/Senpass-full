@@ -8,6 +8,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { isValidPhoneNumber, type CountryCode } from 'libphonenumber-js';
+import { getAuth, signInWithEmailAndPassword, getIdToken } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+
 import {
   Tabs,
   TabsContent,
@@ -58,8 +61,8 @@ const DeveloperRegistrationDialogContent = dynamic(() => import("@/components/de
 
 const VALID_LOGIN_TABS = ['individuals', 'business', 'developers', 'ministries'];
 
-// Generic Login Form Component
-const LoginForm = ({
+// Generic Login Form Component for Business/Dev/Ministry (simulated)
+const SimulatedLoginForm = ({
   userType,
   targetPath,
 }: {
@@ -127,6 +130,7 @@ const LoginForm = ({
     </form>
   );
 };
+
 
 const PhoneLoginForm = () => {
   const { toast } = useToast();
@@ -263,13 +267,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await getIdToken(userCredential.user);
 
-      const data = await response.json();
+      // Now, exchange the ID token for a session cookie
+      const response = await fetch('/api/auth/session-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+      });
 
       if (response.ok) {
         toast({
@@ -278,23 +284,27 @@ export default function LoginPage() {
         });
         router.push('/dashboard');
       } else {
-        toast({
-          title: "Échec de la Connexion",
-          description: data.error || "Les informations de connexion sont incorrectes.",
-          variant: "destructive",
-        });
+        const errorData = await response.json();
+        throw new Error(errorData.error || "La création de la session a échoué.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
+      let errorMessage = "Les informations de connexion sont incorrectes.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = "L'e-mail ou le mot de passe est incorrect.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
       toast({
-        title: "Erreur",
-        description: "Une erreur de communication est survenue. Veuillez réessayer.",
+        title: "Échec de la Connexion",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="flex flex-col justify-center items-center py-12 min-h-screen bg-background">
@@ -398,7 +408,7 @@ export default function LoginPage() {
               <CardDescription>Accès sécurisé pour les organisations partenaires.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 <LoginForm userType="Entreprise" targetPath="/business-dashboard" />
+                 <SimulatedLoginForm userType="Entreprise" targetPath="/business-dashboard" />
                  <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
@@ -413,7 +423,7 @@ export default function LoginPage() {
               <CardDescription>Accès aux APIs et outils d'intégration.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 <LoginForm userType="Développeur" targetPath="/developer-dashboard" />
+                 <SimulatedLoginForm userType="Développeur" targetPath="/developer-dashboard" />
                  <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
@@ -428,7 +438,7 @@ export default function LoginPage() {
               <CardDescription>Portail sécurisé pour les institutions.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 <LoginForm userType="Ministère" targetPath="/ministry-dashboard" />
+                 <SimulatedLoginForm userType="Ministère" targetPath="/ministry-dashboard" />
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés.</p></CardFooter>
           </Card>
