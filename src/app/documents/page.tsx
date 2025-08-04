@@ -1,17 +1,39 @@
 
+"use client";
+
+import * as React from 'react';
 import type { Metadata } from 'next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { FolderArchive, Lock, FileText, FileScan } from "lucide-react"; // Added relevant icons
-import Link from "next/link"; // Import Link
-import { Button } from "@/components/ui/button"; // Import Button
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert
+import { FolderArchive, Lock, FileText, FileScan } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import SecureAccessDialog from '@/components/secure-access-dialog'; // Import the new component
 
-export const metadata: Metadata = {
-  title: 'Mon Coffre-Fort Numérique - SenPass',
-  description: 'Accédez à vos documents officiels stockés de manière sécurisée.',
-};
+// Metadata is now handled at the page level, not as an exported const for client components
+// You can set the title using document.title in a useEffect hook if needed.
 
 export default function DocumentsPage() {
+  const [isVerified, setIsVerified] = React.useState(false);
+
+  React.useEffect(() => {
+    document.title = 'Mon Coffre-Fort Numérique - SenPass';
+  }, []);
+
+
+  const handleVerificationSuccess = () => {
+    setIsVerified(true);
+  };
+
+  if (!isVerified) {
+    return (
+      <SecureAccessDialog
+        onVerified={handleVerificationSuccess}
+        resourceName="votre coffre-fort numérique"
+      />
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
        <div className="flex items-center justify-between mb-6">
