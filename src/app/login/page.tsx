@@ -43,6 +43,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import PhoneNumberInput from "@/components/phone-number-input"; // Import the component
 import { ScrollArea } from "@/components/ui/scroll-area"; // Import ScrollArea
+import BotVerificationDialog from "@/components/bot-verification-dialog"; // Import BotVerificationDialog
 
 // Dynamically import dialog content components
 const FacialRecognitionDialogContent = dynamic(() => import("@/components/facial-recognition-dialog-content"), {
@@ -72,17 +73,22 @@ const ministries = [
   "Jeunesse, Sport et Entrepreneuriat", "Communication et Économie numérique"
 ];
 
+// Login state type
+type LoginState = {
+  isVerifying: boolean;
+  onVerificationSuccess?: () => void;
+};
+
 
 // Generic Login Form Component for Business/Dev/Ministry (simulated)
 const SimulatedLoginForm = ({
   userType,
-  targetPath,
+  onLoginSuccess,
 }: {
   userType: string;
-  targetPath: string;
+  onLoginSuccess: () => void;
 }) => {
   const { toast } = useToast();
-  const router = useRouter();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
@@ -96,17 +102,15 @@ const SimulatedLoginForm = ({
       description: `Tentative de connexion au portail ${userType}.`,
     });
 
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Simulate success
+    
+    setIsLoading(false);
     toast({
       title: `Connexion ${userType} Réussie!`,
-      description: "Redirection vers votre tableau de bord.",
+      description: "Veuillez compléter la vérification de sécurité.",
     });
 
-    router.push(targetPath);
-    setIsLoading(false);
+    onLoginSuccess();
   };
 
   return (
@@ -144,9 +148,8 @@ const SimulatedLoginForm = ({
 };
 
 
-const PhoneLoginForm = () => {
+const PhoneLoginForm = ({ onLoginSuccess }: { onLoginSuccess: () => void; }) => {
   const { toast } = useToast();
-  const router = useRouter();
   const [phoneNumber, setPhoneNumber] = React.useState("+221"); // Default to Senegal
   const [otp, setOtp] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -185,13 +188,13 @@ const PhoneLoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
+        setIsLoading(false);
         if (otp === expectedOtp && otp !== "") {
-            toast({ title: "Connexion Réussie!", description: "Redirection vers votre tableau de bord." });
-            router.push('/dashboard');
+            toast({ title: "Connexion Réussie!", description: "Veuillez compléter la vérification de sécurité." });
+            onLoginSuccess();
         } else {
             toast({ title: "Échec", description: "Le code est incorrect.", variant: "destructive" });
         }
-        setIsLoading(false);
     }, 1000);
   };
 
@@ -230,6 +233,8 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
+  
+  const [loginState, setLoginState] = React.useState<LoginState>({ isVerifying: false });
 
   const [qrCodeData, setQrCodeData] = React.useState<string | null>(null);
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
@@ -251,13 +256,22 @@ export default function LoginPage() {
   // State for ministry login flow
   const [selectedMinistry, setSelectedMinistry] = React.useState<string | null>(null);
 
+  const startVerification = (redirectPath: string) => {
+    setLoginState({
+      isVerifying: true,
+      onVerificationSuccess: () => {
+        setLoginState({ isVerifying: false });
+        router.push(redirectPath);
+      },
+    });
+  };
 
-   const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => {
+  const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => {
       setShowFacialRecognitionDialog(false);
       setIsQrDialogOpen(false);
       setQrCodeData(null);
-      setTimeout(() => { router.push(targetPath); }, 300);
-   }, [router]);
+      startVerification(targetPath);
+  }, [router]);
 
    const handleRegistrationSuccess = React.useCallback(() => {
       setIsRegistrationDialogOpen(false);
@@ -285,7 +299,6 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await getIdToken(userCredential.user);
 
-      // Now, exchange the ID token for a session cookie
       const response = await fetch('/api/auth/session-login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -295,9 +308,9 @@ export default function LoginPage() {
       if (response.ok) {
         toast({
           title: "Connexion Réussie!",
-          description: "Redirection vers votre tableau de bord.",
+          description: "Veuillez compléter la vérification de sécurité.",
         });
-        router.push('/dashboard');
+        startVerification('/dashboard');
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "La création de la session a échoué.");
@@ -327,6 +340,13 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col justify-center items-center py-12 min-h-screen bg-background">
+       {loginState.isVerifying && (
+        <BotVerificationDialog 
+          open={loginState.isVerifying}
+          onOpenChange={(open) => !open && setLoginState({ isVerifying: false })}
+          onSuccess={loginState.onVerificationSuccess!}
+        />
+      )}
        <div className="flex flex-col items-center gap-4 mb-8">
           <Image src="https://media.licdn.com/dms/image/v2/D4E0BAQEZqb1Jwm5tDQ/company-logo_100_100/B4EZa0hKR.HoAQ-/0/1746785314889?e=1756339200&v=beta&t=Jd6PipGqCyUUvYcM_sEpCtQb_OHUtNBtVYBTk9K2Khw" alt="SenPass Logo" width={60} height={60} className="rounded-xl" />
           <div className="text-center">
@@ -390,7 +410,7 @@ export default function LoginPage() {
                         </form>
                     </TabsContent>
                     <TabsContent value="phone" className="pt-4">
-                        <PhoneLoginForm />
+                        <PhoneLoginForm onLoginSuccess={() => startVerification('/dashboard')} />
                     </TabsContent>
                 </Tabs>
               
@@ -427,7 +447,10 @@ export default function LoginPage() {
               <CardDescription>Accès sécurisé pour les organisations partenaires.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 <SimulatedLoginForm userType="Entreprise" targetPath="/business-dashboard" />
+                 <SimulatedLoginForm 
+                    userType="Entreprise" 
+                    onLoginSuccess={() => startVerification('/business-dashboard')}
+                 />
                  <div className="text-center pt-4"><Dialog open={isBusinessRegistrationDialogOpen} onOpenChange={setIsBusinessRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><Building2 className="h-4 w-4" /> S'inscrire en tant qu'entreprise</Button></DialogTrigger>{isBusinessRegistrationDialogOpen && <BusinessRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Besoin d'aide ? <Link href="#" className="text-primary underline hover:no-underline">Contactez le support</Link>.</p></CardFooter>
@@ -442,7 +465,10 @@ export default function LoginPage() {
               <CardDescription>Accès aux APIs et outils d'intégration.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-                 <SimulatedLoginForm userType="Développeur" targetPath="/developer-dashboard" />
+                 <SimulatedLoginForm 
+                    userType="Développeur"
+                    onLoginSuccess={() => startVerification('/developer-dashboard')}
+                 />
                  <div className="text-center pt-4"><Dialog open={isDeveloperRegistrationDialogOpen} onOpenChange={setIsDeveloperRegistrationDialogOpen}><DialogTrigger asChild><Button variant="link" className="text-primary h-auto p-0 text-sm flex items-center gap-1.5"><CodeXml className="h-4 w-4" /> S'inscrire en tant que développeur</Button></DialogTrigger>{isDeveloperRegistrationDialogOpen && <DeveloperRegistrationDialogContent onSuccess={handleRegistrationSuccess} />}</Dialog></div>
             </CardContent>
             <CardFooter><p className="text-xs text-muted-foreground text-center w-full"><Link href="#" className="text-primary underline hover:no-underline">Consultez la documentation API</Link>.</p></CardFooter>
@@ -478,7 +504,7 @@ export default function LoginPage() {
                     <div className="pt-4">
                        <SimulatedLoginForm 
                           userType={`Ministère de ${selectedMinistry}`} 
-                          targetPath={`/ministry-dashboard?name=${encodeURIComponent(selectedMinistry)}`} 
+                          onLoginSuccess={() => startVerification(`/ministry-dashboard?name=${encodeURIComponent(selectedMinistry)}`)} 
                        />
                     </div>
                 ) : (
@@ -513,6 +539,8 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
 
     
 
