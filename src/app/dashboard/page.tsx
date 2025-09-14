@@ -32,7 +32,8 @@ import {
   EyeOff, // Icon for visibility off
   CreditCard, // Icon for Pay button
   MessageSquare, // Icon for Chat Trigger
-  ArrowDownToLine // Icon for Deposit button
+  ArrowDownToLine, // Icon for Deposit button
+  HeartPulse, // Icon for Health Card
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
@@ -163,7 +164,7 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
               <Separator className="my-6" />
               <Skeleton className="h-10 w-40 mb-4" /> {/* Features Title Skeleton */}
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-               {Array.from({ length: 7 }).map((_, i) => ( // Adjusted to 7 for the new feature card count
+               {Array.from({ length: 8 }).map((_, i) => ( // Adjusted to 8 for the new feature card count
                  <Skeleton key={i} className="h-28 rounded-lg" />
                ))}
              </div>
@@ -371,5 +372,3 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
     </div>
   );
 }
-
-    

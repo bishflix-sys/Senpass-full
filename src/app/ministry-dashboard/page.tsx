@@ -268,5 +268,3 @@ function MinistryDashboardSkeleton() {
     </div>
   );
 }
-
-    

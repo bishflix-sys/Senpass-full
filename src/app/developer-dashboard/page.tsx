@@ -299,5 +299,3 @@ function DeveloperDashboardSkeleton() {
     </div>
   );
 }
-
-    

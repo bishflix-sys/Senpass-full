@@ -39,5 +39,3 @@ const FeatureCard = React.memo(function FeatureCard({ icon: Icon, title, descrip
 });
 
 export default FeatureCard;
-
-    
