@@ -1,4 +1,3 @@
-
 "use client";
 
 import 'leaflet/dist/leaflet.css';
@@ -8,7 +7,7 @@ import L from 'leaflet';
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from './ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
-import { MapPin, Loader2, LocateFixed } from 'lucide-react';
+import { LocateFixed, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 
 // Fix for default Leaflet icon not showing up in Next.js
@@ -36,7 +35,6 @@ const userIcon = new L.Icon({
     popupAnchor: [0, -12],
 });
 
-
 // Sample nearby locations
 const nearbyLocations = [
     { id: 1, name: 'CBAO Agence Centrale', type: 'bank', position: [14.673, -17.442] as [number, number] },
@@ -47,94 +45,20 @@ const nearbyLocations = [
     { id: 6, name: 'Ecobank Point-E', type: 'bank', position: [14.694, -17.476] as [number, number] },
 ];
 
-// Component to handle map view updates
-const ChangeView = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
-    const map = useMap();
-    map.setView(center, zoom);
-    return null;
+
+interface MapViewProps {
+    userPosition: [number, number];
 }
 
-export default function LocationMap() {
-    const { toast } = useToast();
-    const [userPosition, setUserPosition] = React.useState<[number, number] | null>(null);
-    const [isLoading, setIsLoading] = React.useState(true);
+const MapView: React.FC<MapViewProps> = ({ userPosition }) => {
     const mapRef = React.useRef<L.Map | null>(null);
-
-    React.useEffect(() => {
-        let watchId: number;
-
-        if (navigator.geolocation) {
-            watchId = navigator.geolocation.watchPosition(
-                (position) => {
-                    const newPos: [number, number] = [position.coords.latitude, position.coords.longitude];
-                    setUserPosition(newPos);
-                    if (isLoading) setIsLoading(false);
-                },
-                (error) => {
-                    console.error("Geolocation error:", error.message);
-                    if(userPosition === null) { // Only set default and toast if no position was ever set
-                        setUserPosition([14.6937, -17.44406]); // Fallback to Dakar
-                        toast({
-                            variant: 'destructive',
-                            title: "Erreur de géolocalisation",
-                            description: "Impossible d'obtenir votre position. Affichage d'une carte par défaut.",
-                        });
-                    }
-                    setIsLoading(false);
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                }
-            );
-        } else {
-            setUserPosition([14.6937, -17.44406]);
-            setIsLoading(false);
-            toast({
-                variant: 'destructive',
-                title: "Géolocalisation non supportée",
-                description: "Votre navigateur ne supporte pas la géolocalisation.",
-            });
-        }
-
-        return () => {
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-            }
-        };
-    }, [toast, isLoading, userPosition]);
+    const { toast } = useToast();
 
     const centerOnUser = () => {
         if(userPosition && mapRef.current) {
             mapRef.current.setView(userPosition, 16);
             toast({ title: "Position centrée", description: "La carte a été centrée sur votre position actuelle." });
         }
-    }
-
-
-    if (isLoading) {
-        return (
-             <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Recherche de votre position...</span>
-                </div>
-                <Skeleton className="h-[400px] w-full" />
-             </div>
-        );
-    }
-    
-    if (!userPosition) {
-        return (
-            <Alert variant="destructive">
-                <LocateFixed className="h-4 w-4" />
-                <AlertTitle>Carte non disponible</AlertTitle>
-                <AlertDescription>
-                    La carte n'a pas pu être chargée. Veuillez vérifier vos permissions de localisation.
-                </AlertDescription>
-            </Alert>
-        );
     }
 
     return (
@@ -153,7 +77,7 @@ export default function LocationMap() {
                 
                 {/* Marker for user's position */}
                 <Marker position={userPosition} icon={userIcon}>
-                    <Popup>Vous êtes ici (position en temps réel).</Popup>
+                    <Popup>Vous êtes ici (position approximative).</Popup>
                 </Marker>
                 
                 {/* Markers for nearby locations */}
@@ -177,5 +101,78 @@ export default function LocationMap() {
                 <LocateFixed className="h-5 w-5" />
             </Button>
         </div>
-    );
+    )
+}
+
+export default function LocationMap() {
+    const { toast } = useToast();
+    const [userPosition, setUserPosition] = React.useState<[number, number] | null>(null);
+    const [error, setError] = React.useState<string | null>(null);
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        if (!navigator.geolocation) {
+            setError("La géolocalisation n'est pas supportée par votre navigateur.");
+            setIsLoading(false);
+            toast({
+                variant: 'destructive',
+                title: "Géolocalisation non supportée",
+                description: "Votre navigateur ne supporte pas la géolocalisation.",
+            });
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setUserPosition([position.coords.latitude, position.coords.longitude]);
+                setIsLoading(false);
+            },
+            (err) => {
+                console.error("Geolocation error:", err.message);
+                setError("Impossible d'obtenir votre position. Affichage d'une carte par défaut.");
+                // Fallback to a default position if geolocation fails
+                setUserPosition([14.6937, -17.44406]); 
+                setIsLoading(false);
+                toast({
+                    variant: 'destructive',
+                    title: "Erreur de géolocalisation",
+                    description: "Veuillez autoriser l'accès à votre position.",
+                });
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }, [toast]);
+
+    if (isLoading) {
+        return (
+             <div className="space-y-2">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Recherche de votre position...</span>
+                </div>
+                <Skeleton className="h-[400px] w-full rounded-lg" />
+             </div>
+        );
+    }
+    
+    if (error && !userPosition) {
+        return (
+            <Alert variant="destructive">
+                <LocateFixed className="h-4 w-4" />
+                <AlertTitle>Carte non disponible</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        );
+    }
+
+    if (userPosition) {
+         return <MapView userPosition={userPosition} />;
+    }
+
+    // This case should ideally not be reached if logic is correct
+    return null; 
 }
