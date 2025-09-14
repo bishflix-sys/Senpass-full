@@ -8,7 +8,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound, UserCircle, Hash, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound, UserCircle, Hash, MapPin, Check, ChevronsUpDown } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -28,6 +28,13 @@ import {
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -41,14 +48,7 @@ import { fr } from "date-fns/locale"; // French locale for date picker
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Separator } from "./ui/separator";
-
-// List of regions in Senegal
-const senegalRegions = [
-  "Dakar", "Diourbel", "Fatick", "Kaffrine", "Kaolack", "Kédougou", 
-  "Kolda", "Louga", "Matam", "Saint-Louis", "Sédhiou", "Tambacounda", 
-  "Thiès", "Ziguinchor"
-];
-
+import { senegalRegions, senegalCommunes } from "@/lib/senegal-locations";
 
 // Registration Form Schema
 const registrationSchema = z.object({
@@ -60,6 +60,7 @@ const registrationSchema = z.object({
     required_error: "La date d'émission du document est requise.",
   }),
   region: z.string({ required_error: "Veuillez sélectionner votre région."}),
+  commune: z.string({ required_error: "Veuillez sélectionner votre commune." }),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "Vous devez accepter les conditions et la politique de confidentialité.",
   }),
@@ -84,6 +85,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
       cniOrPassport: "",
       issueDate: undefined,
       region: undefined,
+      commune: undefined,
       termsAccepted: false,
     },
   });
@@ -161,28 +163,88 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
                 </FormItem>
               )}
             />
-             <FormField
-              control={form.control}
-              name="region"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Région*</FormLabel>
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez votre région de résidence" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {senegalRegions.map(region => (
-                         <SelectItem key={region} value={region}>{region}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="region"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Région*</FormLabel>
+                       <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionnez..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {senegalRegions.map(region => (
+                             <SelectItem key={region} value={region}>{region}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="commune"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Commune*</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? senegalCommunes.find(
+                                    (commune) => commune === field.value
+                                  )
+                                : "Sélectionnez..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                          <Command>
+                            <CommandInput placeholder="Rechercher une commune..." />
+                            <CommandEmpty>Aucune commune trouvée.</CommandEmpty>
+                            <CommandGroup className="overflow-y-auto">
+                              {senegalCommunes.map((commune) => (
+                                <CommandItem
+                                  value={commune}
+                                  key={commune}
+                                  onSelect={() => {
+                                    form.setValue("commune", commune)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      commune === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {commune}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+             </div>
             <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-muted-foreground" /> Adresse e-mail*</FormLabel>

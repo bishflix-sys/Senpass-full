@@ -16,6 +16,7 @@ const registerSchema = z.object({
   cniOrPassport: z.string().min(5, { message: "Le numéro CNI/Passeport est requis." }),
   issueDate: z.string().min(1, { message: "La date d'émission est requise." }), // Accept as string, as sent by client
   region: z.string().min(1, { message: "La région est requise." }),
+  commune: z.string().min(1, { message: "La commune est requise." }),
 });
 
 export async function POST(request: Request) {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const { email, password, fullName, cniOrPassport, issueDate, region } = validation.data;
+    const { email, password, fullName, cniOrPassport, issueDate, region, commune } = validation.data;
     const auth = getAuth();
     const db = getFirestore();
 
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
       cniOrPassport,
       issueDate,
       region, // Save the region
+      commune, // Save the commune
       createdAt: new Date().toISOString(),
     });
 
