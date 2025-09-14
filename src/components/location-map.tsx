@@ -58,7 +58,7 @@ export default function LocationMap() {
     const { toast } = useToast();
     const [userPosition, setUserPosition] = React.useState<[number, number] | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
-    const mapRef = React.useRef<L.Map>(null);
+    const mapRef = React.useRef<L.Map | null>(null);
 
     React.useEffect(() => {
         let watchId: number;
@@ -144,7 +144,7 @@ export default function LocationMap() {
                 zoom={15}
                 scrollWheelZoom={true}
                 style={{ height: '400px', width: '100%', borderRadius: 'var(--radius)' }}
-                whenCreated={map => { if(mapRef) (mapRef as React.MutableRefObject<L.Map>).current = map }}
+                ref={mapRef}
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
