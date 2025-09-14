@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower, ShoppingCart, Terminal, MapPin } from "lucide-react"; // Added Terminal for Alert and MapPin
+import { Building, Users, FileCheck, Settings, LogOut, QrCode, CreditCard, Smartphone, RadioTower, ShoppingCart, Terminal, MapPin, FileSignature, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -71,49 +71,60 @@ export default function BusinessDashboardPage() {
 
 
       {/* Main Content Area */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Placeholder Card 1: Verification Requests */}
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/* Card 1: KYC */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <FileCheck className="h-5 w-5 text-primary" /> Demandes de Vérification
+                        <ShieldCheck className="h-5 w-5 text-primary" /> KYC Automatisé
                     </CardTitle>
-                    <CardDescription>Gérer les demandes d'identité en attente.</CardDescription>
+                    <CardDescription>Vérifiez l'identité de vos clients (KYC).</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">Aucune demande en attente.</p>
-                    {/* Placeholder for verification list or stats */}
-                    <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Information", description: "Affichage de toutes les demandes."})}>Voir tout</Button>
+                    <p className="text-muted-foreground text-sm">2 nouvelles demandes de vérification.</p>
+                    <Button variant="secondary" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Lancement du processus KYC."})}>Lancer une vérification</Button>
                 </CardContent>
             </Card>
 
-            {/* Placeholder Card 2: Manage Users/Team */}
+            {/* Card 2: Signature Électronique */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <FileSignature className="h-5 w-5 text-primary" /> Signature Électronique
+                    </CardTitle>
+                    <CardDescription>Signez et faites signer des contrats et factures.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground text-sm">1 contrat en attente de signature.</p>
+                    <Button variant="outline" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture du module de signature."})}>Gérer les documents</Button>
+                </CardContent>
+            </Card>
+            
+            {/* Card 3: Accès aux Appels d'Offres */}
+            <Card className="hover:shadow-lg transition-shadow duration-200 border">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Search className="h-5 w-5 text-primary" /> Appels d'Offres Publics
+                    </CardTitle>
+                    <CardDescription>Accédez aux appels d'offres via SenPass.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <p className="text-muted-foreground text-sm">5 nouveaux appels d'offres disponibles.</p>
+                    <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Information", description: "Redirection vers le portail des marchés publics."})}>Consulter</Button>
+                </CardContent>
+            </Card>
+            
+            {/* Card 4: Gérer l'Équipe */}
+             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Users className="h-5 w-5 text-primary" /> Gérer l'Équipe
                     </CardTitle>
-                    <CardDescription>Ajouter ou gérer les accès de vos collaborateurs.</CardDescription>
+                    <CardDescription>Gérez les accès de vos collaborateurs.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground text-sm">3 utilisateurs actifs.</p>
-                    {/* Placeholder for user management actions */}
                     <Button variant="outline" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture du panneau de gestion des accès."})}>Gérer les accès</Button>
-                </CardContent>
-            </Card>
-
-            {/* Placeholder Card 3: Account Settings */}
-            <Card className="hover:shadow-lg transition-shadow duration-200 border">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Settings className="h-5 w-5 text-primary" /> Paramètres du Compte
-                    </CardTitle>
-                    <CardDescription>Configurer les informations de l'entreprise.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <p className="text-muted-foreground text-sm">Mettre à jour vos informations.</p>
-                    {/* Placeholder for settings link */}
-                    <Button variant="secondary" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture des paramètres du compte."})}>Modifier les paramètres</Button>
                 </CardContent>
             </Card>
        </div>
@@ -170,3 +181,5 @@ export default function BusinessDashboardPage() {
     </div>
   );
 }
+
+    

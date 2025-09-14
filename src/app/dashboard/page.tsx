@@ -126,47 +126,49 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
   // Loading state UI
   if (isLoading) {
     return (
-      <div className="space-y-8 animate-pulse">
-         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-           <div className="flex-1 space-y-2">
-             <Skeleton className="h-8 w-3/4" />
-             <Skeleton className="h-4 w-1/2" />
-           </div>
-           <Skeleton className="h-9 w-32 rounded-md" />
-         </div>
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-           <Skeleton className="md:col-span-1 h-64 rounded-lg" />
-           <div className="md:col-span-2 space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                 {/* Skeleton for ID Card */}
-                 <Skeleton className="h-60 rounded-lg" /> {/* Adjusted height for ID Card */}
-                 <div className="space-y-4">
-                     {/* Skeleton for Unique ID Card */}
-                     <Skeleton className="h-24 rounded-lg" /> {/* Adjusted height */}
-                     {/* Skeleton for Wallet Card */}
-                     <Skeleton className="h-36 rounded-lg" />
-                 </div>
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+         <div className="space-y-8 animate-pulse">
+             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+               <div className="flex-1 space-y-2">
+                 <Skeleton className="h-8 w-3/4" />
+                 <Skeleton className="h-4 w-1/2" />
+               </div>
+               <Skeleton className="h-9 w-32 rounded-md" />
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               <Skeleton className="md:col-span-1 h-64 rounded-lg" />
+               <div className="md:col-span-2 space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                     {/* Skeleton for ID Card */}
+                     <Skeleton className="h-60 rounded-lg" /> {/* Adjusted height for ID Card */}
+                     <div className="space-y-4">
+                         {/* Skeleton for Unique ID Card */}
+                         <Skeleton className="h-24 rounded-lg" /> {/* Adjusted height */}
+                         {/* Skeleton for Wallet Card */}
+                         <Skeleton className="h-36 rounded-lg" />
+                     </div>
+                  </div>
+                  {/* Skeleton for Activity and Alerts row */}
+                   <Skeleton className="h-72 rounded-lg" /> {/* Notification Card Skeleton */}
+               </div>
+             </div>
+              <Separator className="my-6" />
+              <Skeleton className="h-10 w-40 mb-4" /> {/* Service Shortcuts Title Skeleton */}
+              {/* Simplified skeleton for Service Shortcuts grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} className="h-36 rounded-lg" />
+                ))}
               </div>
-              {/* Skeleton for Activity and Alerts row */}
-               <Skeleton className="h-72 rounded-lg" /> {/* Notification Card Skeleton */}
-           </div>
-         </div>
-          <Separator className="my-6" />
-          <Skeleton className="h-10 w-40 mb-4" /> {/* Service Shortcuts Title Skeleton */}
-          {/* Simplified skeleton for Service Shortcuts grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-36 rounded-lg" />
-            ))}
+              <Separator className="my-6" />
+              <Skeleton className="h-10 w-40 mb-4" /> {/* Features Title Skeleton */}
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+               {Array.from({ length: 7 }).map((_, i) => ( // Adjusted to 7 for the new feature card count
+                 <Skeleton key={i} className="h-28 rounded-lg" />
+               ))}
+             </div>
+              {/* Chat skeleton removed from main flow */}
           </div>
-          <Separator className="my-6" />
-          <Skeleton className="h-10 w-40 mb-4" /> {/* Features Title Skeleton */}
-         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-           {Array.from({ length: 7 }).map((_, i) => ( // Adjusted to 7 for the new feature card count
-             <Skeleton key={i} className="h-28 rounded-lg" />
-           ))}
-         </div>
-          {/* Chat skeleton removed from main flow */}
       </div>
     );
   }
@@ -178,187 +180,194 @@ export default function DashboardPage() { // Renamed from Home to DashboardPage
 
   return (
     // Added relative positioning context if needed, though fixed positioning usually doesn't require it.
-    <div className="relative pb-20"> {/* Added padding-bottom to prevent overlap with fixed chat button */}
-      <div className="space-y-8">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-           <div className="flex-1">
-              <h1 className="text-3xl font-bold text-primary">
-                Bienvenue, {userProfile.name} !
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Votre tableau de bord centralisé pour votre identité numérique unique.
-              </p>
-           </div>
-           <LogoutButton />
-        </div>
+     <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="relative pb-20"> {/* Added padding-bottom to prevent overlap with fixed chat button */}
+          <div className="space-y-8">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+               <div className="flex-1">
+                  <h1 className="text-3xl font-bold text-primary">
+                    Bienvenue, {userProfile.name} !
+                  </h1>
+                  <p className="text-muted-foreground mt-1">
+                    Votre tableau de bord centralisé pour votre identité numérique unique.
+                  </p>
+               </div>
+               <LogoutButton />
+            </div>
 
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Profile Section (Left Column) */}
-          <div className="md:col-span-1">
-            <ProfileCard user={userProfile} />
-          </div>
-
-          {/* ID Card, Wallet, Unique ID, Activity/Alerts Section (Right Column) */}
-          <div className="md:col-span-2 space-y-6">
-               {/* Container for ID Card, Unique ID and Wallet */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                  {/* ID Card Display */}
-                  <IdCardDisplay
-                    user={userProfile}
-                    qrData={qrData}
-                    className="shadow-md border h-full" // Added h-full
-                  />
-
-                  {/* Container for Unique ID and Wallet */}
-                  <div className="space-y-6">
-                      {/* Unique Alphanumeric ID Card */}
-                      <Card className="shadow-md border">
-                      <CardHeader className="pb-3"> {/* Reduced bottom padding */}
-                          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                              <Hash className="h-5 w-5 text-primary" /> ID Unique
-                          </CardTitle>
-                           <CardDescription className="text-xs">Votre identifiant numérique personnel.</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                          <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
-                              {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
-                          </Badge>
-                      </CardContent>
-                      </Card>
-
-                      {/* Wallet Balance Card */}
-                      <Card className="shadow-md border">
-                          <CardHeader className="pb-3">
-                              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                                  <Wallet className="h-5 w-5 text-primary" /> Solde Portefeuille
-                              </CardTitle>
-                              <CardDescription className="text-xs">Votre balance e-wallet.</CardDescription>
-                          </CardHeader>
-                          <CardContent className="flex items-center justify-between flex-wrap gap-4"> {/* Added flex-wrap */}
-                             <span className="text-2xl font-bold tracking-tight">
-                              {walletBalance === null ? (
-                                  <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
-                              ) : isBalanceVisible ? (
-                                  `${walletBalance.toLocaleString('fr-FR')} FCFA`
-                              ) : (
-                                  '**** FCFA'
-                              )}
-                             </span>
-                             <div className="flex items-center gap-2 flex-wrap"> {/* Group toggle and action buttons, added flex-wrap */}
-                                 <Button
-                                   variant="ghost"
-                                   size="icon"
-                                   onClick={() => setIsBalanceVisible(!isBalanceVisible)}
-                                   aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
-                                   className="text-muted-foreground hover:text-primary"
-                                 >
-                                   {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                                 </Button>
-                                 <Button asChild variant="outline" size="sm">
-                                     <Link href="/deposit">
-                                         <ArrowDownToLine className="mr-2 h-4 w-4" /> Déposer
-                                     </Link>
-                                 </Button>
-                                 <Button asChild variant="outline" size="sm">
-                                     <Link href="/select-service">
-                                         <CreditCard className="mr-2 h-4 w-4" /> Payer
-                                     </Link>
-                                 </Button>
-                             </div>
-                          </CardContent>
-                      </Card>
-                  </div>
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Profile Section (Left Column) */}
+              <div className="md:col-span-1">
+                <ProfileCard user={userProfile} />
               </div>
 
-               {/* Notifications Card */}
-               <NotificationSimulation />
+              {/* ID Card, Wallet, Unique ID, Activity/Alerts Section (Right Column) */}
+              <div className="md:col-span-2 space-y-6">
+                   {/* Container for ID Card, Unique ID and Wallet */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                      {/* ID Card Display */}
+                      <IdCardDisplay
+                        user={userProfile}
+                        qrData={qrData}
+                        className="shadow-md border h-full" // Added h-full
+                      />
+
+                      {/* Container for Unique ID and Wallet */}
+                      <div className="space-y-6">
+                          {/* Unique Alphanumeric ID Card */}
+                          <Card className="shadow-md border">
+                          <CardHeader className="pb-3"> {/* Reduced bottom padding */}
+                              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                  <Hash className="h-5 w-5 text-primary" /> ID Unique
+                              </CardTitle>
+                               <CardDescription className="text-xs">Votre identifiant numérique personnel.</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                              <Badge variant="secondary" className="text-lg font-mono tracking-wider p-2 break-all">
+                                  {uniqueId || <Loader2 className="h-5 w-5 animate-spin"/>}
+                              </Badge>
+                          </CardContent>
+                          </Card>
+
+                          {/* Wallet Balance Card */}
+                          <Card className="shadow-md border">
+                              <CardHeader className="pb-3">
+                                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                      <Wallet className="h-5 w-5 text-primary" /> Solde Portefeuille
+                                  </CardTitle>
+                                  <CardDescription className="text-xs">Votre balance e-wallet.</CardDescription>
+                              </CardHeader>
+                              <CardContent className="flex items-center justify-between flex-wrap gap-4"> {/* Added flex-wrap */}
+                                 <span className="text-2xl font-bold tracking-tight">
+                                  {walletBalance === null ? (
+                                      <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
+                                  ) : isBalanceVisible ? (
+                                      `${walletBalance.toLocaleString('fr-FR')} FCFA`
+                                  ) : (
+                                      '**** FCFA'
+                                  )}
+                                 </span>
+                                 <div className="flex items-center gap-2 flex-wrap"> {/* Group toggle and action buttons, added flex-wrap */}
+                                     <Button
+                                       variant="ghost"
+                                       size="icon"
+                                       onClick={() => setIsBalanceVisible(!isBalanceVisible)}
+                                       aria-label={isBalanceVisible ? "Masquer le solde" : "Afficher le solde"}
+                                       className="text-muted-foreground hover:text-primary"
+                                     >
+                                       {isBalanceVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                     </Button>
+                                     <Button asChild variant="outline" size="sm">
+                                         <Link href="/deposit">
+                                             <ArrowDownToLine className="mr-2 h-4 w-4" /> Déposer
+                                         </Link>
+                                     </Button>
+                                     <Button asChild variant="outline" size="sm">
+                                         <Link href="/select-service">
+                                             <CreditCard className="mr-2 h-4 w-4" /> Payer
+                                         </Link>
+                                     </Button>
+                                 </div>
+                              </CardContent>
+                          </Card>
+                      </div>
+                  </div>
+
+                   {/* Notifications Card - now represents "Suivi des démarches" */}
+                   <NotificationSimulation />
+              </div>
+            </div>
+
+            {/* Separator */}
+            <Separator className="my-8" />
+
+            {/* Service Shortcuts Section */}
+            <ServiceShortcuts />
+
+             {/* Separator */}
+            <Separator className="my-8" />
+
+            {/* Features Section */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                 {/* Reordered and added new features */}
+                 <FeatureCard
+                    icon={LockKeyhole} // New icon for strong auth
+                    title="Authentification Sécurisée"
+                    description="Accès aux services via biométrie, PIN, OTP."
+                    accentIcon
+                 />
+                 <FeatureCard
+                    icon={UserCheck}
+                    title="Vérification Simplifiée"
+                    description="Validation d'identité sécurisée et rapide, sans documents physiques."
+                 />
+                 <FeatureCard
+                    icon={FileSignature}
+                    title="Signature Électronique"
+                    description="Signature de documents administratifs avec valeur légale."
+                 />
+                 <FeatureCard
+                    icon={Wallet} // New icon for e-wallet
+                    title="Portefeuille Numérique"
+                    description="Paiement intégré de taxes et factures via e-wallet."
+                 />
+                 <FeatureCard
+                    icon={FolderArchive} // New icon for document management
+                    title="Documents Dématérialisés"
+                    description="Accès et stockage sécurisé de vos documents dans le cloud."
+                 />
+                 <FeatureCard
+                    icon={ShieldCheck} // New icon for data protection
+                    title="Protection des Données (RGPD)"
+                    description="Contrôle sur vos informations personnelles, respect de la confidentialité."
+                 />
+                 <FeatureCard
+                    icon={User}
+                    title="MonProfil Connect"
+                    description="Remplissage intelligent et automatisé des formulaires avec vos données. Apprend de vos habitudes pour simplifier vos démarches."
+                 />
+                 <FeatureCard
+                    icon={HeartPulse}
+                    title="Carte Santé Numérique"
+                    description="Accès à vos informations médicales de base : vaccins, groupe sanguin, etc."
+                />
+              </div>
+            </section>
+
+             {/* BISHOP Chatbot Section - Now within a Sheet */}
+             {/* The trigger button is fixed */}
+
           </div>
+
+          {/* Fixed Position Chatbot Trigger Button */}
+          <Sheet>
+             <SheetTrigger asChild>
+                <Button
+                  variant="secondary" // Use secondary or adjust styling
+                  size="lg" // Larger button
+                  className="fixed right-6 bottom-6 z-50 rounded-full shadow-lg flex items-center gap-2 px-5 py-3 h-auto"
+                  aria-label="Ouvrir l'assistant BISHOP"
+                >
+                   <Bot className="h-6 w-6" />
+                   <span className="text-base font-semibold hidden sm:inline">BISHOP</span>
+                </Button>
+             </SheetTrigger>
+             <SheetContent
+                side="right"
+                className="w-full max-w-md p-0 border-l border-border" // Set max width, remove padding
+                onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus trap issues
+             >
+                <React.Suspense fallback={<div className="flex flex-col h-full"><Skeleton className="h-16 w-full border-b" /><div className="flex-grow p-4 space-y-4"><Skeleton className="h-10 w-3/4" /><Skeleton className="h-10 w-1/2 self-end" /><Skeleton className="h-10 w-3/4" /></div><Skeleton className="h-16 w-full border-t" /></div>}>
+                  <BishopChat />
+                </React.Suspense>
+             </SheetContent>
+          </Sheet>
         </div>
-
-        {/* Separator */}
-        <Separator className="my-8" />
-
-        {/* Service Shortcuts Section */}
-        <ServiceShortcuts />
-
-         {/* Separator */}
-        <Separator className="my-8" />
-
-        {/* Features Section */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Fonctionnalités Principales</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-             {/* Reordered and added new features */}
-             <FeatureCard
-                icon={LockKeyhole} // New icon for strong auth
-                title="Authentification Sécurisée"
-                description="Accès aux services via biométrie, PIN, OTP."
-                accentIcon
-             />
-             <FeatureCard
-                icon={UserCheck}
-                title="Vérification Simplifiée"
-                description="Validation d'identité sécurisée et rapide, sans documents physiques."
-             />
-             <FeatureCard
-                icon={FileSignature}
-                title="Signature Électronique"
-                description="Signature de documents administratifs avec valeur légale."
-             />
-             <FeatureCard
-                icon={Wallet} // New icon for e-wallet
-                title="Portefeuille Numérique"
-                description="Paiement intégré de taxes et factures via e-wallet."
-             />
-             <FeatureCard
-                icon={FolderArchive} // New icon for document management
-                title="Documents Dématérialisés"
-                description="Accès et stockage sécurisé de vos documents dans le cloud."
-             />
-             <FeatureCard
-                icon={ShieldCheck} // New icon for data protection
-                title="Protection des Données (RGPD)"
-                description="Contrôle sur vos informations personnelles, respect de la confidentialité."
-             />
-             <FeatureCard
-                icon={User}
-                title="MonProfil Connect"
-                description="Remplissage intelligent et automatisé des formulaires avec vos données. Apprend de vos habitudes pour simplifier vos démarches."
-             />
-          </div>
-        </section>
-
-         {/* BISHOP Chatbot Section - Now within a Sheet */}
-         {/* The trigger button is fixed */}
-
-      </div>
-
-      {/* Fixed Position Chatbot Trigger Button */}
-      <Sheet>
-         <SheetTrigger asChild>
-            <Button
-              variant="secondary" // Use secondary or adjust styling
-              size="lg" // Larger button
-              className="fixed right-6 bottom-6 z-50 rounded-full shadow-lg flex items-center gap-2 px-5 py-3 h-auto"
-              aria-label="Ouvrir l'assistant BISHOP"
-            >
-               <Bot className="h-6 w-6" />
-               <span className="text-base font-semibold hidden sm:inline">BISHOP</span>
-            </Button>
-         </SheetTrigger>
-         <SheetContent
-            side="right"
-            className="w-full max-w-md p-0 border-l border-border" // Set max width, remove padding
-            onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus trap issues
-         >
-            <React.Suspense fallback={<div className="flex flex-col h-full"><Skeleton className="h-16 w-full border-b" /><div className="flex-grow p-4 space-y-4"><Skeleton className="h-10 w-3/4" /><Skeleton className="h-10 w-1/2 self-end" /><Skeleton className="h-10 w-3/4" /></div><Skeleton className="h-16 w-full border-t" /></div>}>
-              <BishopChat />
-            </React.Suspense>
-         </SheetContent>
-      </Sheet>
     </div>
   );
 }

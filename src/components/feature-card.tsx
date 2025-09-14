@@ -23,7 +23,7 @@ const FeatureCard = React.memo(function FeatureCard({ icon: Icon, title, descrip
            <Icon className="h-5 w-5" /> {/* Slightly smaller icon */}
          </div>
         <div className="space-y-1 flex-1">
-          <CardTitle className="text-lg font-semibold leading-tight">{title}</CardTitle> {/* Adjusted size/leading */}
+          <CardTitle className="text-base font-semibold leading-tight">{title}</CardTitle> {/* Adjusted size/leading */}
         </div>
       </CardHeader>
       <CardContent className="pt-0 flex-grow"> {/* Remove top padding, allow content to grow */}

@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal, ShoppingCart, MapPin } from "lucide-react";
+import { CodeXml, Key, BookOpen, BarChart2, Settings, LogOut, PackagePlus, Terminal, ShoppingCart, MapPin, Rocket, GitBranch, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -91,7 +91,7 @@ export default function DeveloperDashboardPage() {
 
 
       {/* Main Content Area */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* API Keys Management */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
@@ -112,44 +112,59 @@ export default function DeveloperDashboardPage() {
                 </CardContent>
             </Card>
 
-            {/* API Documentation */}
+            {/* API Documentation & SDKs */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5 text-primary" /> Documentation API
+                        <BookOpen className="h-5 w-5 text-primary" /> Documentation & SDKs
                     </CardTitle>
-                    <CardDescription>Explorez les endpoints et guides.</CardDescription>
+                    <CardDescription>Explorez les endpoints, guides et kits SDK.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm mb-3">Consultez nos guides pour intégrer SenPass.</p>
-                    <Button variant="outline" size="sm" asChild>
-                       <Link href="/docs/api" target="_blank"> {/* Link to future docs */}
-                           Voir la documentation
-                       </Link>
+                    <p className="text-muted-foreground text-sm mb-3">Consultez nos guides pour intégrer SenPass rapidement.</p>
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" asChild>
+                           <Link href="/docs/api" target="_blank">
+                               Voir la doc
+                           </Link>
+                        </Button>
+                         <Button variant="outline" size="sm" onClick={() => toast({description: "Téléchargement du SDK..."})}>
+                           SDKs
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+            
+            {/* Marketplace */}
+            <Card className="hover:shadow-lg transition-shadow duration-200 border">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Store className="h-5 w-5 text-primary" /> Marketplace
+                    </CardTitle>
+                    <CardDescription>Découvrez des applications connectées à Senpass.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <p className="text-muted-foreground text-sm mb-3">Explorez et publiez des applications.</p>
+                     <Button variant="link" className="p-0 h-auto text-primary" onClick={() => toast({title: "Information", description: "Bientôt disponible."})}>Explorer la Marketplace</Button>
+                </CardContent>
+            </Card>
+            
+             {/* Open Innovation */}
+            <Card className="hover:shadow-lg transition-shadow duration-200 border">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Rocket className="h-5 w-5 text-primary" /> Open Innovation
+                    </CardTitle>
+                    <CardDescription>Participez à nos programmes et hackathons.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <p className="text-muted-foreground text-sm mb-3">Rejoignez la communauté et innovez avec nous.</p>
+                     <Button variant="secondary" size="sm" onClick={() => toast({title: "Information", description: "Bientôt disponible."})}>
+                        Voir les programmes
                     </Button>
-                    {/* Placeholder link, target should be actual docs */}
-                     <p className="text-xs text-muted-foreground mt-2">Exemples: Authentification, Signature...</p>
                 </CardContent>
             </Card>
 
-            {/* Usage Statistics */}
-            <Card className="hover:shadow-lg transition-shadow duration-200 border">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <BarChart2 className="h-5 w-5 text-primary" /> Statistiques d'Usage
-                    </CardTitle>
-                    <CardDescription>Suivez l'utilisation de vos APIs.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <p className="text-muted-foreground text-sm">Aucune donnée disponible.</p>
-                     {/* Placeholder for charts or stats */}
-                     <div className="mt-3 space-y-2">
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                     </div>
-                     <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Information", description: "Affichage des statistiques détaillées."})}>Voir détails</Button>
-                </CardContent>
-            </Card>
        </div>
        
         <Separator />
@@ -284,3 +299,5 @@ function DeveloperDashboardSkeleton() {
     </div>
   );
 }
+
+    

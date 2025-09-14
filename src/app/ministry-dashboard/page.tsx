@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2, MapPin } from "lucide-react";
+import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2, MapPin, Handshake, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -89,46 +89,46 @@ export default function MinistryDashboardPage() {
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-primary" /> Données Citoyennes
+                        <BarChart3 className="h-5 w-5 text-primary" /> Tableau de Bord National
                     </CardTitle>
-                    <CardDescription>Consulter les statistiques et données agrégées.</CardDescription>
+                    <CardDescription>Statistiques agrégées en temps réel.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">Accès aux statistiques démographiques, utilisation des services, etc.</p>
-                    <Button variant="secondary" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture du module d'analyse de données."})}>
-                        Analyser les Données
+                    <p className="text-muted-foreground text-sm">Suivi des KPIs (population, santé, éducation).</p>
+                    <Button variant="secondary" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture du tableau de bord national."})}>
+                        Consulter les stats
                     </Button>
                 </CardContent>
             </Card>
 
-            {/* Card 2: Service Management */}
+            {/* Card 2: Suivi des Subventions Sociales */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Settings className="h-5 w-5 text-primary" /> Gestion des Services
+                        <Briefcase className="h-5 w-5 text-primary" /> Subventions Sociales
                     </CardTitle>
-                    <CardDescription>Configurer les services du ministère liés à SenPass.</CardDescription>
+                    <CardDescription>Gérez les bourses, aides et allocations.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground text-sm">Intégrer de nouveaux services, gérer les accès API, etc.</p>
-                    <Button variant="outline" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture du panneau de configuration des services."})}>
-                        Configurer
+                    <p className="text-muted-foreground text-sm">Suivi des paiements et des bénéficiaires.</p>
+                    <Button variant="outline" size="sm" className="mt-2" onClick={() => toast({title: "Information", description: "Ouverture du module de gestion des subventions."})}>
+                        Gérer les Aides
                     </Button>
                 </CardContent>
             </Card>
 
-            {/* Card 3: Reporting & Analytics */}
+            {/* Card 3: Registre Foncier Numérique */}
             <Card className="hover:shadow-lg transition-shadow duration-200 border">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <BarChart3 className="h-5 w-5 text-primary" /> Rapports et Performances
+                        <FileText className="h-5 w-5 text-primary" /> Registre Foncier
                     </CardTitle>
-                    <CardDescription>Visualiser les indicateurs clés de performance (KPIs).</CardDescription>
+                    <CardDescription>Consultez et sécurisez les titres fonciers.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                     <p className="text-muted-foreground text-sm">Suivi de l'adoption des e-services, temps de traitement, etc.</p>
-                     <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Information", description: "Affichage des tableaux de bord de performance."})}>
-                        Voir les Rapports
+                     <p className="text-muted-foreground text-sm">Interopérabilité avec le cadastre.</p>
+                     <Button variant="link" className="p-0 h-auto mt-2 text-primary" onClick={() => toast({title: "Information", description: "Ouverture du registre foncier."})}>
+                        Accéder au Registre
                      </Button>
                 </CardContent>
             </Card>
@@ -193,26 +193,29 @@ export default function MinistryDashboardPage() {
 
         {/* Specific Ministerial Tools Section (Placeholder) */}
         <section>
-            <h2 className="text-2xl font-semibold mb-4">Outils Spécifiques au Ministère</h2>
-            <Card className="border shadow-sm">
-                <CardHeader>
-                    <CardTitle>Modules Métiers</CardTitle>
-                    <CardDescription>Exemples de modules qui pourraient être disponibles selon le ministère.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="p-4 border rounded-md bg-muted/50">
-                        <h3 className="font-semibold text-primary flex items-center gap-2"><FileText className="h-5 w-5"/> Gestion Documentaire Sécurisée</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Archivage, consultation et partage de documents officiels internes.</p>
-                        <Button size="sm" variant="ghost" className="mt-2 text-primary" onClick={() => toast({description: "Accès aux archives."})}>Accéder aux archives</Button>
-                    </div>
-                    <div className="p-4 border rounded-md bg-muted/50">
-                        <h3 className="font-semibold text-primary flex items-center gap-2"><Users className="h-5 w-5"/> Registre National (Exemple)</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Interface pour la gestion d'un registre national spécifique (ex: registre de l'état civil, registre foncier).</p>
-                         <Button size="sm" variant="ghost" className="mt-2 text-primary" onClick={() => toast({description: "Ouverture du registre."})}>Ouvrir le registre</Button>
-                    </div>
-                    {/* Add more ministry-specific tools based on the type of ministry */}
-                </CardContent>
-            </Card>
+            <h2 className="text-2xl font-semibold mb-4">Autres Outils Spécifiques</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="border shadow-sm">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-primary"><Handshake className="h-5 w-5"/> Interopérabilité CEDEAO</CardTitle>
+                        <CardDescription>Faciliter la mobilité et le commerce régional.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">Outils pour l'échange de données sécurisé avec les pays membres.</p>
+                        <Button size="sm" variant="outline" className="mt-2" onClick={() => toast({description: "Accès au portail CEDEAO."})}>Portail Régional</Button>
+                    </CardContent>
+                </Card>
+                <Card className="border shadow-sm">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-primary"><Users className="h-5 w-5"/> Contrôle de Présence</CardTitle>
+                        <CardDescription>Système de pointage des fonctionnaires.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground">Basé sur la biométrie ou le scan de QR code via SenPass.</p>
+                         <Button size="sm" variant="outline" className="mt-2" onClick={() => toast({description: "Ouverture du système de pointage."})}>Tableau de bord RH</Button>
+                    </CardContent>
+                </Card>
+            </div>
         </section>
 
     </div>
@@ -265,3 +268,5 @@ function MinistryDashboardSkeleton() {
     </div>
   );
 }
+
+    
