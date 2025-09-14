@@ -247,6 +247,9 @@ export default function LoginPage() {
   const requestedTab = searchParams.get('tab');
   const activeTab = VALID_LOGIN_TABS.includes(requestedTab ?? '') ? requestedTab : 'individuals';
   const [activeIndividualTab, setActiveIndividualTab] = React.useState('email');
+  
+  // State for ministry login flow
+  const [selectedMinistry, setSelectedMinistry] = React.useState<string | null>(null);
 
 
    const handleAuthenticationSuccess = React.useCallback((targetPath: string = '/dashboard') => {
@@ -317,12 +320,8 @@ export default function LoginPage() {
     }
   };
 
-  const handleMinistryLogin = (ministry: string) => {
-    toast({
-      title: "Accès au portail",
-      description: `Connexion simulée pour le Ministère de ${ministry}. Redirection...`,
-    });
-    router.push(`/ministry-dashboard?name=${encodeURIComponent(ministry)}`);
+  const handleMinistrySelection = (ministry: string) => {
+    setSelectedMinistry(ministry);
   };
 
 
@@ -453,26 +452,52 @@ export default function LoginPage() {
         {/* Ministries Tab */}
         <TabsContent value="ministries">
            <Card className="shadow-lg border">
-             <CardHeader>
-               <CardTitle className="text-xl">Accès Institutionnel</CardTitle>
-               <CardDescription>Sélectionnez votre ministère pour accéder au portail.</CardDescription>
-             </CardHeader>
-             <CardContent>
-                <ScrollArea className="h-[350px] w-full pr-4">
-                    <div className="space-y-2">
-                        {ministries.map((ministry) => (
-                            <Button
-                                key={ministry}
-                                variant="outline"
-                                className="w-full justify-start text-left h-auto py-2.5"
-                                onClick={() => handleMinistryLogin(ministry)}
-                            >
-                                <Landmark className="mr-3 h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <span className="flex-1">Ministère de {ministry}</span>
-                            </Button>
-                        ))}
+              <CardHeader>
+                 {selectedMinistry ? (
+                    <div className="relative">
+                         <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => setSelectedMinistry(null)}
+                            className="absolute -left-4 -top-2"
+                          >
+                            <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+                         </Button>
+                         <CardTitle className="text-xl pt-8 text-center">Portail - {selectedMinistry}</CardTitle>
+                         <CardDescription className="text-center">Saisissez vos identifiants d'agent.</CardDescription>
                     </div>
-                </ScrollArea>
+                 ) : (
+                    <>
+                       <CardTitle className="text-xl">Accès Institutionnel</CardTitle>
+                       <CardDescription>Sélectionnez votre ministère pour continuer.</CardDescription>
+                    </>
+                 )}
+              </CardHeader>
+             <CardContent>
+                {selectedMinistry ? (
+                    <div className="pt-4">
+                       <SimulatedLoginForm 
+                          userType={`Ministère de ${selectedMinistry}`} 
+                          targetPath={`/ministry-dashboard?name=${encodeURIComponent(selectedMinistry)}`} 
+                       />
+                    </div>
+                ) : (
+                    <ScrollArea className="h-[350px] w-full pr-4">
+                        <div className="space-y-2">
+                            {ministries.map((ministry) => (
+                                <Button
+                                    key={ministry}
+                                    variant="outline"
+                                    className="w-full justify-start text-left h-auto py-2.5"
+                                    onClick={() => handleMinistrySelection(ministry)}
+                                >
+                                    <Landmark className="mr-3 h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                    <span className="flex-1">Ministère de {ministry}</span>
+                                </Button>
+                            ))}
+                        </div>
+                    </ScrollArea>
+                )}
              </CardContent>
              <CardFooter>
                  <p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés.</p>
@@ -488,5 +513,7 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
 
     
