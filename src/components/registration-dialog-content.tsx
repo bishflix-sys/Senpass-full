@@ -147,7 +147,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
       </DialogHeader>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
           {/* --- Section 1: Basic Info --- */}
           <div className="space-y-4">
             <FormField
@@ -163,88 +163,88 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
                 </FormItem>
               )}
             />
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="region"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Région*</FormLabel>
-                       <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionnez..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {senegalRegions.map(region => (
-                             <SelectItem key={region} value={region}>{region}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="commune"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Commune*</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
+            
+            <FormField
+              control={form.control}
+              name="region"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Région*</FormLabel>
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {senegalRegions.map(region => (
+                         <SelectItem key={region} value={region}>{region}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="commune"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Commune*</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? senegalCommunes.find(
+                                (commune) => commune === field.value
+                              )
+                            : "Sélectionnez..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                      <Command>
+                        <CommandInput placeholder="Rechercher une commune..." />
+                        <CommandEmpty>Aucune commune trouvée.</CommandEmpty>
+                        <CommandGroup className="overflow-y-auto">
+                          {senegalCommunes.map((commune) => (
+                            <CommandItem
+                              value={commune}
+                              key={commune}
+                              onSelect={() => {
+                                form.setValue("commune", commune)
+                              }}
                             >
-                              {field.value
-                                ? senegalCommunes.find(
-                                    (commune) => commune === field.value
-                                  )
-                                : "Sélectionnez..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-                          <Command>
-                            <CommandInput placeholder="Rechercher une commune..." />
-                            <CommandEmpty>Aucune commune trouvée.</CommandEmpty>
-                            <CommandGroup className="overflow-y-auto">
-                              {senegalCommunes.map((commune) => (
-                                <CommandItem
-                                  value={commune}
-                                  key={commune}
-                                  onSelect={() => {
-                                    form.setValue("commune", commune)
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      commune === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {commune}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-             </div>
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  commune === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {commune}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1.5"><Mail className="h-4 w-4 text-muted-foreground" /> Adresse e-mail*</FormLabel>
@@ -254,6 +254,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
                 <FormMessage />
               </FormItem>
             )} />
+
             <FormField control={form.control} name="password" render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-1.5"><KeyRound className="h-4 w-4 text-muted-foreground" /> Mot de passe*</FormLabel>
