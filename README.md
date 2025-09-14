@@ -1,58 +1,67 @@
 📘 Senpass – Identité Numérique Nationale du Sénégal
-Senpass est une plateforme numérique souveraine conçue pour fournir à chaque citoyen sénégalais une identité numérique unique, sécurisée et interopérable. Elle permet l'accès simple, rapide et protégé à une large gamme de services publics et privés.
+
+Senpass, développé par Yelo Digital Sénégal, est une plateforme numérique souveraine conçue pour fournir à chaque citoyen sénégalais une identité numérique unique, sécurisée et interopérable. Elle permet un accès simple, rapide et protégé à une large gamme de services publics, privés et innovants, favorisant la modernisation, l’inclusion et la souveraineté numérique.
 
 🚀 Objectifs du projet
-Moderniser l'administration publique à travers la dématérialisation des services.
+
+Moderniser l'administration publique via la dématérialisation des services.
 
 Assurer une gestion fiable, centralisée et sécurisée de l’identité des citoyens.
 
-Favoriser l’inclusion numérique et administrative de l’ensemble de la population.
+Favoriser l’inclusion numérique et administrative de tous les citoyens, y compris la diaspora.
 
-Faciliter l’interopérabilité entre les institutions publiques et les partenaires privés.
+Faciliter l’interopérabilité entre institutions publiques, entreprises privées et partenaires internationaux.
+
+Développer un écosystème numérique innovant pour startups et développeurs.
 
 🔑 Fonctionnalités principales
 Fonctionnalité	Description
 💳 Identité numérique unique	Attribution d’un identifiant numérique personnel et inaltérable.
-🔐 Authentification sécurisée	Accès aux services via des moyens modernes (biométrie, OTP, mot de passe).
-🏛️ Accès aux services publics	Portail centralisé pour la santé, l'éducation, l’état civil, les impôts, etc.
+🔐 Authentification sécurisée	Accès via biométrie, OTP, mot de passe, MFA.
+🏛️ Accès aux services publics	Santé, éducation, état civil, impôts, sécurité sociale, etc.
 ✍️ Signature électronique qualifiée	Signature légale de documents numériques (conforme eIDAS).
-💼 Portefeuille numérique	Paiement sécurisé des frais administratifs et services via e-wallet.
-🔒 Contrôle des données (RGPD)	L’utilisateur gère et audite l'accès à ses données personnelles.
-🔗 Interopérabilité & API	Intégration fluide avec les systèmes partenaires (ministères, banques...).
-📂 Coffre-fort numérique	Accès et archivage sécurisé de documents officiels (CNI, etc.).
-📱 Accès hors-ligne	Vérification d'identité basique sans connexion internet.
-🔍 Détection de doublons	Utilisation de la biométrie pour garantir un enrôlement unique.
-🔔 Notifications en temps réel	Alertes de sécurité et d'activité sur le compte.
-
+💼 Portefeuille numérique	Paiement sécurisé via e-wallet pour frais administratifs et services.
+🔒 Contrôle des données (RGPD)	Gestion et audit de l'accès aux données personnelles.
+🔗 Interopérabilité & API	Intégration fluide avec ministères, banques, entreprises et développeurs.
+📂 Coffre-fort numérique	Archivage sécurisé de documents officiels (CNI, diplômes, certificats).
+📱 Accès hors-ligne	Vérification d'identité basique sans connexion Internet.
+🔍 Détection de doublons	Biométrie pour garantir un enrôlement unique.
+🔔 Notifications en temps réel	Alertes de sécurité et activités sur le compte.
+🌐 Marketplace Senpass	Applications et services tiers certifiés pour citoyens et entreprises.
+🤖 Assistance IA	Chatbot officiel pour guider les citoyens dans leurs démarches.
+🗳️ E-vote	Participation aux élections locales et tests pour vote national.
+🌱 Blockchain	Traçabilité des transactions sensibles (titres fonciers, vote, contrats).
+🌍 Internationalisation	Interopérabilité CEDEAO et accès pour la diaspora.
+📚 E-learning	Plateforme éducative pour étudiants et enseignants.
+👥 Inclusion sociale	Services pour familles vulnérables et personnes handicapées.
 🏗️ Architecture technique
-Basée sur une infrastructure cloud sécurisée et souveraine.
 
-Intégration d’un système de gestion d’identité (IAM) avancé.
+Infrastructure cloud souveraine et sécurisée.
 
-API standardisées et Sandbox pour les développeurs partenaires.
+Système de gestion d’identité (IAM) avancé.
 
-Conformité avec les standards RGPD, eIDAS et ceux de la Smart Africa Alliance.
+API standardisées et Sandbox pour développeurs partenaires.
 
-Moteur de règles métier pour une configuration agile des processus.
+Conformité aux standards RGPD, eIDAS, Smart Africa Alliance.
 
-Principe de "Privacy by Design" : pseudonymisation, minimisation des données.
+Moteur de règles métier pour configuration agile des processus.
 
-## 🔐 Sécurisation des systèmes d'identification numérique : un pilier de la confiance digitale
+Privacy by Design : pseudonymisation et minimisation des données.
 
-À l’ère numérique, protéger les systèmes d’identification est essentiel pour éviter les fuites de données, préserver la confiance des utilisateurs et prévenir les cyberattaques.
+Intégration possible de Blockchain et IA pour services avancés.
 
-### Principales bonnes pratiques :
-- **Analyse des risques** : identifier les failles et points d’accès critiques.
-- **Authentification forte** : privilégier la MFA et une gestion rigoureuse des identifiants.
-- **Contrôle des accès** : définir les rôles et limiter les droits au strict nécessaire.
-- **Surveillance active** : détecter et réagir aux activités suspectes.
-- **Blocage automatisé** : activer des défenses en temps réel.
-- **Chiffrement** : sécuriser les échanges avec TLS/SSL.
-- **Sensibilisation** : former les utilisateurs aux risques, notamment le phishing.
-- **Mises à jour** : corriger les vulnérabilités rapidement.
-- **Réponse aux incidents** : planifier les actions d’urgence et la reprise.
+🔐 Sécurisation des systèmes
+
+Analyse des risques, contrôle des accès et authentification forte (MFA).
+
+Surveillance active, blocage automatisé et chiffrement TLS/SSL.
+
+Sensibilisation et formation aux risques numériques.
+
+Mises à jour régulières et plan de réponse aux incidents.
 
 👥 Utilisateurs cibles
+
 Citoyens sénégalais : accès simplifié à leurs droits et services.
 
 Administrations publiques : gestion centralisée et automatisée des identités.
@@ -61,16 +70,18 @@ Entreprises privées : services d’authentification et de vérification d’ide
 
 Partenaires institutionnels : interconnexion sécurisée aux données autorisées.
 
-📦 Déploiement
-Senpass est prévu pour être déployé en plusieurs phases :
+Développeurs & startups : intégration via API et marketplace pour innovation.
 
-Enrôlement et création de l’identité numérique.
+📦 Déploiement par phases
 
-Intégration des premiers services publics (état civil, impôts...).
+V1 – Fondation : Enrôlement et création de l’identité numérique, services publics de base (état civil, impôts).
 
-Ouverture aux services privés (banques, assurances...).
+V2 – Expansion : Intégration ministères clés, entreprises privées, portefeuille numérique, signature électronique, carte santé, application mobile.
 
-Extension aux diasporas sénégalaises.
+V3 – Consolidation : E-vote, registre foncier, KYC automatisé, tableau de bord national, mode urgence, Blockchain.
+
+V4 – Rayonnement : Diaspora, marketplace d’applications, programme innovation, interopérabilité CEDEAO, services premium pour entreprises, IA pour assistance citoyenne.
 
 📄 Licence
-Ce projet est développé sous la supervision de l’État du Sénégal. Toute reproduction ou réutilisation nécessite autorisation officielle.
+
+Développé par Yelo Digital Sénégal sous supervision de l’État du Sénégal. Toute reproduction ou réutilisation nécessite autorisation officielle.
