@@ -71,7 +71,7 @@ export default function LocationMap() {
                     if (isLoading) setIsLoading(false);
                 },
                 (error) => {
-                    console.error("Geolocation error:", error);
+                    console.error("Geolocation error:", error.message);
                     if(userPosition === null) { // Only set default and toast if no position was ever set
                         setUserPosition([14.6937, -17.44406]); // Fallback to Dakar
                         toast({
