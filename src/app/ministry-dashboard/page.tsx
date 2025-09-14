@@ -4,7 +4,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Landmark, Users, FileText, Settings, LogOut, BarChart3, Banknote, Eye, EyeOff, Loader2, MapPin, Handshake, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
@@ -21,6 +21,7 @@ const LocationMap = dynamic(() => import('@/components/location-map'), {
 
 export default function MinistryDashboardPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = React.useState(true);
     const [ministryName, setMinistryName] = React.useState<string>("Ministère de l'Exemple");
@@ -29,12 +30,13 @@ export default function MinistryDashboardPage() {
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
-            setMinistryName("Ministère de l'Économie, du Plan et de la Coopération");
+            const nameFromQuery = searchParams.get('name');
+            setMinistryName(nameFromQuery ? `Ministère de ${nameFromQuery}` : "Ministère de l'Économie, du Plan et de la Coopération");
             setWalletBalance(Math.floor(Math.random() * 1000000000) + 50000000);
             setIsLoading(false);
         }, 1500);
         return () => clearTimeout(timer);
-    }, []);
+    }, [searchParams]);
 
     const handleLogout = () => {
         toast({
@@ -63,7 +65,7 @@ export default function MinistryDashboardPage() {
                <Landmark className="h-7 w-7 sm:h-8 sm:w-8" /> Portail Ministère
              </h1>
              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-               Tableau de bord pour {ministryName}.
+               Tableau de bord pour le {ministryName}.
              </p>
            </div>
         </div>
@@ -268,3 +270,5 @@ function MinistryDashboardSkeleton() {
     </div>
   );
 }
+
+    

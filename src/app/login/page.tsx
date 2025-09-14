@@ -42,6 +42,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import PhoneNumberInput from "@/components/phone-number-input"; // Import the component
+import { ScrollArea } from "@/components/ui/scroll-area"; // Import ScrollArea
 
 // Dynamically import dialog content components
 const FacialRecognitionDialogContent = dynamic(() => import("@/components/facial-recognition-dialog-content"), {
@@ -60,6 +61,17 @@ const DeveloperRegistrationDialogContent = dynamic(() => import("@/components/de
 
 
 const VALID_LOGIN_TABS = ['individuals', 'business', 'developers', 'ministries'];
+
+const ministries = [
+  "Forces armées", "Intégration africaine et Affaires étrangères", "Justice, Garde des Sceaux", "Intérieur",
+  "Finances et Budget", "Infrastructures et Transports", "Économie, Plan et Coopération", "Éducation nationale",
+  "Enseignement supérieur, Recherche et Innovation", "Formation professionnelle", "Eau et Assainissement",
+  "Santé et Action sociale", "Femme, Famille et Protection des enfants", "Fonction publique", "Urbanisme, Logement et Hygiène publique",
+  "Commerce et PME", "Industrie et Mines", "Agriculture et Souveraineté alimentaire", "Pêche et Économie maritime",
+  "Environnement et Développement durable", "Travail et Dialogue social", "Culture et Patrimoine historique",
+  "Jeunesse, Sport et Entrepreneuriat", "Communication et Économie numérique"
+];
+
 
 // Generic Login Form Component for Business/Dev/Ministry (simulated)
 const SimulatedLoginForm = ({
@@ -305,6 +317,14 @@ export default function LoginPage() {
     }
   };
 
+  const handleMinistryLogin = (ministry: string) => {
+    toast({
+      title: "Accès au portail",
+      description: `Connexion simulée pour le Ministère de ${ministry}. Redirection...`,
+    });
+    router.push(`/ministry-dashboard?name=${encodeURIComponent(ministry)}`);
+  };
+
 
   return (
     <div className="flex flex-col justify-center items-center py-12 min-h-screen bg-background">
@@ -432,17 +452,33 @@ export default function LoginPage() {
 
         {/* Ministries Tab */}
         <TabsContent value="ministries">
-          <Card className="shadow-lg border">
-            <CardHeader>
-              <CardTitle className="text-xl">Accès Ministères</CardTitle>
-              <CardDescription>Portail sécurisé pour les institutions.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-2">
-                 <SimulatedLoginForm userType="Ministère" targetPath="/ministry-dashboard" />
-            </CardContent>
-            <CardFooter><p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés.</p></CardFooter>
-          </Card>
-        </TabsContent>
+           <Card className="shadow-lg border">
+             <CardHeader>
+               <CardTitle className="text-xl">Accès Institutionnel</CardTitle>
+               <CardDescription>Sélectionnez votre ministère pour accéder au portail.</CardDescription>
+             </CardHeader>
+             <CardContent>
+                <ScrollArea className="h-[350px] w-full pr-4">
+                    <div className="space-y-2">
+                        {ministries.map((ministry) => (
+                            <Button
+                                key={ministry}
+                                variant="outline"
+                                className="w-full justify-start text-left h-auto py-2.5"
+                                onClick={() => handleMinistryLogin(ministry)}
+                            >
+                                <Landmark className="mr-3 h-5 w-5 text-muted-foreground flex-shrink-0" />
+                                <span className="flex-1">Ministère de {ministry}</span>
+                            </Button>
+                        ))}
+                    </div>
+                </ScrollArea>
+             </CardContent>
+             <CardFooter>
+                 <p className="text-xs text-muted-foreground text-center w-full">Accès réservé aux personnels autorisés.</p>
+             </CardFooter>
+           </Card>
+         </TabsContent>
       </Tabs>
       <div className="mt-4 text-center">
         <a href="http://127.0.0.1:8000/" className="text-sm text-primary hover:underline flex items-center justify-center gap-1.5" target="_blank" rel="noopener noreferrer">
@@ -452,3 +488,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
