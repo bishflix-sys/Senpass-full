@@ -8,7 +8,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound, UserCircle, Hash } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, UserPlus, Mail, KeyRound, UserCircle, Hash, MapPin } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -27,6 +27,13 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -34,6 +41,14 @@ import { fr } from "date-fns/locale"; // French locale for date picker
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Separator } from "./ui/separator";
+
+// List of regions in Senegal
+const senegalRegions = [
+  "Dakar", "Diourbel", "Fatick", "Kaffrine", "Kaolack", "Kédougou", 
+  "Kolda", "Louga", "Matam", "Saint-Louis", "Sédhiou", "Tambacounda", 
+  "Thiès", "Ziguinchor"
+];
+
 
 // Registration Form Schema
 const registrationSchema = z.object({
@@ -44,6 +59,7 @@ const registrationSchema = z.object({
   issueDate: z.date({
     required_error: "La date d'émission du document est requise.",
   }),
+  region: z.string({ required_error: "Veuillez sélectionner votre région."}),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: "Vous devez accepter les conditions et la politique de confidentialité.",
   }),
@@ -67,6 +83,7 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
       password: "",
       cniOrPassport: "",
       issueDate: undefined,
+      region: undefined,
       termsAccepted: false,
     },
   });
@@ -95,9 +112,9 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
         onSuccess();
       } else {
         // Handle specific errors from the backend
-        const errorMessage = result.error === 'auth/email-already-exists' 
+        const errorMessage = result.code === 'auth/email-already-exists' 
             ? "Cette adresse e-mail est déjà utilisée." 
-            : "Une erreur s'est produite. Veuillez réessayer.";
+            : (result.error || "Une erreur s'est produite. Veuillez réessayer.");
         toast({
           title: "Échec de l'Inscription",
           description: errorMessage,
@@ -140,6 +157,28 @@ const RegistrationDialogContent: React.FC<RegistrationDialogContentProps> = Reac
                   <FormControl>
                     <Input placeholder="Prénom(s) Nom" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="region"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1.5"><MapPin className="h-4 w-4 text-muted-foreground"/> Région*</FormLabel>
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionnez votre région de résidence" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {senegalRegions.map(region => (
+                         <SelectItem key={region} value={region}>{region}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

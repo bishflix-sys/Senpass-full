@@ -15,6 +15,7 @@ const registerSchema = z.object({
   fullName: z.string().min(2, { message: "Le nom complet est requis." }),
   cniOrPassport: z.string().min(5, { message: "Le numéro CNI/Passeport est requis." }),
   issueDate: z.string().min(1, { message: "La date d'émission est requise." }), // Accept as string, as sent by client
+  region: z.string().min(1, { message: "La région est requise." }),
 });
 
 export async function POST(request: Request) {
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const { email, password, fullName, cniOrPassport, issueDate } = validation.data;
+    const { email, password, fullName, cniOrPassport, issueDate, region } = validation.data;
     const auth = getAuth();
     const db = getFirestore();
 
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
       email,
       cniOrPassport,
       issueDate,
+      region, // Save the region
       createdAt: new Date().toISOString(),
     });
 
